@@ -42,12 +42,12 @@ export async function POST(req: NextRequest) {
         realJudgeError instanceof Error ? realJudgeError.message : 'unknown sandbox error';
 
       if (payload.language === 'cpp' && fallbackReason.includes('401')) {
-        // Do not attempt local g++ judge in serverless/cloud environments where g++ is unavailable
-        const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.FUNCTIONS_WORKER_RUNTIME);
-        if (isServerless) {
+        // Local compiler fallback is for local development only.
+        const isDev = process.env.NODE_ENV !== 'production';
+        if (!isDev) {
           result = buildExecutionFailureResult(
             payload,
-            'C++ execution is not available in this environment. Please use JavaScript or Python instead.'
+            `Cloud C++ sandbox authorization failed (${fallbackReason}). Check PISTON_API_URL or sandbox availability.`
           );
           return NextResponse.json({ success: true, result });
         }

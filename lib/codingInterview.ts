@@ -1392,31 +1392,55 @@ async function runInSandbox(language: CodingLanguage, source: string): Promise<S
     c: 'main.c',
   };
 
-  const response = await fetch('https://emkc.org/api/v2/piston/execute', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      language: pistonLang.language,
-      version: pistonLang.version,
-      files: [{ name: fileNameByLanguage[language], content: source }],
-    }),
-  });
+  const configuredEndpoint = process.env.PISTON_API_URL?.trim();
+  const endpoints = Array.from(
+    new Set(
+      [configuredEndpoint, 'https://emkc.org/api/v2/piston/execute', 'https://piston.rs/api/v2/execute'].filter(
+        (value): value is string => Boolean(value)
+      )
+    )
+  );
 
-  if (!response.ok) {
-    throw new Error(`Sandbox execution service returned ${response.status}.`);
+  let lastError = 'unknown sandbox error';
+
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Some hosted endpoints reject requests without a user-agent.
+          'User-Agent': 'interview-ai-agent/1.0',
+        },
+        body: JSON.stringify({
+          language: pistonLang.language,
+          version: pistonLang.version,
+          files: [{ name: fileNameByLanguage[language], content: source }],
+        }),
+      });
+
+      if (!response.ok) {
+        lastError = `${endpoint} returned ${response.status}`;
+        continue;
+      }
+
+      const payload = (await response.json()) as {
+        run?: { stdout?: string; stderr?: string; output?: string; code?: number };
+        compile?: { stdout?: string; stderr?: string; output?: string; code?: number };
+      };
+
+      return {
+        stdout: payload.run?.stdout ?? '',
+        stderr: payload.run?.stderr ?? payload.run?.output ?? '',
+        compileOutput: payload.compile?.stderr ?? payload.compile?.output ?? payload.compile?.stdout ?? '',
+        runTimeMs: 35,
+      };
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : 'sandbox network error';
+    }
   }
 
-  const payload = (await response.json()) as {
-    run?: { stdout?: string; stderr?: string; output?: string; code?: number };
-    compile?: { stdout?: string; stderr?: string; output?: string; code?: number };
-  };
-
-  return {
-    stdout: payload.run?.stdout ?? '',
-    stderr: payload.run?.stderr ?? payload.run?.output ?? '',
-    compileOutput: payload.compile?.stderr ?? payload.compile?.output ?? payload.compile?.stdout ?? '',
-    runTimeMs: 35,
-  };
+  throw new Error(`Sandbox execution service unavailable: ${lastError}`);
 }
 
 export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest): Promise<CodingExecuteResult> {
