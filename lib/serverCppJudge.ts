@@ -385,6 +385,16 @@ async function compileAndRunCpp(source: string): Promise<{ stdout: string; stder
         windowsHide: true,
       });
     } catch (error) {
+      // Detect missing g++ binary (e.g. serverless/cloud environments)
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code === 'ENOENT') {
+        return {
+          stdout: '',
+          stderr: '',
+          compileError:
+            'C++ compiler (g++) is not available in this environment. Please use JavaScript or Python instead.',
+        };
+      }
       const compileError = error instanceof Error ? error.message : 'Compilation failed';
       return { stdout: '', stderr: '', compileError };
     }
