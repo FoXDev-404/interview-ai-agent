@@ -1395,13 +1395,13 @@ async function runInSandbox(language: CodingLanguage, source: string): Promise<S
   const configuredEndpoint = process.env.PISTON_API_URL?.trim();
   const endpoints = Array.from(
     new Set(
-      [configuredEndpoint, 'https://emkc.org/api/v2/piston/execute', 'https://piston.rs/api/v2/execute'].filter(
+      [configuredEndpoint, 'https://piston.rs/api/v2/execute', 'https://emkc.org/api/v2/piston/execute'].filter(
         (value): value is string => Boolean(value)
       )
     )
   );
 
-  let lastError = 'unknown sandbox error';
+  const endpointErrors: string[] = [];
 
   for (const endpoint of endpoints) {
     try {
@@ -1412,6 +1412,7 @@ async function runInSandbox(language: CodingLanguage, source: string): Promise<S
           // Some hosted endpoints reject requests without a user-agent.
           'User-Agent': 'interview-ai-agent/1.0',
         },
+        signal: AbortSignal.timeout(8000),
         body: JSON.stringify({
           language: pistonLang.language,
           version: pistonLang.version,
@@ -1420,7 +1421,7 @@ async function runInSandbox(language: CodingLanguage, source: string): Promise<S
       });
 
       if (!response.ok) {
-        lastError = `${endpoint} returned ${response.status}`;
+        endpointErrors.push(`${endpoint} returned ${response.status}`);
         continue;
       }
 
@@ -1436,11 +1437,21 @@ async function runInSandbox(language: CodingLanguage, source: string): Promise<S
         runTimeMs: 35,
       };
     } catch (error) {
-      lastError = error instanceof Error ? error.message : 'sandbox network error';
+      const e = error as Error & { cause?: unknown };
+      const causeText =
+        typeof e.cause === 'string'
+          ? e.cause
+          : e.cause && typeof e.cause === 'object' && 'message' in (e.cause as Record<string, unknown>)
+            ? String((e.cause as Record<string, unknown>).message)
+            : '';
+
+      endpointErrors.push(
+        `${endpoint} threw ${e.name}: ${e.message}${causeText ? ` | cause: ${causeText}` : ''}`
+      );
     }
   }
 
-  throw new Error(`Sandbox execution service unavailable: ${lastError}`);
+  throw new Error(`Sandbox execution service unavailable. Tried: ${endpointErrors.join(' ; ')}`);
 }
 
 export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest): Promise<CodingExecuteResult> {
@@ -1455,6 +1466,21 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
       status: 'Wrong Answer',
       output: '',
       error: 'Code is empty.',
+      executionTimeMs: 0,
+      memoryMB: 0,
+      passed: 0,
+      total: payload.mode === 'submit' ? question.hiddenTestCases.length : question.examples.length,
+      aiFeedback: buildAIFeedback(question, 0, 'Wrong Answer'),
+    };
+  }
+
+  const normalizeTemplate = (code: string) => code.replace(/\s+/g, ' ').trim();
+  const starterTemplate = question.starterCode[payload.language] ?? '';
+  if (starterTemplate && normalizeTemplate(payload.code) === normalizeTemplate(starterTemplate)) {
+    return {
+      status: 'Wrong Answer',
+      output: '',
+      error: 'Starter code was submitted without changes. Please implement the function logic before running tests.',
       executionTimeMs: 0,
       memoryMB: 0,
       passed: 0,
