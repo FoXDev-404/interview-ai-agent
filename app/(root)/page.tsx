@@ -5,8 +5,9 @@ import Image from 'next/image'
 import InterviewCard from '@/components/InterviewCard'
 import FaangCard from '@/components/FaangCard'
 import LeaderboardTopWidget from '@/components/LeaderboardTopWidget'
+import HomeAuthAutoRefresh from '@/components/HomeAuthAutoRefresh'
 import { getUserInterviews } from '@/lib/actions/interview.action'
-import { getTopLeaderboardUsers } from '@/lib/actions/leaderboard.action'
+import { getLeaderboardSnapshot } from '@/lib/actions/leaderboard.action'
 import { getCurrentUser } from '@/lib/auth'
 
 // Force dynamic rendering
@@ -115,9 +116,12 @@ const page = async () => {
   let userInterviews: Interview[] = [];
   let topLeaderboardUsers: LeaderboardEntry[] = [];
 
-  const leaderboardResult = await getTopLeaderboardUsers(3);
+  const leaderboardResult = await getLeaderboardSnapshot({
+    limit: 3,
+    currentUserId: user?.uid,
+  });
   if (leaderboardResult.success) {
-    topLeaderboardUsers = leaderboardResult.users;
+    topLeaderboardUsers = leaderboardResult.topUsers;
   }
 
   if (user) {
@@ -127,6 +131,7 @@ const page = async () => {
 
   return (
     <>
+      <HomeAuthAutoRefresh />
       {/* ── HERO ──────────────────────────────────────────── */}
       <section className="hero-section relative overflow-hidden rounded-3xl">
         {/* Animated gradient orbs */}
