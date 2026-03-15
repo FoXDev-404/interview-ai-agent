@@ -227,7 +227,7 @@ export async function getFeedbackByInterview(interviewId: string) {
     }
 
     // Sort in-memory to get the most recent feedback without requiring a composite index
-    const sorted = snapshot.docs.sort((a, b) => {
+    const sorted = snapshot.docs.sort((a: FirebaseFirestore.QueryDocumentSnapshot, b: FirebaseFirestore.QueryDocumentSnapshot) => {
       const aDate = a.data().createdAt ?? '';
       const bDate = b.data().createdAt ?? '';
       return bDate > aDate ? 1 : bDate < aDate ? -1 : 0;
