@@ -100,6 +100,8 @@ interface SandboxExecutionResult {
   stderr: string;
   compileOutput: string;
   runTimeMs: number;
+  memoryKB: number;
+  statusDescription: string;
 }
 
 const LANG_LABELS: Record<CodingLanguage, string> = {
@@ -1360,98 +1362,82 @@ function buildSandboxSource(question: CodingQuestion, language: CodingLanguage, 
   throw new Error('Real sandbox for this language is not enabled yet.');
 }
 
-function getPistonLanguage(language: CodingLanguage): { language: string; version: string } | null {
+function getJudge0LanguageId(language: CodingLanguage): number | null {
   switch (language) {
-    case 'javascript':
-      return { language: 'javascript', version: '18.15.0' };
-    case 'typescript':
-      return { language: 'typescript', version: '5.0.3' };
-    case 'python':
-      return { language: 'python', version: '3.10.0' };
-    case 'java':
-      return { language: 'java', version: '15.0.2' };
     case 'cpp':
-      return { language: 'cpp', version: '10.2.0' };
+      return 54;
+    case 'python':
+      return 71;
+    case 'java':
+      return 62;
+    case 'javascript':
+      return 63;
     default:
       return null;
   }
 }
 
-async function runInSandbox(language: CodingLanguage, source: string): Promise<SandboxExecutionResult> {
-  const pistonLang = getPistonLanguage(language);
-  if (!pistonLang) {
-    throw new Error('Real sandbox is currently unavailable for the selected language.');
+async function runInSandbox(language: CodingLanguage, source: string, stdin = ''): Promise<SandboxExecutionResult> {
+  const languageId = getJudge0LanguageId(language);
+  if (!languageId) {
+    throw new Error(`Language '${language}' is not currently supported for Judge0 execution.`);
   }
 
-  const fileNameByLanguage: Record<CodingLanguage, string> = {
-    javascript: 'main.js',
-    typescript: 'main.ts',
-    python: 'main.py',
-    java: 'Main.java',
-    cpp: 'main.cpp',
-    c: 'main.c',
+  const endpoint = process.env.JUDGE0_URL?.trim()
+    ? `${process.env.JUDGE0_URL!.trim().replace(/\/$/, '')}/submissions?base64_encoded=false&wait=true`
+    : 'https://ce.judge0.com/submissions?base64_encoded=false&wait=true';
+
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'interview-ai-agent/1.0',
+      },
+      signal: AbortSignal.timeout(10000),
+      body: JSON.stringify({
+        source_code: source,
+        language_id: languageId,
+        stdin,
+        cpu_time_limit: 2,
+        wall_time_limit: 2,
+      }),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'network failure calling Judge0';
+    throw new Error(`Judge0 request failed: ${message}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(`Judge0 request failed with HTTP ${response.status}`);
+  }
+
+  const payload = (await response.json()) as {
+    stdout?: string | null;
+    stderr?: string | null;
+    compile_output?: string | null;
+    message?: string | null;
+    time?: string | number | null;
+    memory?: number | null;
+    status?: { id?: number; description?: string };
   };
 
-  const configuredEndpoint = process.env.PISTON_API_URL?.trim();
-  const endpoints = Array.from(
-    new Set(
-      [configuredEndpoint, 'https://piston.rs/api/v2/execute', 'https://emkc.org/api/v2/piston/execute'].filter(
-        (value): value is string => Boolean(value)
-      )
-    )
-  );
+  const statusDescription = payload.status?.description ?? 'Unknown';
+  const timeSec = Number(payload.time ?? 0);
+  const runTimeMs = Number.isFinite(timeSec) ? Math.max(0, Math.round(timeSec * 1000)) : 0;
 
-  const endpointErrors: string[] = [];
+  const compileOutput = payload.compile_output ?? '';
+  const stderr = payload.stderr ?? payload.message ?? '';
 
-  for (const endpoint of endpoints) {
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Some hosted endpoints reject requests without a user-agent.
-          'User-Agent': 'interview-ai-agent/1.0',
-        },
-        signal: AbortSignal.timeout(8000),
-        body: JSON.stringify({
-          language: pistonLang.language,
-          version: pistonLang.version,
-          files: [{ name: fileNameByLanguage[language], content: source }],
-        }),
-      });
-
-      if (!response.ok) {
-        endpointErrors.push(`${endpoint} returned ${response.status}`);
-        continue;
-      }
-
-      const payload = (await response.json()) as {
-        run?: { stdout?: string; stderr?: string; output?: string; code?: number };
-        compile?: { stdout?: string; stderr?: string; output?: string; code?: number };
-      };
-
-      return {
-        stdout: payload.run?.stdout ?? '',
-        stderr: payload.run?.stderr ?? payload.run?.output ?? '',
-        compileOutput: payload.compile?.stderr ?? payload.compile?.output ?? payload.compile?.stdout ?? '',
-        runTimeMs: 35,
-      };
-    } catch (error) {
-      const e = error as Error & { cause?: unknown };
-      const causeText =
-        typeof e.cause === 'string'
-          ? e.cause
-          : e.cause && typeof e.cause === 'object' && 'message' in (e.cause as Record<string, unknown>)
-            ? String((e.cause as Record<string, unknown>).message)
-            : '';
-
-      endpointErrors.push(
-        `${endpoint} threw ${e.name}: ${e.message}${causeText ? ` | cause: ${causeText}` : ''}`
-      );
-    }
-  }
-
-  throw new Error(`Sandbox execution service unavailable. Tried: ${endpointErrors.join(' ; ')}`);
+  return {
+    stdout: payload.stdout ?? '',
+    stderr,
+    compileOutput,
+    runTimeMs,
+    memoryKB: Math.max(0, Number(payload.memory ?? 0)),
+    statusDescription,
+  };
 }
 
 export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest): Promise<CodingExecuteResult> {
@@ -1500,6 +1486,7 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
   let passed = 0;
   let combinedOutput = '';
   let totalRunTime = 0;
+  let maxMemoryKB = 0;
   let runtimeError = '';
 
   for (let i = 0; i < tests.length; i++) {
@@ -1510,9 +1497,14 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
       ? buildDesignSandboxSource(question, payload.language, payload.code, test)
       : buildSandboxSource(question, payload.language, payload.code, parseCaseInput(question.id, (test as FunctionTestCase).input));
 
-    const result = await runInSandbox(payload.language, source);
+    const result = await runInSandbox(
+      payload.language,
+      source,
+      payload.mode === 'run' && payload.customInput ? payload.customInput : ''
+    );
 
     totalRunTime += result.runTimeMs;
+    maxMemoryKB = Math.max(maxMemoryKB, result.memoryKB);
 
     if (result.compileOutput) {
       runtimeError = result.compileOutput;
@@ -1554,7 +1546,7 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
       output: combinedOutput,
       error: runtimeError,
       executionTimeMs: totalRunTime,
-      memoryMB: 42,
+      memoryMB: Number((maxMemoryKB / 1024).toFixed(2)),
       passed,
       total: tests.length,
       aiFeedback: buildAIFeedback(question, 0.35, 'Runtime Error'),
@@ -1575,7 +1567,7 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
         : combinedOutput,
     error: accepted ? undefined : payload.mode === 'submit' ? 'Logic mismatch on hidden cases. Revisit edge cases and constraints.' : 'Some test cases failed. Check your output against the expected values.',
     executionTimeMs: totalRunTime,
-    memoryMB: 42,
+    memoryMB: Number((maxMemoryKB / 1024).toFixed(2)),
     passed,
     total: tests.length,
     aiFeedback: buildAIFeedback(question, coverage, status),

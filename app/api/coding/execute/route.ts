@@ -4,7 +4,6 @@ import {
   evaluateCodingSubmissionReal,
   type CodingLanguage,
 } from '@/lib/codingInterview';
-import { evaluateCppSubmissionLocal } from '@/lib/serverCppJudge';
 
 interface ExecuteBody {
   code?: string;
@@ -40,45 +39,21 @@ export async function POST(req: NextRequest) {
     } catch (realJudgeError) {
       const fallbackReason =
         realJudgeError instanceof Error ? realJudgeError.message : 'unknown sandbox error';
-
-      const isCpp = payload.language === 'cpp';
-      const normalizedReason = fallbackReason.toLowerCase();
-      const isAuthError = fallbackReason.includes('401') || normalizedReason.includes('authorization');
-      const isNetworkError =
-        normalizedReason.includes('fetch failed') ||
-        normalizedReason.includes('timeout') ||
-        normalizedReason.includes('enotfound') ||
-        normalizedReason.includes('econnreset');
-
-      if (isCpp && (isAuthError || isNetworkError)) {
-        const isDev = process.env.NODE_ENV !== 'production';
-
-        if (isDev) {
-          try {
-            result = await evaluateCppSubmissionLocal(payload);
-            return NextResponse.json({ success: true, result });
-          } catch (localCppError) {
-            result = buildExecutionFailureResult(
-              payload,
-              `Cloud C++ sandbox failed and local fallback failed: ${
-                localCppError instanceof Error ? localCppError.message : 'unknown local execution error'
-              }`
-            );
-            return NextResponse.json({ success: true, result });
-          }
-        }
-
-        result = buildExecutionFailureResult(
-          payload,
-          'Cloud code sandbox is temporarily unreachable from deployment runtime. Please retry in a few minutes.'
-        );
-        return NextResponse.json({ success: true, result });
-      }
-
       result = buildExecutionFailureResult(payload, fallbackReason);
     }
 
-    return NextResponse.json({ success: true, result });
+    return NextResponse.json({
+      success: true,
+      output: result.output,
+      error: result.error ?? '',
+      status: result.status,
+      stdout: result.output,
+      stderr: result.error ?? '',
+      compile_output: result.status === 'Runtime Error' ? result.error ?? '' : '',
+      execution_time_ms: result.executionTimeMs,
+      memory_mb: result.memoryMB,
+      result,
+    });
   } catch (error) {
     console.error('coding execute api error', error);
     return NextResponse.json(
