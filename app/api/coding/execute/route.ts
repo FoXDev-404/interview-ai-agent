@@ -41,28 +41,38 @@ export async function POST(req: NextRequest) {
       const fallbackReason =
         realJudgeError instanceof Error ? realJudgeError.message : 'unknown sandbox error';
 
-      if (payload.language === 'cpp' && fallbackReason.includes('401')) {
-        // Local compiler fallback is for local development only.
+      const isCpp = payload.language === 'cpp';
+      const normalizedReason = fallbackReason.toLowerCase();
+      const isAuthError = fallbackReason.includes('401') || normalizedReason.includes('authorization');
+      const isNetworkError =
+        normalizedReason.includes('fetch failed') ||
+        normalizedReason.includes('timeout') ||
+        normalizedReason.includes('enotfound') ||
+        normalizedReason.includes('econnreset');
+
+      if (isCpp && (isAuthError || isNetworkError)) {
         const isDev = process.env.NODE_ENV !== 'production';
-        if (!isDev) {
-          result = buildExecutionFailureResult(
-            payload,
-            `Cloud C++ sandbox authorization failed (${fallbackReason}). Check PISTON_API_URL or sandbox availability.`
-          );
-          return NextResponse.json({ success: true, result });
+
+        if (isDev) {
+          try {
+            result = await evaluateCppSubmissionLocal(payload);
+            return NextResponse.json({ success: true, result });
+          } catch (localCppError) {
+            result = buildExecutionFailureResult(
+              payload,
+              `Cloud C++ sandbox failed and local fallback failed: ${
+                localCppError instanceof Error ? localCppError.message : 'unknown local execution error'
+              }`
+            );
+            return NextResponse.json({ success: true, result });
+          }
         }
-        try {
-          result = await evaluateCppSubmissionLocal(payload);
-          return NextResponse.json({ success: true, result });
-        } catch (localCppError) {
-          result = buildExecutionFailureResult(
-            payload,
-            `Local C++ judge failed: ${
-              localCppError instanceof Error ? localCppError.message : 'unknown local execution error'
-            }`
-          );
-          return NextResponse.json({ success: true, result });
-        }
+
+        result = buildExecutionFailureResult(
+          payload,
+          'Cloud code sandbox is temporarily unreachable from deployment runtime. Please retry in a few minutes.'
+        );
+        return NextResponse.json({ success: true, result });
       }
 
       result = buildExecutionFailureResult(payload, fallbackReason);
