@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const uid = decodedClaims.uid;
 
     // Get the request body
-    const { displayName, photoURL } = await request.json();
+    const { displayName, photoURL, headline, bio } = await request.json();
 
     // Update the user's display name in Firebase Auth
     const updateData: { displayName?: string } = {};
@@ -33,7 +33,15 @@ export async function POST(request: NextRequest) {
     // Store profile data (including photoURL) in Firestore
     if (db) {
       const userRef = db.collection('users').doc(uid);
-      const profileData: { name?: string; displayName?: string; photoURL?: string | null; avatar?: string | null; updatedAt: Date } = {
+      const profileData: {
+        name?: string;
+        displayName?: string;
+        photoURL?: string | null;
+        avatar?: string | null;
+        headline?: string;
+        bio?: string;
+        updatedAt: Date;
+      } = {
         updatedAt: new Date()
       };
 
@@ -62,6 +70,14 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      if (headline !== undefined) {
+        profileData.headline = String(headline).slice(0, 120);
+      }
+
+      if (bio !== undefined) {
+        profileData.bio = String(bio).slice(0, 600);
+      }
+
       await userRef.set(profileData, { merge: true });
     }
 
@@ -69,7 +85,9 @@ export async function POST(request: NextRequest) {
       success: true, 
       message: 'Profile updated successfully',
       displayName,
-      photoURL 
+      photoURL,
+      headline,
+      bio,
     });
 
   } catch (error) {

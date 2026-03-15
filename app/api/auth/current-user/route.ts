@@ -16,7 +16,9 @@ export async function GET() {
       uid: user.uid,
       email: user.email,
       name: user.name,
-      photoURL: user.photoURL
+      photoURL: user.photoURL,
+      bio: user.bio || '',
+      headline: user.headline || '',
     });
 
   } catch (error) {
