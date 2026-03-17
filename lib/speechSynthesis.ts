@@ -64,6 +64,7 @@ export class SpeechSynthesizer {
   } = {}) {
     if (!this.synthesis || !this.supported) {
       console.warn('Speech synthesis not available');
+      options.onEnd?.();
       return;
     }
 
@@ -96,10 +97,12 @@ export class SpeechSynthesizer {
     utterance.onerror = (event: SpeechSynthesisErrorEvent) => {
       // "interrupted" and "canceled" are expected when cancel() is called before new speech
       if (event.error === 'interrupted' || event.error === 'canceled') {
+        options.onEnd?.();
         return;
       }
       console.error('Speech error:', event.error);
       options.onError?.(event);
+      options.onEnd?.();
     };
 
     // Speak the text

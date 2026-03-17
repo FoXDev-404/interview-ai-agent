@@ -92,6 +92,15 @@ const FeedbackDisplay = ({ interview, feedback }: Props) => {
 
   const strengths = feedback.keyStrengths || feedback.strengths || [];
   const weaknesses = feedback.improvementAreas || feedback.areasForImprovement || [];
+  const speechCoach = feedback.speechCoach;
+
+  const speechMetricRows = speechCoach ? [
+    { label: "Confidence", value: speechCoach.confidence },
+    { label: "Tone", value: speechCoach.tone },
+    { label: "Clarity", value: speechCoach.clarity },
+    { label: "Pacing", value: speechCoach.pacing },
+    { label: "Filler Control", value: speechCoach.fillerControl },
+  ] : [];
 
   const decompositionItems = [
     {
@@ -229,6 +238,67 @@ const FeedbackDisplay = ({ interview, feedback }: Props) => {
           </div>
         </article>
       </section>
+
+      {speechCoach && speechCoach.analyzedResponses > 0 && (
+        <section className="rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0b1a29] via-[#0f2235] to-[#112840] p-7 md:p-9">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div>
+              <h2 className="text-xl font-extrabold text-white">Speech Coach Analysis</h2>
+              <p className="text-xs text-light-300/80 mt-1">
+                Voice-based communication analysis from {speechCoach.analyzedResponses} response{speechCoach.analyzedResponses === 1 ? "" : "s"}
+              </p>
+            </div>
+            <span className="rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200 font-semibold">
+              Overall {speechCoach.overall}/100
+            </span>
+          </div>
+
+          <div className="grid md:grid-cols-5 gap-3 mb-6">
+            {speechMetricRows.map((metric) => (
+              <article key={metric.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-[11px] uppercase tracking-wider text-light-400">{metric.label}</p>
+                <p className="mt-1 text-2xl font-extrabold text-white">{metric.value}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-3 mb-6">
+            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[11px] uppercase tracking-wider text-light-400">Average Pace</p>
+              <p className="mt-1 text-xl font-bold text-white">{speechCoach.averageWpm} WPM</p>
+            </article>
+            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[11px] uppercase tracking-wider text-light-400">Filler Words</p>
+              <p className="mt-1 text-xl font-bold text-white">{speechCoach.totalFillerWords}</p>
+            </article>
+            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[11px] uppercase tracking-wider text-light-400">Most Frequent Fillers</p>
+              <p className="mt-1 text-sm text-light-100/90 leading-relaxed">
+                {speechCoach.topFillerWords.length > 0 ? speechCoach.topFillerWords.join(", ") : "None detected"}
+              </p>
+            </article>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-4">
+            <article className="rounded-xl border border-emerald-400/20 bg-emerald-500/5 p-5">
+              <h3 className="text-sm font-bold text-white mb-3">Communication Highlights</h3>
+              <div className="space-y-2">
+                {speechCoach.insights.map((insight, index) => (
+                  <p key={index} className="text-sm text-light-100/85 leading-relaxed">• {insight}</p>
+                ))}
+              </div>
+            </article>
+            <article className="rounded-xl border border-amber-400/20 bg-amber-500/5 p-5">
+              <h3 className="text-sm font-bold text-white mb-3">Speech Improvement Plan</h3>
+              <div className="space-y-2">
+                {speechCoach.recommendations.map((recommendation, index) => (
+                  <p key={index} className="text-sm text-light-100/85 leading-relaxed">• {recommendation}</p>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+      )}
 
       <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-[#11182d] to-[#101b34] p-7 md:p-9">
         <h2 className="text-xl font-extrabold text-white mb-4">Interviewer Assessment</h2>

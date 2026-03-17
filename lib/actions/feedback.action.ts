@@ -6,7 +6,7 @@ import { updateUserLeaderboardAfterInterview } from "@/lib/actions/leaderboard.a
 import { syncUserLeaderboardStats } from "@/lib/actions/leaderboard.action";
 
 export async function createFeedback(params: CreateFeedbackParams) {
-  const { interviewId, userId, transcript, feedbackId, finalAnalysis } = params;
+  const { interviewId, userId, transcript, feedbackId, finalAnalysis, speechCoachSummary } = params;
 
   try {
     // Get interview data to understand context
@@ -60,6 +60,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
         interviewerNotes: finalAnalysis.interviewerNotes,
         detailedAnalysis: finalAnalysis.detailedAnalysis,
         rubricSummary: finalAnalysis.rubricSummary,
+        speechCoach: speechCoachSummary,
       };
     } else {
       // Fallback to legacy Gemini feedback generation
@@ -103,6 +104,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
         areasForImprovement: extractImprovements(feedback.detailedFeedback),
         finalAssessment: feedback.finalAssessment,
         createdAt: new Date().toISOString(),
+        speechCoach: speechCoachSummary,
       };
     }
 
@@ -227,7 +229,7 @@ export async function getFeedbackByInterview(interviewId: string) {
     }
 
     // Sort in-memory to get the most recent feedback without requiring a composite index
-    const sorted = snapshot.docs.sort((a, b) => {
+    const sorted = snapshot.docs.sort((a: FirebaseFirestore.QueryDocumentSnapshot, b: FirebaseFirestore.QueryDocumentSnapshot) => {
       const aDate = a.data().createdAt ?? '';
       const bDate = b.data().createdAt ?? '';
       return bDate > aDate ? 1 : bDate < aDate ? -1 : 0;

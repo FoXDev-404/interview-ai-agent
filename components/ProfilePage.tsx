@@ -12,6 +12,7 @@ export default function ProfilePage() {
   const [currentUser, setCurrentUser] = useState<{uid: string; email: string; name: string; photoURL?: string} | null>(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [headline, setHeadline] = useState('');
   const [bio, setBio] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -48,6 +49,9 @@ export default function ProfilePage() {
         if (user.photoURL) {
           setProfileImage(user.photoURL);
         }
+
+        setHeadline(user.headline || '');
+        setBio(user.bio || '');
       }
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -157,7 +161,9 @@ export default function ProfilePage() {
         body: JSON.stringify({
           uid: currentUser.uid,
           displayName: fullName,
-          photoURL: photoURL
+          photoURL: photoURL,
+          headline,
+          bio,
         }),
       });
 
@@ -283,13 +289,15 @@ export default function ProfilePage() {
   return (
     <>
       {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          Profile
-        </h1>
-        <p className="text-xl text-gray-300 leading-relaxed max-w-3xl mx-auto">
-          Manage your account information and preferences
-        </p>
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="rounded-2xl border border-white/10 bg-gradient-to-r from-blue-600/15 via-indigo-600/10 to-cyan-600/10 p-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Profile
+          </h1>
+          <p className="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
+            Manage your account information and preferences
+          </p>
+        </div>
       </div>
 
       {/* Profile Content */}
@@ -327,6 +335,22 @@ export default function ProfilePage() {
                       placeholder="Enter your last name"
                     />
                   </div>
+                </div>
+
+                {/* Email (Read-only) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Professional Headline
+                  </label>
+                  <input
+                    type="text"
+                    value={headline}
+                    onChange={(e) => setHeadline(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. Frontend Engineer | React | Next.js"
+                    maxLength={120}
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Shown as a quick summary on your profile.</p>
                 </div>
 
                 {/* Email (Read-only) */}
@@ -374,8 +398,8 @@ export default function ProfilePage() {
           </div>
 
           {/* Profile Picture Section */}
-          <div className="space-y-6">
-            <div className="bg-gray-800/50 rounded-2xl p-8">
+          <div className="flex flex-col gap-6">
+            <div className="bg-gray-800/50 rounded-2xl p-8 flex-1">
               <h3 className="text-xl font-bold text-white mb-6">Profile Picture</h3>
               
               <div className="flex flex-col items-center space-y-4">
@@ -430,45 +454,29 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Security */}
-            <div className="bg-gray-800/50 rounded-2xl p-8">
+            <div className="bg-gray-800/50 rounded-2xl p-8 flex-1">
               <h3 className="text-xl font-bold text-white mb-6">
                 <Shield className="w-5 h-5 inline mr-2" />
                 Account Security
               </h3>
               
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-gray-700">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center py-3 border-b border-gray-700/70">
                   <div>
                     <p className="text-white font-medium">Password</p>
                     <p className="text-sm text-gray-400">Last updated 30 days ago</p>
                   </div>
                   <button 
                     onClick={() => setShowPasswordModal(true)}
-                    className="text-blue-400 hover:text-blue-300 text-sm"
+                    className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
                   >
                     Change
                   </button>
                 </div>
-                
-                <div className="flex justify-between items-center py-3 border-b border-gray-700">
-                  <div>
-                    <p className="text-white font-medium">Two-Factor Auth</p>
-                    <p className="text-sm text-gray-400">Not enabled</p>
-                  </div>
-                  <button className="text-blue-400 hover:text-blue-300 text-sm">
-                    Enable
-                  </button>
-                </div>
-                
-                <div className="flex justify-between items-center py-3">
-                  <div>
-                    <p className="text-white font-medium">Login Sessions</p>
-                    <p className="text-sm text-gray-400">Manage active sessions</p>
-                  </div>
-                  <button className="text-blue-400 hover:text-blue-300 text-sm">
-                    View
-                  </button>
-                </div>
+
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  Keep your account secure by using a strong password and updating it regularly.
+                </p>
               </div>
             </div>
           </div>

@@ -19,6 +19,8 @@ export async function getCurrentUser() {
     // Get additional profile data from Firestore
     let photoURL = userRecord.photoURL;
     let displayName = userRecord.displayName;
+    let bio = '';
+    let headline = '';
 
     if (db) {
       try {
@@ -29,6 +31,8 @@ export async function getCurrentUser() {
             // Use Firestore data if available, fallback to Auth data
             photoURL = userData.avatar || userData.photoURL || photoURL;
             displayName = userData.name || userData.displayName || displayName;
+            bio = userData.bio || '';
+            headline = userData.headline || '';
           }
         }
       } catch (firestoreError) {
@@ -41,7 +45,9 @@ export async function getCurrentUser() {
       uid: decodedClaims.uid,
       email: decodedClaims.email,
       name: displayName || decodedClaims.name || 'User',
-      photoURL: photoURL || undefined
+      photoURL: photoURL || undefined,
+      bio,
+      headline,
     };
   } catch (error) {
     console.error('Error verifying session:', error);

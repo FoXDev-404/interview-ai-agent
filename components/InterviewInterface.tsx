@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { finalizeInterview } from "@/lib/actions/interview.action";
 import { createFeedback } from "@/lib/actions/feedback.action";
@@ -9,10 +9,21 @@ import Image from "next/image";
 import { speechSynthesizer } from "@/lib/speechSynthesis";
 import { realTimeAnalysisService } from "@/lib/realTimeAnalysis";
 import { VoiceRecorder } from "@/lib/voiceRecorder";
+import {
+  analyzeSpeechCoachResponse,
+  summarizeSpeechCoachResponses,
+  type SpeechCoachResponseInsight,
+} from "@/lib/speechCoach";
 
 interface Props {
   interview: Interview;
   userId: string;
+}
+
+interface InterviewResponse {
+  question: string;
+  answer: string;
+  speechCoach?: SpeechCoachResponseInsight;
 }
 
 const InterviewInterface = ({ interview, userId }: Props) => {
@@ -20,11 +31,13 @@ const InterviewInterface = ({ interview, userId }: Props) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentResponse, setCurrentResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [responses, setResponses] = useState<{ question: string; answer: string }[]>([]);
+  const [responses, setResponses] = useState<InterviewResponse[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
   const [voiceRecorder, setVoiceRecorder] = useState<VoiceRecorder | null>(null);
+  const [currentVoiceDurationSeconds, setCurrentVoiceDurationSeconds] = useState(0);
+  const recordingStartedAtRef = useRef<number | null>(null);
 
   const currentQuestion = interview.questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === interview.questions.length - 1;
@@ -35,7 +48,21 @@ const InterviewInterface = ({ interview, userId }: Props) => {
   useEffect(() => {
     const recorder = new VoiceRecorder(
       (transcript: string) => { setCurrentResponse(transcript); },
-      (recording: boolean) => { setIsRecording(recording); },
+      (recording: boolean) => {
+        setIsRecording(recording);
+
+        if (recording) {
+          recordingStartedAtRef.current = Date.now();
+          return;
+        }
+
+        if (recordingStartedAtRef.current) {
+          const elapsedMs = Date.now() - recordingStartedAtRef.current;
+          const elapsedSeconds = Math.max(0, Math.round(elapsedMs / 1000));
+          setCurrentVoiceDurationSeconds((prev) => prev + elapsedSeconds);
+        }
+        recordingStartedAtRef.current = null;
+      },
       (message: string) => { toast.error(message); }
     );
     setVoiceRecorder(recorder);
@@ -48,10 +75,14 @@ const InterviewInterface = ({ interview, userId }: Props) => {
 
   useEffect(() => {
     if (currentQuestion) {
-      setIsSpeaking(true);
+      if (!speechSynthesizer.isSupported()) {
+        setIsSpeaking(false);
+        return;
+      }
       speechSynthesizer.speak(currentQuestion, {
         onStart: () => setIsSpeaking(true),
-        onEnd: () => setIsSpeaking(false)
+        onEnd: () => setIsSpeaking(false),
+        onError: () => setIsSpeaking(false),
       });
     }
   }, [currentQuestionIndex, currentQuestion]);
@@ -71,14 +102,27 @@ const InterviewInterface = ({ interview, userId }: Props) => {
       return;
     }
     speechSynthesizer.stop();
-    const updatedResponses = [...responses, { question: currentQuestion, answer: currentResponse.trim() }];
+    const speechCoach = currentVoiceDurationSeconds > 0
+      ? analyzeSpeechCoachResponse(currentQuestion, currentResponse.trim(), currentVoiceDurationSeconds)
+      : undefined;
+
+    const updatedResponses = [
+      ...responses,
+      {
+        question: currentQuestion,
+        answer: currentResponse.trim(),
+        speechCoach,
+      },
+    ];
+
     setResponses(updatedResponses);
     setCurrentResponse("");
+    setCurrentVoiceDurationSeconds(0);
     if (isLastQuestion) handleCompleteInterview(updatedResponses);
     else setCurrentQuestionIndex(prev => prev + 1);
   };
 
-  const handleCompleteInterview = async (allResponses: { question: string; answer: string }[] = responses) => {
+  const handleCompleteInterview = async (allResponses: InterviewResponse[] = responses) => {
     setIsLoading(true);
     try {
       const scoredResponses = await Promise.all(
@@ -112,8 +156,23 @@ const InterviewInterface = ({ interview, userId }: Props) => {
       });
       transcript.push({ role: 'assistant', content: `FINAL ANALYSIS: Overall Score: ${finalAnalysis.overallScore}/100, Performance: ${finalAnalysis.performanceLevel}, Hiring Recommendation: ${finalAnalysis.hiringRecommendation}` });
       transcript.push({ role: 'assistant', content: `Final Feedback: ${finalAnalysis.finalFeedback}` });
+
+      const speechCoachAnalyses = allResponses
+        .map((response) => response.speechCoach)
+        .filter((analysis): analysis is SpeechCoachResponseInsight => Boolean(analysis));
+
+      const speechCoachSummary = speechCoachAnalyses.length > 0
+        ? summarizeSpeechCoachResponses(speechCoachAnalyses)
+        : undefined;
+
       await finalizeInterview(interview.id);
-      const feedbackResult = await createFeedback({ interviewId: interview.id, userId, transcript, finalAnalysis });
+      const feedbackResult = await createFeedback({
+        interviewId: interview.id,
+        userId,
+        transcript,
+        finalAnalysis,
+        speechCoachSummary,
+      });
       if (!feedbackResult.success) throw new Error('Failed to generate feedback');
       speechSynthesizer.speak(
         `Interview completed! Your overall score is ${finalAnalysis.overallScore} out of 100. Performance level: ${finalAnalysis.performanceLevel}. Hiring recommendation: ${finalAnalysis.hiringRecommendation}. You can view your comprehensive detailed feedback now.`,

@@ -8,7 +8,6 @@ import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth
 import { auth } from "@/firebase/client";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "@/components/FormField";
-import { Button } from "@/components/ui/button";
 
 const schema = z.object({
   email: z.string().email(),

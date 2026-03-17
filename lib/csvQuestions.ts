@@ -3,14 +3,6 @@
 import fs from 'fs';
 import path from 'path';
 
-interface QuestionRecord {
-  role: string;
-  level: string;
-  techstack: string; // semicolon-separated
-  type: string;
-  question: string;
-}
-
 export async function loadQuestionsFromCSV(
   role: string,
   level: string,

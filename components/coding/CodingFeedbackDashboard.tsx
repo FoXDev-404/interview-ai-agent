@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
     CheckCircle2,
-    XCircle,
     Clock3,
     TrendingUp,
     Target,

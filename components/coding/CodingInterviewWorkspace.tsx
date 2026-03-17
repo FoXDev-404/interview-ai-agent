@@ -363,7 +363,6 @@ export default function CodingInterviewWorkspace({
             <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1">
               <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-xs font-semibold text-white">
                 {currentUser?.photoURL ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={currentUser.photoURL} alt="Profile" className="h-full w-full object-cover" />
                 ) : (
                   currentUser?.name?.charAt(0)?.toUpperCase() || currentUser?.email?.charAt(0)?.toUpperCase() || 'U'

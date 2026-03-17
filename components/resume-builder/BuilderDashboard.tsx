@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { FileText } from 'lucide-react';
-import Link from 'next/link';
 import ResumeCard from './ResumeCard';
 import TemplateCard from './TemplateCard';
 import { useRouter } from 'next/navigation';
@@ -10,10 +9,9 @@ import { getAllTemplates, getTemplateCategories } from '@/lib/resume-builder/tem
 
 interface BuilderDashboardProps {
   resumes: ResumeDocument[];
-  userId: string;
 }
 
-export default function BuilderDashboard({ resumes, userId }: BuilderDashboardProps) {
+export default function BuilderDashboard({ resumes }: BuilderDashboardProps) {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
