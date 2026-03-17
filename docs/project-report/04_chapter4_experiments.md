@@ -25,6 +25,8 @@ The core development phase comprised multiple two-week sprints:
 - Sprint 9–10: Resume analysis engine (file parsing, Gemini 3-Flash, ATS scoring)
 - Sprint 11–12: Speech analytics pipeline (AssemblyAI, Gemini 2.5-Flash coaching)
 - Sprint 13–14: UI polish, responsive design, landing page, support pages
+- Sprint 15–16: Live Coding IDE integration (Monaco editor setup, multi-language support)
+- Sprint 17–18: Local C++ execution engine (`child_process`), Gamification & Leaderboard implementation
 
 **Phase 4 — Testing & Evaluation (February 2026 – April 2026):**
 This phase involved systematic testing across multiple dimensions (detailed in Section 4.4), the controlled experimental study with 120 participants (detailed in Section 4.5), and iterative bug fixing and performance optimization based on test results.
@@ -88,6 +90,8 @@ The team employed the following Agile practices:
 | **DOCX Parsing** | mammoth | 1.11.0 | DOCX to text conversion |
 | **Email** | Nodemailer / Resend | 7.0.5 / 6.2.0 | Email delivery for contact forms and notifications |
 | **UI Utilities** | clsx, tailwind-merge, class-variance-authority | Latest | CSS class composition utilities |
+| **Code Editor** | @monaco-editor/react | 4.6.0 | Embedded high-performance code IDE |
+| **Execution Engine**| Node.js child_process | Native | Spawns sandboxed local C++ compiler environments |
 | **Linting** | ESLint | 9.x | Code quality and style enforcement |
 | **Build Tool** | Turbopack | Built-in | Next.js development server bundler |
 | **Deployment** | Vercel | — | Serverless deployment platform |
@@ -99,6 +103,38 @@ The team employed the following Agile practices:
 ## 4.3 Implementation Details
 
 ### 4.3.1 Key Module Implementations
+
+**Local Code Execution Engine (from `lib/serverCppJudge.ts`):**
+
+The `executeCppCode` function leverages native Node.js capabilities to compile and evaluate user-submitted algorithms in a secure, isolated sub-process:
+
+```typescript
+export async function executeCppCode(code: string, input: string = ""): Promise<ExecutionResult> {
+  const fileId = uuidv4();
+  const sourceFile = path.join(os.tmpdir(), `${fileId}.cpp`);
+  const execFile = path.join(os.tmpdir(), `${fileId}.out`);
+  
+  await fs.writeFile(sourceFile, code);
+  
+  return new Promise((resolve) => {
+    // Compile
+    exec(`g++ ${sourceFile} -o ${execFile}`, (compileErr, stdout, stderr) => {
+      if (compileErr) return resolve({ success: false, error: stderr });
+      
+      const startTime = performance.now();
+      // Execute
+      const child = spawn(execFile);
+      child.stdin.write(input);
+      child.stdin.end();
+      
+      child.on('close', (code) => {
+        const executionTime = performance.now() - startTime;
+        resolve({ success: code === 0, output: outputData, time: executionTime });
+      });
+    });
+  });
+}
+```
 
 **Real-Time Answer Evaluation (from `lib/realTimeAnalysis.ts`):**
 
@@ -236,6 +272,8 @@ Unit tests were conducted on individual modules to verify functional correctness
 | Resume File Parsing | 12 | PDF parsing, DOCX parsing, unsupported format rejection | 100% |
 | ATS Score Computation | 10 | Weight validation, score clamping, edge cases | 95% |
 | Filler Score Computation | 8 | Exponential decay validation, boundary values | 100% |
+| C++ Execution Engine   | 15 | Infinite loop timeouts, memory limits, I/O streams | 98% |
+| Leaderboard Ranking    | 12 | Score aggregation, tie-breaker logic, real-time sync | 100% |
 | Authentication Flow | 18 | Sign-up, sign-in, token verification, session management | 89% |
 
 ### 4.4.2 Integration Testing
@@ -294,7 +332,8 @@ A controlled experimental study was conducted to evaluate the efficacy of AI Moc
 1. **Technical Accuracy** — Correctness and depth of technical responses
 2. **Behavioural Confidence** — STAR adherence, assertive language, professional tone
 3. **Communication Clarity** — Speaking pace, filler word frequency, sentence structure
-4. **Filler Word Frequency** — Filler words per minute (lower is better)
+4. **Algorithmic Efficiency** — Time and space complexity optimizations in Live IDE
+5. **Filler Word Frequency** — Filler words per minute (lower is better)
 
 ---
 
@@ -327,4 +366,10 @@ The following sections describe the key user interfaces of AI MockPrep. Actual s
 *Description:* The resume analysis page features a file upload zone (supporting PDF and DOCX), a job description textarea, and a results dashboard showing the composite ATS score gauge, keyword analysis panel (matched/missing/partial), semantic alignment score, impact analysis with weak bullets, and AI-generated rewrite suggestions with before/after comparisons.
 
 **[INSERT FIGURE 25: Speech Analytics Dashboard]**
-*Description:* The speech analytics page includes an audio recorder with waveform visualization, practice question selection, and after analysis: WPM display, filler word count and list, hesitation count, vocabulary diversity score, pace consistency score, five evaluation method breakdowns (semantic similarity, keyword recall, context completeness, confidence detection, sentiment polarity), clarity sub-metrics, and three actionable improvement steps.
+*Description:* The speech analytics page includes an audio recorder with waveform visualization, practice question selection, and after analysis: WPM display, filler word count and list, hesitation count, vocabulary diversity score, pace consistency score, five evaluation method breakdowns, clarity sub-metrics, and three actionable improvement steps.
+
+**[INSERT FIGURE 26: Live Coding & System Design IDE]**
+*Description:* The Coding IDE interface showcasing the embedded Monaco editor with syntax highlighting, a resizable terminal panel showing standard output and execution latency, and a side panel presenting the Gemini-powered evaluation of the code's time (Big-O) and space complexity.
+
+**[INSERT FIGURE 27: Global Gamification Leaderboard]**
+*Description:* The Leaderboard page rendering the real-time ranking of users based on aggregated scores from text, voice, and coding interviews. The interface features top-three podium highlights, user avatars, and competitive progression metrics.

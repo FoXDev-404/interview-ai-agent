@@ -10,7 +10,7 @@ AI MockPrep employs a six-layer modular architecture designed for scalability, m
 
 The six layers, from the user-facing presentation tier to the data persistence tier, are described below:
 
-**Layer 1 — Frontend UI (Next.js 16 / React 19):** The presentation layer is built using Next.js 16 with the App Router architecture and React 19 with TypeScript. It provides a responsive, server-side rendered, single-page application experience. The UI utilizes Tailwind CSS v4 for styling, Framer Motion for animations, Radix UI for accessible component primitives, Lucide React for iconography, Recharts for data visualization, and Sonner for toast notifications. The frontend communicates with the backend through Next.js Server Actions (for mutations and secure server-side operations) and API Routes (for client-side data fetching and external service integration).
+**Layer 1 — Frontend UI (Next.js 16 / React 19):** The presentation layer is built using Next.js 16 with the App Router architecture and React 19 with TypeScript. It provides a responsive, server-side rendered, single-page application experience. The UI utilizes Tailwind CSS v4 for styling, Framer Motion for animations, Radix UI for accessible component primitives, Lucide React for iconography, Recharts for data visualization, and Sonner for toast notifications. For the Live Coding IDE, the frontend integrates a fully functional embedded Monaco Editor supporting syntax highlighting and multi-language auto-completion. A real-time Global Leaderboard is also implemented at this layer to aggregate performance metrics. The frontend communicates with the backend through Next.js Server Actions (for mutations and secure server-side operations) and API Routes (for client-side data fetching and external service integration).
 
 **Layer 2 — Speech Capture Engine (VAPI AI + AssemblyAI):** This layer handles voice-based interview delivery and speech-to-text transcription. VAPI AI provides the real-time voice interface for conducting mock interviews, managing question delivery with 60-second timeouts, capturing candidate speech, and providing voice-synthesized feedback. AssemblyAI's universal-3-pro model transcribes recorded audio with word-level timestamps, enabling precise computation of speech metrics.
 
@@ -43,8 +43,10 @@ The application employs three route groups:
 **`(root)/` — Authenticated Application Pages:**
 - `/` — Landing/home page (public) with hero section, feature overview, and FAANG quick-start cards
 - `/interview/[id]` — Individual interview page with question display and response interface
+- `/coding-interview` — Live IDE for Data Structures and Algorithms with embedded Monaco editor and algorithmic evaluation panel
 - `/resume` — Resume analyzer with file upload, job description input, and ATS analysis dashboard
 - `/speech-analytics` — Speech practice with audio recording, transcription, and coaching feedback
+- `/leaderboard` — Global ranking dashboard tracking user interview metrics and gamified performance
 - `/profile` — User profile management with avatar, bio, and experience details
 - `/settings` — Application settings including theme, email preferences, and account management
 - Layout includes `Navigation` component (responsive navbar with mobile drawer) and `Footer`
@@ -67,6 +69,8 @@ The component library comprises 24+ custom components organized into four direct
 - `FeedbackDisplay.tsx` (15.2 KB) — Comprehensive feedback viewer with overall score gauge, category score breakdowns, strengths/weaknesses lists, and hiring recommendation
 - `LiveChat.tsx` (18.5 KB) — Real-time chat interface for text-based interview interaction
 - `VapiInterview.tsx` (11.4 KB) — Voice-based interview wrapper integrating VAPI AI service
+- `LeaderboardTopWidget.tsx` — Real-time display of top-ranked users based on aggregated algorithmic and interview scoring
+- `MonacoEditor.tsx` — Embedded code editor abstraction with syntax highlighting and multi-language support (C++, JS, Python)
 - `ProfilePage.tsx` (23.3 KB) — Full user profile management interface
 - `SettingsPage.tsx` (17.1 KB) — Settings management with theme toggle, notification preferences
 - `Navigation.tsx` (13.6 KB) — Responsive navigation bar with mobile hamburger menu
@@ -136,6 +140,9 @@ Server Actions, introduced in Next.js 13+, enable direct server-side function ca
 - `getInterview(interviewId)` — Retrieves single interview by document ID
 - `getUserInterviews(userId)` — Retrieves all interviews for a user, sorted by creation date
 - `finalizeInterview(interviewId)` — Marks interview as completed
+
+**`lib/serverCppJudge.ts` — Code Execution Engine:**
+- `executeCppCode(code, input)` — Spawns isolated Node.js `child_process` instances to natively compile and execute C++ payloads, returning standard output, standard error, and latency metrics directly to the IDE.
 
 **`lib/actions/feedback.action.ts` — Feedback Generation Actions:**
 - `createFeedback(params)` — If finalAnalysis is provided (from real-time analysis), stores comprehensive feedback including category scores, performance level, hiring recommendation, and detailed analysis; otherwise, falls back to legacy Gemini-based feedback generation
@@ -251,6 +258,8 @@ The scoring module implements four distinct weighted evaluation formulas:
 - Logic & Approach: 30%
 - Correctness: 30%
 - Efficiency (Time/Space Complexity): 15%
+
+For Coding interviews, the system combines real execution output (e.g., passing 10/10 test cases sets a high baseline Correctness score) with Gemini evaluating the Big-O time and space complexity string parsing to accurately award Efficiency points.
 
 **Technical Interview:**
 - Technical Accuracy: 40%
@@ -385,10 +394,12 @@ The Level 2 DFD further decomposes the Interview Management and Answer Evaluatio
 10. View ATS Score and Keyword Analysis
 11. Record Speech for Analysis
 12. View Speech Metrics and Coaching Feedback
-13. Manage Profile
-14. Manage Settings
-15. View Past Interviews and Feedback
-16. Submit Contact Form
+13. Write and Execute Code in Live IDE
+14. View Global Leaderboard Standings
+15. Manage Profile
+16. Manage Settings
+17. View Past Interviews and Feedback
+18. Submit Contact Form
 
 **Use Cases for Unregistered Visitor:**
 1. View Landing Page
@@ -432,3 +443,17 @@ The Level 2 DFD further decomposes the Interview Management and Answer Evaluatio
 5. Gemini → API Route: Keyword analysis, semantic score, rewrites
 6. API Route → Frontend: Complete analysis result
 7. Frontend → User: Display ATS score, keywords, rewrites
+
+### 3.9.3 Coding Interview and Execution Flow
+
+**[INSERT FIGURE 16: Sequence Diagram — Coding Execution Flow]**
+
+1. User → Frontend: Type code in Monaco Editor and click "Run"
+2. Frontend → Server Action / API (`serverCppJudge`): Transmit raw code payload
+3. Server Action → OS Child Process: Spawns `g++` compiler on the server environment
+4. OS Child Process → Server Action: Execution standard output / errors / runtime metrics
+5. Server Action → Frontend: Return output payload
+6. Frontend → User: Display execution output in terminal panel
+7. Frontend → Gemini API: Assess Big-O logical complexity of submitted code
+8. Gemini → Frontend: Return Big-O algorithm evaluation feedback
+9. Frontend → User: Display algorithmic scoring and update leaderboard telemetry
