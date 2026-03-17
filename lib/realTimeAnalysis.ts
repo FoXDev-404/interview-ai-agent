@@ -1,7 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.GOOGLE_GEMINI_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY || "";
-const genAI = new GoogleGenerativeAI(apiKey);
+const apiKey =
+  process.env.NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY ||
+  process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
+  process.env.GOOGLE_GEMINI_API_KEY ||
+  process.env.GEMINI_API_KEY ||
+  "";
+
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export interface AnswerAnalysis {
   score: number; // 0-10 scale
@@ -53,7 +59,20 @@ export interface InterviewAnalysis {
 }
 
 class RealTimeAnalysisService {
-  private model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  private model = genAI ? genAI.getGenerativeModel({ model: "gemini-1.5-flash" }) : null;
+
+  private isAuthOrIdentityError(error: unknown): boolean {
+    const message = error instanceof Error ? error.message : String(error);
+    const normalized = message.toLowerCase();
+
+    return (
+      normalized.includes('unregistered callers') ||
+      normalized.includes('api key') ||
+      normalized.includes('permission denied') ||
+      normalized.includes('forbidden') ||
+      normalized.includes('[403')
+    );
+  }
 
   private mapDifficulty(level: string): 'Easy' | 'Medium' | 'Hard' {
     const normalized = (level || '').toLowerCase();
@@ -182,6 +201,10 @@ class RealTimeAnalysisService {
     }
 
     try {
+      if (!this.model) {
+        throw new Error('Gemini API key is not configured for interview analysis.');
+      }
+
       const prompt = `
 You are a senior technical interviewer evaluating a candidate during a mock technical interview.
 
@@ -311,7 +334,11 @@ Output Format (Strict JSON):
         rubric,
       };
     } catch (error) {
-      console.error('Error analyzing answer:', error);
+      if (this.isAuthOrIdentityError(error)) {
+        console.warn('Gemini auth/identity issue detected in answer analysis. Falling back to heuristic scoring.');
+      } else {
+        console.error('Error analyzing answer:', error);
+      }
       
       // Enhanced fallback with strict inadequate response handling
       if (this.isInadequateResponse(candidateAnswer)) {
@@ -476,6 +503,10 @@ Output Format (Strict JSON):
     }
 
     try {
+      if (!this.model) {
+        throw new Error('Gemini API key is not configured for interview analysis.');
+      }
+
       const totalScore = answers.reduce((sum, answer) => sum + answer.score, 0);
       const averageScore = answers.length > 0 ? totalScore / answers.length : 0;
       const overallScore = Math.round((averageScore / 10) * 100);
@@ -575,7 +606,11 @@ BE EXTREMELY STRICT. High inadequate response rates should result in poor scores
         rubricSummary,
       };
     } catch (error) {
-      console.error('Error generating final analysis:', error);
+      if (this.isAuthOrIdentityError(error)) {
+        console.warn('Gemini auth/identity issue detected in final analysis. Falling back to deterministic summary.');
+      } else {
+        console.error('Error generating final analysis:', error);
+      }
       
       const totalScore = answers.reduce((sum, answer) => sum + answer.score, 0);
       const averageScore = answers.length > 0 ? totalScore / answers.length : 0;

@@ -6,7 +6,7 @@ import { updateUserLeaderboardAfterInterview } from "@/lib/actions/leaderboard.a
 import { syncUserLeaderboardStats } from "@/lib/actions/leaderboard.action";
 
 export async function createFeedback(params: CreateFeedbackParams) {
-  const { interviewId, userId, transcript, feedbackId, finalAnalysis } = params;
+  const { interviewId, userId, transcript, feedbackId, finalAnalysis, speechCoachSummary } = params;
 
   try {
     // Get interview data to understand context
@@ -60,6 +60,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
         interviewerNotes: finalAnalysis.interviewerNotes,
         detailedAnalysis: finalAnalysis.detailedAnalysis,
         rubricSummary: finalAnalysis.rubricSummary,
+        speechCoach: speechCoachSummary,
       };
     } else {
       // Fallback to legacy Gemini feedback generation
@@ -103,6 +104,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
         areasForImprovement: extractImprovements(feedback.detailedFeedback),
         finalAssessment: feedback.finalAssessment,
         createdAt: new Date().toISOString(),
+        speechCoach: speechCoachSummary,
       };
     }
 

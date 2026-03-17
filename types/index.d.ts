@@ -34,6 +34,22 @@ interface Feedback {
     difficulty_adjustment: number;
     total_score: number;
   };
+  speechCoach?: InterviewSpeechCoachSummary;
+}
+
+interface InterviewSpeechCoachSummary {
+  analyzedResponses: number;
+  confidence: number;
+  tone: number;
+  clarity: number;
+  pacing: number;
+  fillerControl: number;
+  overall: number;
+  totalFillerWords: number;
+  topFillerWords: string[];
+  averageWpm: number;
+  insights: string[];
+  recommendations: string[];
 }
 
 interface Interview {
@@ -55,6 +71,7 @@ interface CreateFeedbackParams {
   userId: string;
   transcript: { role: string; content: string }[];
   feedbackId?: string;
+  speechCoachSummary?: InterviewSpeechCoachSummary;
   finalAnalysis?: {
     overallScore: number;
     totalQuestions: number;
