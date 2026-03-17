@@ -78,6 +78,7 @@ export default function GoogleLoginButton({ onSuccess }: Props) {
       type="button"
       onClick={handleGoogleLogin}
       disabled={loading}
+      suppressHydrationWarning
       className="auth-google-btn"
     >
       <Image src="/google.png" alt="Google" width={20} height={20} className="rounded-sm bg-white p-[2px]" />

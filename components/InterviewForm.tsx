@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TECH_CATEGORIES: Record<string, string[]> = {
-  "Frontend": ["React", "Next.js", "Vue.js", "Angular", "TypeScript", "JavaScript", "Tailwind CSS", "Bootstrap"],
+  "Frontend": ["React", "Next.js", "Vue.js", "Angular", "TypeScript", "JavaScript", "Tailwind CSS", "Bootstrap" ,"HTML" ,"CSS"],
   "Backend": ["Node.js", "Express", "Python", "Django", "Flask", "Java", "Spring", "Go", "Rust"],
   "DevOps & Cloud": ["Docker", "Kubernetes", "AWS", "Azure", "GraphQL", "REST API"],
   "Databases": ["MongoDB", "PostgreSQL", "MySQL", "Redis"],
@@ -30,14 +30,10 @@ const ROLE_GROUPS: Array<{ label: string; roles: string[] }> = [
   {
     label: "Core Software",
     roles: [
-      "Software Engineer",
       "Software Developer",
       "Application Engineer",
-      "Full Stack Engineer",
       "Full Stack Developer",
-      "Backend Engineer",
       "Backend Developer",
-      "Frontend Engineer",
       "Frontend Developer",
     ],
   },

@@ -21,14 +21,14 @@ function getCsvFileNameForType(type: string): string {
   const normalizedType = normalizeInterviewType(type);
 
   if (normalizedType === 'behavioral') {
-    return 'final_20k_behavioral_cleaned.csv';
+    return 'faang_behavioral.csv';
   }
 
   if (normalizedType === 'mixed') {
-    return 'final_20k_mixed_cleaned.csv';
+    return 'faang_mixed.csv';
   }
 
-  return 'final_20k_technical_cleaned.csv';
+  return 'faang_technical.csv';
 }
 
 function shuffleArray<T>(items: T[]): T[] {
