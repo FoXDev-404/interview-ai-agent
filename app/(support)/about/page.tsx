@@ -10,9 +10,10 @@ export const metadata: Metadata = {
 
 const teamMembers = [
   {
-    name: "Alex Morgan",
-    role: "Product & AI Strategy Lead",
-    image: "/avatars/agent-alex.png",
+    name: "Shubham Bhardwaj",
+    role: "CFO and Marketing Head",
+    image: "/avatars/Shubham.jpeg",
+    avatarPosition: "center 36%",
     vision:
       "Build an interview platform that gives every learner actionable, role-specific coaching powered by practical AI insights.",
     social: {
@@ -23,9 +24,10 @@ const teamMembers = [
     },
   },
   {
-    name: "Maya Chen",
-    role: "Experience Design Lead",
+    name: "Pallavi Rawat",
+    role: "Design Lead",
     image: "/avatars/agent-maya.png",
+    avatarPosition: "center 30%",
     vision:
       "Design calm, confidence-boosting practice flows that make preparation feel structured, personal, and motivating.",
     social: {
@@ -36,11 +38,12 @@ const teamMembers = [
     },
   },
   {
-    name: "John Patel",
-    role: "Backend & Platform Engineer",
-    image: "/avatars/agent-john.png",
+    name: "Rajpal Nishad",
+    role: "CEO & Intelligence Specialist",
+    image: "/avatars/Rajpal.jpeg",
+    avatarPosition: "center 24%",
     vision:
-      "Ensure fast, reliable interview simulations and feedback pipelines that scale smoothly for users in production.",
+      "To create a powerful and scalable interview platform that delivers real-time, personalized feedback, enabling users to grow, improve, and confidently achieve their career goals.",
     social: {
       github: "https://github.com",
       linkedin: "https://linkedin.com",
@@ -49,11 +52,12 @@ const teamMembers = [
     },
   },
   {
-    name: "Riya Sharma",
-    role: "Career Intelligence Specialist",
-    image: "/avatars/agent-maya.png",
+    name: "Nikhil Pratap Singh",
+    role: "Lead Developer",
+    image: "/avatars/Nikhil.jpeg",
+    avatarPosition: "center 24%",
     vision:
-      "Translate hiring expectations into measurable guidance so users can improve communication, technical depth, and outcomes.",
+      "Transform expectations into measurable improvements in communication, skills, and results.",
     social: {
       github: "https://github.com",
       linkedin: "https://linkedin.com",

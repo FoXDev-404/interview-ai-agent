@@ -8,6 +8,7 @@ interface TeamMember {
   name: string;
   role: string;
   image: string;
+  avatarPosition?: string;
   vision: string;
   social: {
     github: string;
@@ -150,16 +151,20 @@ const TeamCarousel = ({ members }: TeamCarouselProps) => {
             <article
               key={member.name}
               data-team-card="true"
-              className="min-w-0 w-full md:w-[calc(50%-10px)] h-[332px] shrink-0 snap-start rounded-xl border border-white/10 bg-gray-900/55 p-5 hover:border-blue-400/40 transition-colors duration-300 flex flex-col"
+              className="min-w-0 w-full md:w-[calc(50%-10px)] h-[356px] shrink-0 snap-start rounded-xl border border-white/10 bg-gray-900/55 p-5 hover:border-blue-400/40 transition-colors duration-300 flex flex-col"
             >
-              <div className="relative h-24 w-24 mx-auto mb-3 rounded-full overflow-hidden ring-2 ring-blue-400/35 shadow-[0_0_0_6px_rgba(59,130,246,0.12)]">
+              <div className="relative h-28 w-28 mx-auto mb-4 rounded-full p-[2px] bg-gradient-to-br from-cyan-300/70 via-blue-400/80 to-indigo-500/80 shadow-[0_10px_28px_rgba(59,130,246,0.22)]">
+                <div className="relative h-full w-full rounded-full overflow-hidden bg-slate-900">
                 <Image
                   src={member.image}
                   alt={`${member.name} profile picture`}
                   fill
-                  sizes="96px"
+                  sizes="112px"
                   className="object-cover"
+                  style={{ objectPosition: member.avatarPosition || "center" }}
                 />
+                <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-white/15" />
+                </div>
               </div>
 
               <div className="text-center">
