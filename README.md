@@ -318,6 +318,7 @@ npm run lint     # ESLint
 
 - **Nikhil Pratap Singh**
 - **Rajpal Nishad**
+- **Shubham Bhardwaj**
 
 ## License
 
