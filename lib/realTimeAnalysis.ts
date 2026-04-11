@@ -104,6 +104,56 @@ class RealTimeAnalysisService {
     return Array.from(new Set([...normalizedTech, ...uniqueQuestionKeywords])).slice(0, 12);
   }
 
+  async generateReferenceAnswer(
+    question: string,
+    role: string,
+    techStack: string[],
+    level: string
+  ): Promise<string> {
+    const expectedKeywords = this.buildExpectedKeywords(question, techStack);
+    const difficulty = this.mapDifficulty(level);
+
+    try {
+      if (!this.model) {
+        throw new Error('Gemini API key is not configured for interview analysis.');
+      }
+
+      const prompt = `
+You are an expert technical interviewer.
+
+Generate a concise model answer for this interview question.
+
+Role: ${role}
+Difficulty: ${difficulty}
+Question: ${question}
+Expected Concepts: ${expectedKeywords.join(', ')}
+
+Requirements:
+- Write 3 to 5 short sentences.
+- Answer directly and clearly.
+- Include the important technical concepts.
+- Do not mention that this is a reference answer.
+- Do not use bullet points.
+
+Return plain text only.
+`;
+
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text().trim();
+
+      return text || `Expected key concepts: ${expectedKeywords.join(', ') || 'Core technical concepts relevant to the question.'}`;
+    } catch (error) {
+      if (this.isAuthOrIdentityError(error)) {
+        console.warn('Gemini auth/identity issue detected in reference answer generation. Falling back to heuristic answer.');
+      } else {
+        console.error('Error generating reference answer:', error);
+      }
+
+      return `A strong answer should address: ${expectedKeywords.join(', ') || 'the core technical concepts for this question'}.`;
+    }
+  }
+
   // Add method to detect inadequate responses
   private isInadequateResponse(answer: string): boolean {
     const cleanAnswer = answer.toLowerCase().trim();

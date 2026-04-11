@@ -14,7 +14,7 @@ export default function ConditionalNavigation() {
   return (
     <>
       <Navigation />
-      <div className="h-16" />
+      <div className="h-6" />
     </>
   );
 }
