@@ -471,20 +471,6 @@ const HARD_QUESTION_TITLES = new Set([
   'Concatenated Words',
 ]);
 
-const STRICT_FUNCTION_QUESTION_IDS = new Set<string>([
-  'two-sum',
-  'single-number',
-  '4sum',
-  'contains-duplicate',
-  'best-time-stock',
-  'max-subarray',
-  'product-except-self',
-  'subarray-sum-equals-k',
-  'longest-consecutive-sequence',
-  'house-robber',
-  'coin-change',
-]);
-
 const STRICT_QUESTION_OVERRIDES: Record<string, Partial<CodingQuestion>> = {
   'two-sum': {
     functionName: 'twoSum',
@@ -2480,8 +2466,6 @@ async function runInSandbox(language: CodingLanguage, source: string, stdin = ''
   };
 }
 
-const STRICT_EVALUATION_QUESTION_IDS = STRICT_FUNCTION_QUESTION_IDS;
-
 function hasConcreteFunctionTests(question: CodingQuestion): boolean {
   if (question.problemType === 'DESIGN') {
     return false;
@@ -2498,53 +2482,20 @@ function hasConcreteFunctionTests(question: CodingQuestion): boolean {
   });
 }
 
-async function evaluateCodingSubmissionGeneric(
-  payload: CodingExecuteRequest,
-  question: CodingQuestion
-): Promise<CodingExecuteResult> {
-  const source = buildSandboxSource(question, payload.language, payload.code, { raw: payload.customInput ?? '' });
-  const result = await runInSandbox(payload.language, source, payload.customInput?.trim() ?? '');
-
-  if (result.compileOutput || result.stderr) {
-    const runtimeError = result.compileOutput || result.stderr;
-    return {
-      status: runtimeError.toLowerCase().includes('memory')
-        ? 'Memory Limit Exceeded'
-        : runtimeError.toLowerCase().includes('time')
-          ? 'Time Limit Exceeded'
-          : 'Runtime Error',
-      output: result.stdout ?? '',
-      error: runtimeError,
-      executionTimeMs: result.runTimeMs,
-      memoryMB: Number((Math.max(0, result.memoryKB) / 1024).toFixed(2)),
-      passed: 0,
-      total: 1,
-      aiFeedback: buildAIFeedback(question, 0.35, 'Runtime Error'),
-    };
+function getQuestionTests(question: CodingQuestion, mode: 'run' | 'submit'): CodingTestCase[] {
+  if (question.problemType === 'DESIGN') {
+    return mode === 'submit' ? question.hiddenTestCases : question.examples;
   }
 
-  return {
-    status: 'Accepted',
-    output:
-      payload.mode === 'submit'
-        ? 'Execution completed. Curated question mode is active; hidden-case auto-judge is not enabled for this question yet.'
-        : result.stdout || '(execution finished with no stdout output)',
-    executionTimeMs: result.runTimeMs,
-    memoryMB: Number((Math.max(0, result.memoryKB) / 1024).toFixed(2)),
-    passed: 1,
-    total: 1,
-    aiFeedback: buildAIFeedback(question, 0.8, 'Accepted'),
-  };
+  return mode === 'submit' ? question.hiddenTestCases : question.examples;
 }
 
-export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest): Promise<CodingExecuteResult> {
-  const question = getQuestionById(payload.questionId);
-
-  if (!question) {
-    throw new Error('Question not found for execution.');
-  }
-
-  if (!payload.code.trim()) {
+async function evaluateSubmissionAgainstTests(
+  question: CodingQuestion,
+  payload: CodingExecuteRequest,
+  tests: CodingTestCase[]
+): Promise<CodingExecuteResult> {
+  if (payload.code.trim().length === 0) {
     return {
       status: 'Wrong Answer',
       output: '',
@@ -2552,37 +2503,10 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
       executionTimeMs: 0,
       memoryMB: 0,
       passed: 0,
-      total: payload.mode === 'submit' ? question.hiddenTestCases.length : question.examples.length,
+      total: tests.length,
       aiFeedback: buildAIFeedback(question, 0, 'Wrong Answer'),
     };
   }
-
-  const normalizeTemplate = (code: string) => code.replace(/\s+/g, ' ').trim();
-  const starterTemplate = question.starterCode[payload.language] ?? '';
-  if (starterTemplate && normalizeTemplate(payload.code) === normalizeTemplate(starterTemplate)) {
-    return {
-      status: 'Wrong Answer',
-      output: '',
-      error: 'Starter code was submitted without changes. Please implement the function logic before running tests.',
-      executionTimeMs: 0,
-      memoryMB: 0,
-      passed: 0,
-      total: payload.mode === 'submit' ? question.hiddenTestCases.length : question.examples.length,
-      aiFeedback: buildAIFeedback(question, 0, 'Wrong Answer'),
-    };
-  }
-
-  if (!STRICT_EVALUATION_QUESTION_IDS.has(question.id) || !hasConcreteFunctionTests(question)) {
-    return evaluateCodingSubmissionGeneric(payload, question);
-  }
-
-  const tests = question.problemType === 'DESIGN'
-    ? (payload.mode === 'submit' ? question.hiddenTestCases : question.examples)
-    : payload.mode === 'submit'
-      ? question.hiddenTestCases
-      : payload.customInput?.trim()
-        ? [{ input: payload.customInput.trim(), output: '' } as FunctionTestCase]
-        : question.examples;
 
   let passed = 0;
   let combinedOutput = '';
@@ -2593,7 +2517,6 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
   for (let i = 0; i < tests.length; i++) {
     const test = tests[i];
 
-    // Build sandbox source — route DESIGN vs FUNCTION
     const source = isDesignTestCase(test)
       ? buildDesignSandboxSource(question, payload.language, payload.code, test)
       : buildSandboxSource(question, payload.language, payload.code, parseCaseInput(question.id, (test as FunctionTestCase).input));
@@ -2666,13 +2589,98 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
           ? `All hidden tests passed (${passed}/${tests.length}).`
           : `Hidden tests passed: ${passed}/${tests.length}.`
         : combinedOutput,
-    error: accepted ? undefined : payload.mode === 'submit' ? 'Logic mismatch on hidden cases. Revisit edge cases and constraints.' : 'Some test cases failed. Check your output against the expected values.',
+    error: accepted ? undefined : payload.mode === 'submit' ? 'Logic mismatch on test cases. Revisit edge cases and constraints.' : 'Some test cases failed. Check your output against the expected values.',
     executionTimeMs: totalRunTime,
     memoryMB: Number((maxMemoryKB / 1024).toFixed(2)),
     passed,
     total: tests.length,
     aiFeedback: buildAIFeedback(question, coverage, status),
   };
+}
+
+async function evaluateCodingSubmissionGeneric(
+  payload: CodingExecuteRequest,
+  question: CodingQuestion
+): Promise<CodingExecuteResult> {
+  const tests = getQuestionTests(question, payload.mode);
+
+  if (tests.length > 0) {
+    return evaluateSubmissionAgainstTests(question, payload, tests);
+  }
+
+  const source = buildSandboxSource(question, payload.language, payload.code, { raw: payload.customInput ?? '' });
+  const result = await runInSandbox(payload.language, source, payload.customInput?.trim() ?? '');
+
+  if (result.compileOutput || result.stderr) {
+    const runtimeError = result.compileOutput || result.stderr;
+    return {
+      status: runtimeError.toLowerCase().includes('memory')
+        ? 'Memory Limit Exceeded'
+        : runtimeError.toLowerCase().includes('time')
+          ? 'Time Limit Exceeded'
+          : 'Runtime Error',
+      output: result.stdout ?? '',
+      error: runtimeError,
+      executionTimeMs: result.runTimeMs,
+      memoryMB: Number((Math.max(0, result.memoryKB) / 1024).toFixed(2)),
+      passed: 0,
+      total: 1,
+      aiFeedback: buildAIFeedback(question, 0.35, 'Runtime Error'),
+    };
+  }
+
+  return {
+    status: 'Accepted',
+    output: result.stdout || '(execution finished with no stdout output)',
+    executionTimeMs: result.runTimeMs,
+    memoryMB: Number((Math.max(0, result.memoryKB) / 1024).toFixed(2)),
+    passed: 1,
+    total: 1,
+    aiFeedback: buildAIFeedback(question, 0.8, 'Accepted'),
+  };
+}
+
+export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest): Promise<CodingExecuteResult> {
+  const question = getQuestionById(payload.questionId);
+
+  if (!question) {
+    throw new Error('Question not found for execution.');
+  }
+
+  if (!payload.code.trim()) {
+    return {
+      status: 'Wrong Answer',
+      output: '',
+      error: 'Code is empty.',
+      executionTimeMs: 0,
+      memoryMB: 0,
+      passed: 0,
+      total: payload.mode === 'submit' ? question.hiddenTestCases.length : question.examples.length,
+      aiFeedback: buildAIFeedback(question, 0, 'Wrong Answer'),
+    };
+  }
+
+  const normalizeTemplate = (code: string) => code.replace(/\s+/g, ' ').trim();
+  const starterTemplate = question.starterCode[payload.language] ?? '';
+  if (starterTemplate && normalizeTemplate(payload.code) === normalizeTemplate(starterTemplate)) {
+    return {
+      status: 'Wrong Answer',
+      output: '',
+      error: 'Starter code was submitted without changes. Please implement the function logic before running tests.',
+      executionTimeMs: 0,
+      memoryMB: 0,
+      passed: 0,
+      total: payload.mode === 'submit' ? question.hiddenTestCases.length : question.examples.length,
+      aiFeedback: buildAIFeedback(question, 0, 'Wrong Answer'),
+    };
+  }
+
+  if (!hasConcreteFunctionTests(question)) {
+    return evaluateCodingSubmissionGeneric(payload, question);
+  }
+
+  const tests = getQuestionTests(question, payload.mode);
+  return evaluateSubmissionAgainstTests(question, payload, tests);
 }
 
 export function buildExecutionFailureResult(payload: CodingExecuteRequest, message: string): CodingExecuteResult {

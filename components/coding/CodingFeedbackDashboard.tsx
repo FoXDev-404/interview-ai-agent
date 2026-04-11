@@ -48,6 +48,13 @@ interface QuestionStatus {
   solved: boolean;
 }
 
+interface QuestionSummary {
+  bestSubmission: SubmissionHistoryItem | null;
+  attempts: number;
+  solved: boolean;
+  attempted: boolean;
+}
+
 interface CodingFeedbackDashboardProps {
   interviewId: string;
   role: string;
@@ -189,53 +196,92 @@ export default function CodingFeedbackDashboard({
 
   const totalQuestions = questions.length;
 
-  // Best submission per question
-  const bestSubmissions = questions.reduce<Record<string, SubmissionHistoryItem | null>>(
-    (acc, q) => {
-      const qSubs = submissionHistory.filter((s) => s.questionId === q.id);
-      if (qSubs.length === 0) {
-        acc[q.id] = null;
-        return acc;
-      }
-      const accepted = qSubs.find((s) => s.status === 'Accepted');
-      acc[q.id] = accepted ?? qSubs[0];
-      return acc;
-    },
-    {}
-  );
+  const questionSummaries = questions.reduce<Record<string, QuestionSummary>>((acc, question) => {
+    const qSubs = submissionHistory.filter((submission) => submission.questionId === question.id);
+    const attempts = qSubs.length;
 
-  // Count attempts per question
-  const attemptsPerQuestion = questions.reduce<Record<string, number>>((acc, q) => {
-    acc[q.id] = submissionHistory.filter((s) => s.questionId === q.id).length;
+    if (qSubs.length === 0) {
+      acc[question.id] = {
+        bestSubmission: null,
+        attempts: 0,
+        solved: false,
+        attempted: false,
+      };
+      return acc;
+    }
+
+    const ranked = [...qSubs].sort((a, b) => {
+      const statusRank = (status: SubmissionStatus) => (status === 'Accepted' ? 4 : status === 'Wrong Answer' ? 3 : status === 'Time Limit Exceeded' ? 2 : 1);
+      const aRatio = a.total > 0 ? a.passed / a.total : 0;
+      const bRatio = b.total > 0 ? b.passed / b.total : 0;
+
+      return (
+        statusRank(b.status) - statusRank(a.status) ||
+        b.passed - a.passed ||
+        bRatio - aRatio ||
+        b.runtimeMs - a.runtimeMs ||
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+    });
+
+    const bestSubmission = ranked[0] ?? null;
+    const solved = Boolean(bestSubmission && bestSubmission.status === 'Accepted');
+
+    acc[question.id] = {
+      bestSubmission,
+      attempts,
+      solved,
+      attempted: attempts > 0,
+    };
+
     return acc;
   }, {});
 
-  const solvedCount = Object.values(questionStatus).filter((s) => s?.solved).length;
-  const attemptedCount = Object.values(questionStatus).filter((s) => s?.attempted).length;
+  const attemptsPerQuestion = questions.reduce<Record<string, number>>((acc, question) => {
+    acc[question.id] = questionSummaries[question.id]?.attempts ?? 0;
+    return acc;
+  }, {});
 
-  const acceptedSubs = submissionHistory.filter((s) => s.status === 'Accepted');
+  const solvedCount = Object.values(questionSummaries).filter((summary) => summary.solved).length;
+  const attemptedCount = Object.values(questionSummaries).filter((summary) => summary.attempted).length;
+
+  const bestSubmissions = questions.reduce<Record<string, SubmissionHistoryItem | null>>((acc, question) => {
+    acc[question.id] = questionSummaries[question.id]?.bestSubmission ?? null;
+    return acc;
+  }, {});
+
+  const bestRatedQuestions = Object.values(questionSummaries).filter((summary) => summary.bestSubmission !== null);
+  const acceptedSubs = bestRatedQuestions
+    .map((summary) => summary.bestSubmission)
+    .filter((submission): submission is SubmissionHistoryItem => Boolean(submission && submission.status === 'Accepted'));
   const avgRuntime =
     acceptedSubs.length > 0
-      ? Math.round(acceptedSubs.reduce((sum, s) => sum + s.runtimeMs, 0) / acceptedSubs.length)
+      ? Math.round(acceptedSubs.reduce((sum, submission) => sum + submission.runtimeMs, 0) / acceptedSubs.length)
       : 0;
-  const bestRuntime =
-    acceptedSubs.length > 0 ? Math.min(...acceptedSubs.map((s) => s.runtimeMs)) : 0;
-  const totalPassed = submissionHistory.reduce((sum, s) => sum + s.passed, 0);
-  const totalTestCases = submissionHistory.reduce((sum, s) => sum + s.total, 0);
+  const bestRuntime = acceptedSubs.length > 0 ? Math.min(...acceptedSubs.map((submission) => submission.runtimeMs)) : 0;
+  const totalPassed = bestRatedQuestions.reduce((sum, summary) => sum + (summary.bestSubmission?.passed ?? 0), 0);
+  const totalTestCases = bestRatedQuestions.reduce((sum, summary) => sum + (summary.bestSubmission?.total ?? 0), 0);
 
   // Difficulty breakdown
   type DiffGroup = { total: number; solved: number };
   const difficultyGroups = questions.reduce<Record<string, DiffGroup>>((acc, q) => {
     if (!acc[q.difficulty]) acc[q.difficulty] = { total: 0, solved: 0 };
     acc[q.difficulty].total += 1;
-    if (questionStatus[q.id]?.solved) acc[q.difficulty].solved += 1;
+    if (questionSummaries[q.id]?.solved) acc[q.difficulty].solved += 1;
     return acc;
   }, {});
 
   // Overall score
   const solveRatio = totalQuestions > 0 ? solvedCount / totalQuestions : 0;
   const passRate = totalTestCases > 0 ? totalPassed / totalTestCases : 0;
-  const overallScore = Math.min(100, Math.round(solveRatio * 60 + passRate * 40));
+  const consistencyRate = totalQuestions > 0 ? attemptedCount / totalQuestions : 0;
+
+  // Prevent inflated scores when only a small subset of questions is solved.
+  const effectivePassRate = passRate * solveRatio;
+  const overallScore = Math.min(
+    100,
+    Math.round(solveRatio * 70 + effectivePassRate * 20 + consistencyRate * 10)
+  );
 
   // Skill scores
   const problemSolvingScore = Math.round(solveRatio * 100);
@@ -253,13 +299,13 @@ export default function CodingFeedbackDashboard({
     'Matrix',
   ]);
   const dsQuestions = questions.filter((q) => q.tags.some((t) => dsTagSet.has(t)));
-  const dsSolved = dsQuestions.filter((q) => questionStatus[q.id]?.solved).length;
+  const dsSolved = dsQuestions.filter((q) => questionSummaries[q.id]?.solved).length;
   const dataStructuresScore =
     dsQuestions.length > 0
       ? Math.round((dsSolved / dsQuestions.length) * 100)
       : Math.round(solveRatio * 100);
 
-  const algoEfficiencyScore = Math.round(passRate * 100);
+  const algoEfficiencyScore = Math.round(effectivePassRate * 100);
 
   const activeAttemptCounts = Object.values(attemptsPerQuestion).filter((n) => n > 0);
   const avgAttempts =
@@ -270,12 +316,18 @@ export default function CodingFeedbackDashboard({
 
   const codeQualityScore =
     acceptedSubs.length > 0
-      ? Math.min(100, Math.round(65 + (acceptedSubs.length / Math.max(1, activeAttemptCounts.length)) * 35))
-      : Math.round(solveRatio * 65);
+      ? Math.min(
+          100,
+          Math.round(
+            45 + solveRatio * 40 + (acceptedSubs.length / Math.max(1, activeAttemptCounts.length)) * 15
+          )
+        )
+      : Math.round(solveRatio * 55);
 
   // Recommended topics from unsolved questions
   const unsolvedTags = questions
     .filter((q) => !questionStatus[q.id]?.solved)
+    .filter((q) => !questionSummaries[q.id]?.solved)
     .flatMap((q) => q.tags);
   const topicFreq = unsolvedTags.reduce<Record<string, number>>((acc, t) => {
     acc[t] = (acc[t] ?? 0) + 1;
@@ -441,6 +493,7 @@ export default function CodingFeedbackDashboard({
                 {questions.map((q, idx) => {
                   const best = bestSubmissions[q.id];
                   const status = questionStatus[q.id];
+                  const status = questionSummaries[q.id];
                   const attempts = attemptsPerQuestion[q.id] ?? 0;
                   const isSolved = status?.solved;
                   const isAttempted = status?.attempted;
