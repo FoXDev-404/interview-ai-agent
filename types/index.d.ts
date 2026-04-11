@@ -63,6 +63,7 @@ interface Interview {
   type: string;
   finalized: boolean;
   codingLanguage?: string;
+  codingTopic?: string;
   codingQuestions?: unknown[];
 }
 

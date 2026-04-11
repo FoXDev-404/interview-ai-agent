@@ -122,23 +122,386 @@ export const CODING_LANGUAGES: Array<{ value: CodingLanguage; label: string; mon
   { value: 'c', label: 'C', monaco: 'c' },
 ];
 
-const QUESTION_POOL: CodingQuestion[] = [
-  {
-    id: 'two-sum',
-    title: 'Two Sum',
-    difficulty: 'Easy',
-    tags: ['Array', 'Hash Map'],
+const CURATED_TOPIC_TITLE_MAP: Record<string, string[]> = {
+  array: [
+    'Two Sum',
+    'Best Time to Buy and Sell Stock',
+    'Contains Duplicate',
+    'Maximum Subarray',
+    'Move Zeroes',
+    'Missing Number',
+    'Product of Array Except Self',
+    'Subarray Sum Equals K',
+    'Maximum Product Subarray',
+    'Sort Colors',
+    'Majority Element',
+    'Find Peak Element',
+    'Merge Intervals',
+    'Insert Interval',
+    'Spiral Matrix',
+    'Rotate Image',
+    'Container With Most Water',
+    '3Sum',
+    '4Sum',
+    'Jump Game',
+    'Jump Game II',
+    'Maximum Sum Circular Subarray',
+    'First Missing Positive',
+    'Find All Duplicates in an Array',
+    'Set Matrix Zeroes',
+    'Trapping Rain Water',
+    'Largest Number',
+    'Subarray Product Less Than K',
+    'Range Sum Query',
+    'Maximum Points You Can Obtain from Cards',
+  ],
+  'linked-list': [
+    'Reverse Linked List',
+    'Linked List Cycle',
+    'Detect Cycle II',
+    'Merge Two Sorted Lists',
+    'Remove Nth Node From End',
+    'Middle of the Linked List',
+    'Intersection of Two Linked Lists',
+    'Palindrome Linked List',
+    'Reorder List',
+    'Add Two Numbers',
+    'Copy List with Random Pointer',
+    'Flatten a Multilevel Doubly Linked List',
+    'Rotate List',
+    'Partition List',
+    'Reverse Nodes in k-Group',
+    'Swap Nodes in Pairs',
+    'Remove Duplicates from Sorted List',
+    'Remove Linked List Elements',
+    'Odd Even Linked List',
+    'Sort List',
+  ],
+  tree: [
+    'Maximum Depth of Binary Tree',
+    'Same Tree',
+    'Invert Binary Tree',
+    'Binary Tree Level Order Traversal',
+    'Diameter of Binary Tree',
+    'Balanced Binary Tree',
+    'Lowest Common Ancestor (BST)',
+    'Lowest Common Ancestor (Binary Tree)',
+    'Validate Binary Search Tree',
+    'Kth Smallest Element in BST',
+    'Binary Tree Right Side View',
+    'Path Sum',
+    'Path Sum II',
+    'Serialize and Deserialize Binary Tree',
+    'Construct Binary Tree from Preorder and Inorder',
+    'Convert Sorted Array to BST',
+    'Flatten Binary Tree to Linked List',
+    'Sum Root to Leaf Numbers',
+    'Count Complete Tree Nodes',
+    'House Robber III',
+    'Maximum Path Sum',
+    'Vertical Order Traversal',
+    'Boundary of Binary Tree',
+  ],
+  stack: [
+    'Valid Parentheses',
+    'Min Stack',
+    'Implement Queue using Stacks',
+    'Implement Stack using Queues',
+    'Daily Temperatures',
+    'Next Greater Element',
+    'Largest Rectangle in Histogram',
+    'Sliding Window Maximum',
+    'Evaluate Reverse Polish Notation',
+    'Basic Calculator',
+    'Basic Calculator II',
+    'Decode String',
+    'Remove K Digits',
+    'Asteroid Collision',
+    'Online Stock Span',
+  ],
+  'binary-search': [
+    'Binary Search',
+    'Search in Rotated Sorted Array',
+    'Find Minimum in Rotated Sorted Array',
+    'Peak Index in Mountain Array',
+    'Median of Two Sorted Arrays',
+    'Search Insert Position',
+    'Find First and Last Position',
+    'Koko Eating Bananas',
+    'Capacity to Ship Packages Within D Days',
+    'Split Array Largest Sum',
+    'Aggressive Cows',
+    'Allocate Minimum Pages',
+  ],
+  'dynamic-programming': [
+    'Climbing Stairs',
+    'House Robber',
+    'House Robber II',
+    'Coin Change',
+    'Longest Increasing Subsequence',
+    'Longest Common Subsequence',
+    'Edit Distance',
+    '0/1 Knapsack',
+    'Partition Equal Subset Sum',
+    'Unique Paths',
+    'Decode Ways',
+    'Word Break',
+    'Longest Palindromic Subsequence',
+    'Burst Balloons',
+    'Matrix Chain Multiplication',
+    'Egg Dropping Problem',
+    'Minimum Cost Climbing Stairs',
+    'Distinct Subsequences',
+    'Interleaving String',
+    'Maximum Rectangle',
+    'Palindrome Partitioning II',
+    'Russian Doll Envelopes',
+  ],
+  graph: [
+    'Number of Islands',
+    'Clone Graph',
+    'Course Schedule',
+    'Course Schedule II',
+    'Pacific Atlantic Water Flow',
+    'Rotting Oranges',
+    'Word Ladder',
+    'Graph Valid Tree',
+    'Network Delay Time',
+    'Dijkstra\'s Algorithm',
+    'Bellman-Ford Algorithm',
+    'Floyd Warshall Algorithm',
+    'Minimum Spanning Tree (Kruskal)',
+    'Minimum Spanning Tree (Prim)',
+    'Bridges in Graph',
+    'Articulation Points',
+    'Strongly Connected Components (Kosaraju)',
+    'Bipartite Graph',
+    'Cheapest Flights Within K Stops',
+  ],
+  greedy: [
+    'Jump Game',
+    'Jump Game II',
+    'Gas Station',
+    'Candy',
+    'Assign Cookies',
+    'Task Scheduler',
+    'Minimum Platforms',
+    'Fractional Knapsack',
+    'Job Sequencing Problem',
+    'Non-overlapping Intervals',
+    'Minimum Arrows to Burst Balloons',
+  ],
+  string: [
+    'Valid Anagram',
+    'Longest Substring Without Repeating Characters',
+    'Longest Palindromic Substring',
+    'Group Anagrams',
+    'String to Integer (atoi)',
+    'Implement strStr()',
+    'Minimum Window Substring',
+    'Palindromic Substrings',
+    'Z Algorithm',
+    'KMP Pattern Matching',
+    'Rabin-Karp Algorithm',
+    'Longest Common Prefix',
+    'Multiply Strings',
+    'Valid Palindrome II',
+    'Count and Say',
+    'Text Justification',
+  ],
+  backtracking: [
+    'Subsets',
+    'Subsets II',
+    'Permutations',
+    'Permutations II',
+    'Combination Sum',
+    'Combination Sum II',
+    'Word Search',
+    'N-Queens',
+    'Sudoku Solver',
+    'Palindrome Partitioning',
+    'Restore IP Addresses',
+    'Letter Combinations of Phone Number',
+    'Combination Sum III',
+    'Word Search II',
+  ],
+  heap: [
+    'Kth Largest Element in an Array',
+    'Top K Frequent Elements',
+    'Find Median from Data Stream',
+    'Merge K Sorted Lists',
+    'K Closest Points to Origin',
+    'Reorganize String',
+    'Sliding Window Median',
+    'Connect Ropes with Minimum Cost',
+    'Find K Pairs with Smallest Sums',
+  ],
+  'hash-table': [
+    'Two Sum',
+    'Group Anagrams',
+    'Longest Consecutive Sequence',
+    'Subarray Sum Equals K',
+    'Happy Number',
+    'Isomorphic Strings',
+    'Find All Anagrams in a String',
+    'Longest Substring with K Distinct Characters',
+    'Check Subarray Sum',
+    'Continuous Subarray Sum',
+  ],
+  trie: [
+    'Implement Trie',
+    'Search Suggestions System',
+    'Word Search II',
+    'Replace Words',
+    'Maximum XOR of Two Numbers',
+    'Concatenated Words',
+    'Word Break II',
+    'Design Add and Search Words',
+  ],
+  'bit-manipulation': [
+    'Single Number',
+    'Counting Bits',
+    'Number of 1 Bits',
+    'Missing Number',
+    'Sum of Two Integers',
+    'Subsets using Bitmask',
+    'Maximum XOR of Two Numbers',
+    'Bitwise AND of Numbers Range',
+    'Power of Two',
+    'Power of Four',
+  ],
+  'sliding-window': [
+    'Maximum Sum Subarray of Size K',
+    'Longest Substring Without Repeating Characters',
+    'Minimum Window Substring',
+    'Sliding Window Maximum',
+    'Permutation in String',
+    'Longest Repeating Character Replacement',
+    'Fruit Into Baskets',
+  ],
+  'two-pointers': [
+    'Container With Most Water',
+    '3Sum',
+    '3Sum Closest',
+    'Remove Duplicates from Sorted Array',
+    'Valid Palindrome',
+    'Squares of Sorted Array',
+    'Trapping Rain Water',
+  ],
+  'prefix-sum': [
+    'Range Sum Query',
+    'Subarray Sum Equals K',
+    'Continuous Subarray Sum',
+    'Product of Array Except Self',
+    'Pivot Index',
+  ],
+  'union-find': [
+    'Number of Connected Components',
+    'Redundant Connection',
+    'Accounts Merge',
+    'Friend Circles',
+    'Detect Cycle in Graph',
+  ],
+};
+
+const TOPIC_TAG_LABELS: Record<string, string> = {
+  array: 'Array',
+  'linked-list': 'Linked List',
+  tree: 'Tree',
+  stack: 'Stack',
+  queue: 'Queue',
+  'binary-search': 'Binary Search',
+  'dynamic-programming': 'Dynamic Programming',
+  graph: 'Graph',
+  greedy: 'Greedy',
+  string: 'String',
+  backtracking: 'Backtracking',
+  heap: 'Heap',
+  'hash-table': 'Hash Map',
+  trie: 'Trie',
+  'bit-manipulation': 'Bit Manipulation',
+  'sliding-window': 'Sliding Window',
+  'two-pointers': 'Two Pointers',
+  'prefix-sum': 'Prefix Sum',
+  'union-find': 'Union Find',
+};
+
+const EASY_QUESTION_TITLES = new Set([
+  'Two Sum',
+  'Contains Duplicate',
+  'Best Time to Buy and Sell Stock',
+  'Move Zeroes',
+  'Missing Number',
+  'Majority Element',
+  'Valid Parentheses',
+  'Linked List Cycle',
+  'Merge Two Sorted Lists',
+  'Middle of the Linked List',
+  'Maximum Depth of Binary Tree',
+  'Same Tree',
+  'Invert Binary Tree',
+  'Balanced Binary Tree',
+  'Path Sum',
+  'Climbing Stairs',
+  'Valid Anagram',
+  'Longest Common Prefix',
+  'Single Number',
+  'Counting Bits',
+  'Power of Two',
+]);
+
+const HARD_QUESTION_TITLES = new Set([
+  'First Missing Positive',
+  'Trapping Rain Water',
+  '4Sum',
+  'Reverse Nodes in k-Group',
+  'Serialize and Deserialize Binary Tree',
+  'Maximum Path Sum',
+  'Largest Rectangle in Histogram',
+  'Median of Two Sorted Arrays',
+  'Burst Balloons',
+  'Egg Dropping Problem',
+  'Word Ladder',
+  'Cheapest Flights Within K Stops',
+  'Text Justification',
+  'Sudoku Solver',
+  'Word Search II',
+  'Find Median from Data Stream',
+  'Sliding Window Median',
+  'Concatenated Words',
+]);
+
+const STRICT_FUNCTION_QUESTION_IDS = new Set<string>([
+  'two-sum',
+  'single-number',
+  '4sum',
+  'contains-duplicate',
+  'best-time-stock',
+  'max-subarray',
+  'product-except-self',
+  'subarray-sum-equals-k',
+  'longest-consecutive-sequence',
+  'house-robber',
+  'coin-change',
+]);
+
+const STRICT_QUESTION_OVERRIDES: Record<string, Partial<CodingQuestion>> = {
+  'two-sum': {
+    functionName: 'twoSum',
     description:
-      'Given an integer array nums and an integer target, return indices of the two numbers such that they add up to target. You may assume exactly one solution exists, and you may not use the same element twice.',
+      'Given an integer array nums and an integer target, return indices of the two numbers such that they add up to target.',
+    constraints: ['2 <= nums.length <= 100000', '-10^9 <= nums[i] <= 10^9', 'Exactly one valid answer exists.'],
+    hints: ['Use a hash map from value to index.', 'Check complement before inserting current value.'],
+    editorial: 'A one-pass hash table solves this in linear time.',
     examples: [
       { input: 'nums = [2,7,11,15], target = 9', output: '[0,1]' },
       { input: 'nums = [3,2,4], target = 6', output: '[1,2]' },
     ],
-    constraints: ['2 <= nums.length <= 10000', '-10^9 <= nums[i] <= 10^9', 'Exactly one valid answer exists.'],
-    hints: ['A hash map can store number -> index while scanning once.', 'Check complement before inserting current value.'],
-    editorial:
-      'Use a hash map for O(n) lookup. For each value x at index i, compute complement target - x. If complement is already in the map, return [map[complement], i]. Otherwise store x -> i.',
-    functionName: 'twoSum',
+    hiddenTestCases: [
+      { input: 'nums = [1,5,3,7], target = 12', output: '[1,3]' },
+      { input: 'nums = [10,20,30,40], target = 70', output: '[2,3]' },
+      { input: 'nums = [-3,4,3,90], target = 0', output: '[0,2]' },
+    ],
     starterCode: {
       javascript: 'function twoSum(nums, target) {\n  // Write your solution here\n}\n',
       typescript: 'function twoSum(nums: number[], target: number): number[] {\n  // Write your solution here\n  return [];\n}\n',
@@ -147,68 +510,149 @@ const QUESTION_POOL: CodingQuestion[] = [
       cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Write your solution here\n        return {};\n    }\n};\n',
       c: '#include <stdlib.h>\n\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    // Write your solution here\n    *returnSize = 0;\n    return NULL;\n}\n',
     },
-    hiddenTestCases: [
-      { input: 'nums = [1,5,3,7], target = 12', output: '[1,3]' },
-      { input: 'nums = [10,20,30,40], target = 70', output: '[2,3]' },
-      { input: 'nums = [-3,4,3,90], target = 0', output: '[0,2]' },
-    ],
     expectedKeywords: ['map', 'dict', 'unordered_map', 'hash', 'complement'],
-    solutionExplanation:
-      'A one-pass hash table keeps seen numbers and their indices. For each number, check if its complement has already appeared.',
     timeComplexity: 'O(n)',
     spaceComplexity: 'O(n)',
-    bestPractices: ['Use clear variable names like complement and indexByValue.', 'Return early once a valid pair is found.'],
   },
-  {
-    id: 'valid-parentheses',
-    title: 'Valid Parentheses',
-    difficulty: 'Easy',
-    tags: ['String', 'Stack'],
+  'single-number': {
+    functionName: 'singleNumber',
     description:
-      'Given a string s containing just the characters ()[]{} determine if the input string is valid. An input string is valid if open brackets are closed by the same type and in the correct order.',
-    examples: [
-      { input: 's = "()[]{}"', output: 'true' },
-      { input: 's = "([)]"', output: 'false' },
+      'Given a non-empty array of integers nums, every element appears twice except for one. Find that single one. Your solution must run in linear time and use constant extra space.',
+    constraints: [
+      '1 <= nums.length <= 3 * 10^4',
+      '-3 * 10^4 <= nums[i] <= 3 * 10^4',
+      'Each element appears twice except one element that appears once.',
     ],
-    constraints: ['1 <= s.length <= 10000', 's consists of parentheses only: ()[]{}'],
-    hints: ['Use a stack for opening brackets.', 'On closing bracket, verify stack top matches expected opening bracket.'],
+    hints: ['Use XOR: a ^ a = 0 and a ^ 0 = a.', 'XOR all values; duplicates cancel out.'],
     editorial:
-      'Traverse chars. Push opening symbols. For closing symbols, stack must be non-empty and top must match pair. At end stack must be empty.',
-    functionName: 'isValid',
-    starterCode: {
-      javascript: 'function isValid(s) {\n  // Write your solution here\n}\n',
-      typescript: 'function isValid(s: string): boolean {\n  // Write your solution here\n  return false;\n}\n',
-      python: 'def isValid(s):\n    # Write your solution here\n    return False\n',
-      java: 'class Solution {\n    public boolean isValid(String s) {\n        // Write your solution here\n        return false;\n    }\n}\n',
-      cpp: '#include <string>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isValid(string s) {\n        // Write your solution here\n        return false;\n    }\n};\n',
-      c: '#include <stdbool.h>\n\nbool isValid(char* s) {\n    // Write your solution here\n    return false;\n}\n',
-    },
-    hiddenTestCases: [
-      { input: 's = "(((())))"', output: 'true' },
-      { input: 's = "(("', output: 'false' },
-      { input: 's = "{[()]}"', output: 'true' },
+      'Maintain an accumulator initialized to 0 and XOR each value. Paired values cancel, leaving the unique value.',
+    examples: [
+      { input: 'nums = [2,2,1]', output: '1' },
+      { input: 'nums = [4,1,2,1,2]', output: '4' },
+      { input: 'nums = [1]', output: '1' },
     ],
-    expectedKeywords: ['stack', 'push', 'pop'],
-    solutionExplanation: 'A stack naturally models nested open-close ordering.',
+    hiddenTestCases: [
+      { input: 'nums = [7,3,5,3,5]', output: '7' },
+      { input: 'nums = [-1,-1,-8]', output: '-8' },
+      { input: 'nums = [42]', output: '42' },
+    ],
+    starterCode: {
+      javascript: 'function singleNumber(nums) {\n  // Write your solution here\n}\n',
+      typescript: 'function singleNumber(nums: number[]): number {\n  // Write your solution here\n  return 0;\n}\n',
+      python: 'def singleNumber(nums):\n    # Write your solution here\n    return 0\n',
+      java: 'class Solution {\n    public int singleNumber(int[] nums) {\n        // Write your solution here\n        return 0;\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int singleNumber(vector<int>& nums) {\n        // Write your solution here\n        return 0;\n    }\n};\n',
+      c: 'int singleNumber(int* nums, int numsSize) {\n    // Write your solution here\n    return 0;\n}\n',
+    },
+    expectedKeywords: ['xor', '^', 'bit', 'bit manipulation'],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
+  },
+  '4sum': {
+    functionName: 'fourSum',
+    description:
+      'Given an array nums of n integers, return all unique quadruplets [nums[a], nums[b], nums[c], nums[d]] such that a, b, c, and d are distinct indices and nums[a] + nums[b] + nums[c] + nums[d] == target. You may return the answer in any order.',
+    constraints: [
+      '1 <= nums.length <= 200',
+      '-10^9 <= nums[i] <= 10^9',
+      '-10^9 <= target <= 10^9',
+    ],
+    hints: [
+      'Sort the array first so duplicates can be skipped deterministically.',
+      'Fix two indices and solve the remaining 2-sum with two pointers.',
+    ],
+    editorial:
+      'Sort nums, iterate i and j for the first two numbers, then run a two-pointer sweep for the remaining pair. Skip duplicate values for i, j, left, and right to keep only unique quadruplets.',
+    examples: [
+      { input: 'nums = [1,0,-1,0,-2,2], target = 0', output: '[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]' },
+      { input: 'nums = [2,2,2,2,2], target = 8', output: '[[2,2,2,2]]' },
+    ],
+    hiddenTestCases: [
+      { input: 'nums = [0,0,0,0], target = 0', output: '[[0,0,0,0]]' },
+      { input: 'nums = [-3,-1,0,2,4,5], target = 2', output: '[[-3,-1,2,4]]' },
+      { input: 'nums = [1,2,3,4], target = 100', output: '[]' },
+    ],
+    starterCode: {
+      javascript: 'function fourSum(nums, target) {\n  // Write your solution here\n}\n',
+      typescript: 'function fourSum(nums: number[], target: number): number[][] {\n  // Write your solution here\n  return [];\n}\n',
+      python: 'def fourSum(nums, target):\n    # Write your solution here\n    return []\n',
+      java: 'class Solution {\n    public java.util.List<java.util.List<Integer>> fourSum(int[] nums, int target) {\n        // Write your solution here\n        return new java.util.ArrayList<>();\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> fourSum(vector<int>& nums, int target) {\n        // Write your solution here\n        return {};\n    }\n};\n',
+      c: 'int** fourSum(int* nums, int numsSize, int target, int* returnSize, int** returnColumnSizes) {\n    // Write your solution here\n    *returnSize = 0;\n    return NULL;\n}\n',
+    },
+    expectedKeywords: ['sort', 'two pointers', 'dedup', 'quadruplet', 'n^3'],
+    timeComplexity: 'O(n^3)',
+    spaceComplexity: 'O(1) extra (excluding output)',
+  },
+  'contains-duplicate': {
+    functionName: 'containsDuplicate',
+    description: 'Return true if any value appears at least twice in the array.',
+    constraints: ['1 <= nums.length <= 100000', '-10^9 <= nums[i] <= 10^9'],
+    hints: ['Track values in a set.', 'Return early once duplicate appears.'],
+    editorial: 'Set membership gives O(1) average lookups for each value.',
+    examples: [
+      { input: 'nums = [1,2,3,1]', output: 'true' },
+      { input: 'nums = [1,2,3,4]', output: 'false' },
+    ],
+    hiddenTestCases: [
+      { input: 'nums = [0,0]', output: 'true' },
+      { input: 'nums = [5,6,7,8]', output: 'false' },
+      { input: 'nums = [9,1,9]', output: 'true' },
+    ],
+    starterCode: {
+      javascript: 'function containsDuplicate(nums) {\n  // Write your solution here\n}\n',
+      typescript: 'function containsDuplicate(nums: number[]): boolean {\n  // Write your solution here\n  return false;\n}\n',
+      python: 'def containsDuplicate(nums):\n    # Write your solution here\n    return False\n',
+      java: 'class Solution {\n    public boolean containsDuplicate(int[] nums) {\n        // Write your solution here\n        return false;\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool containsDuplicate(vector<int>& nums) {\n        // Write your solution here\n        return false;\n    }\n};\n',
+      c: 'int containsDuplicate(int* nums, int numsSize) {\n    // Write your solution here\n    return 0;\n}\n',
+    },
+    expectedKeywords: ['set', 'hash', 'duplicate'],
     timeComplexity: 'O(n)',
     spaceComplexity: 'O(n)',
-    bestPractices: ['Handle empty stack checks before pop.', 'Use a map for close-to-open bracket pairs.'],
   },
-  {
-    id: 'max-subarray',
-    title: 'Maximum Subarray',
-    difficulty: 'Medium',
-    tags: ['Array', 'Dynamic Programming'],
-    description: 'Given an integer array nums, find the contiguous subarray with the largest sum and return its sum.',
+  'best-time-stock': {
+    functionName: 'maxProfit',
+    description: 'Return the maximum profit from one buy and one sell transaction.',
+    constraints: ['1 <= prices.length <= 100000', '0 <= prices[i] <= 10000'],
+    hints: ['Track running minimum price.', 'Update max profit each step.'],
+    editorial: 'One linear scan with best buy price so far.',
+    examples: [
+      { input: 'prices = [7,1,5,3,6,4]', output: '5' },
+      { input: 'prices = [7,6,4,3,1]', output: '0' },
+    ],
+    hiddenTestCases: [
+      { input: 'prices = [2,4,1]', output: '2' },
+      { input: 'prices = [3,2,6,5,0,3]', output: '4' },
+      { input: 'prices = [1,2]', output: '1' },
+    ],
+    starterCode: {
+      javascript: 'function maxProfit(prices) {\n  // Write your solution here\n}\n',
+      typescript: 'function maxProfit(prices: number[]): number {\n  // Write your solution here\n  return 0;\n}\n',
+      python: 'def maxProfit(prices):\n    # Write your solution here\n    return 0\n',
+      java: 'class Solution {\n    public int maxProfit(int[] prices) {\n        // Write your solution here\n        return 0;\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxProfit(vector<int>& prices) {\n        // Write your solution here\n        return 0;\n    }\n};\n',
+      c: 'int maxProfit(int* prices, int pricesSize) {\n    // Write your solution here\n    return 0;\n}\n',
+    },
+    expectedKeywords: ['min', 'profit', 'buy', 'sell'],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
+  },
+  'max-subarray': {
+    functionName: 'maxSubArray',
+    description: 'Find the contiguous subarray with the largest sum and return its sum.',
+    constraints: ['1 <= nums.length <= 100000', '-10^4 <= nums[i] <= 10^4'],
+    hints: ['Kadane\'s algorithm works in one pass.'],
+    editorial: 'Track best subarray ending at each index.',
     examples: [
       { input: 'nums = [-2,1,-3,4,-1,2,1,-5,4]', output: '6' },
       { input: 'nums = [5,4,-1,7,8]', output: '23' },
     ],
-    constraints: ['1 <= nums.length <= 100000', '-10^4 <= nums[i] <= 10^4'],
-    hints: ['Kadane\'s algorithm tracks best ending at current index.', 'Reset running sum when it hurts future subarrays.'],
-    editorial:
-      'Maintain currentBest and globalBest. currentBest = max(nums[i], currentBest + nums[i]). Update globalBest each step.',
-    functionName: 'maxSubArray',
+    hiddenTestCases: [
+      { input: 'nums = [-1,-2,-3]', output: '-1' },
+      { input: 'nums = [1,2,3,4]', output: '10' },
+      { input: 'nums = [8,-19,5,-4,20]', output: '21' },
+    ],
     starterCode: {
       javascript: 'function maxSubArray(nums) {\n  // Write your solution here\n}\n',
       typescript: 'function maxSubArray(nums: number[]): number {\n  // Write your solution here\n  return 0;\n}\n',
@@ -217,297 +661,489 @@ const QUESTION_POOL: CodingQuestion[] = [
       cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxSubArray(vector<int>& nums) {\n        // Write your solution here\n        return 0;\n    }\n};\n',
       c: 'int maxSubArray(int* nums, int numsSize) {\n    // Write your solution here\n    return 0;\n}\n',
     },
-    hiddenTestCases: [
-      { input: 'nums = [-1,-2,-3]', output: '-1' },
-      { input: 'nums = [1,2,3,4]', output: '10' },
-      { input: 'nums = [8,-19,5,-4,20]', output: '21' },
-    ],
-    expectedKeywords: ['max', 'current', 'kadane'],
-    solutionExplanation: 'Kadane\'s algorithm computes the best subarray ending at each index in one pass.',
+    expectedKeywords: ['kadane', 'current', 'max'],
     timeComplexity: 'O(n)',
     spaceComplexity: 'O(1)',
-    bestPractices: ['Initialize with first element to handle all-negative arrays.', 'Keep logic in a single clean loop.'],
   },
-  {
-    id: 'merge-intervals',
-    title: 'Merge Intervals',
-    difficulty: 'Medium',
-    tags: ['Array', 'Sorting'],
-    description:
-      'Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals and return an array of non-overlapping intervals covering all intervals.',
+  'product-except-self': {
+    functionName: 'productExceptSelf',
+    description: 'Return output[i] as product of all numbers except nums[i], without division.',
+    constraints: ['2 <= nums.length <= 100000', '-30 <= nums[i] <= 30'],
+    hints: ['Build prefix and suffix products.'],
+    editorial: 'Two passes with running product, no division needed.',
     examples: [
-      { input: 'intervals = [[1,3],[2,6],[8,10],[15,18]]', output: '[[1,6],[8,10],[15,18]]' },
-      { input: 'intervals = [[1,4],[4,5]]', output: '[[1,5]]' },
+      { input: 'nums = [1,2,3,4]', output: '[24,12,8,6]' },
+      { input: 'nums = [-1,1,0,-3,3]', output: '[0,0,9,0,0]' },
     ],
-    constraints: ['1 <= intervals.length <= 10000', 'intervals[i].length == 2', '0 <= starti <= endi <= 10000'],
-    hints: ['Sort intervals by start time first.', 'Merge with the last result interval while overlapping.'],
-    editorial: 'Sort by start. Iterate and merge if current.start <= last.end, else append new interval.',
-    functionName: 'merge',
-    starterCode: {
-      javascript: 'function merge(intervals) {\n  // Write your solution here\n}\n',
-      typescript: 'function merge(intervals: number[][]): number[][] {\n  // Write your solution here\n  return [];\n}\n',
-      python: 'def merge(intervals):\n    # Write your solution here\n    return []\n',
-      java: 'import java.util.*;\n\nclass Solution {\n    public int[][] merge(int[][] intervals) {\n        // Write your solution here\n        return new int[][]{};\n    }\n}\n',
-      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> merge(vector<vector<int>>& intervals) {\n        // Write your solution here\n        return {};\n    }\n};\n',
-      c: 'int** merge(int** intervals, int intervalsSize, int* intervalsColSize, int* returnSize, int** returnColumnSizes) {\n    // Write your solution here\n    *returnSize = 0;\n    return 0;\n}\n',
-    },
     hiddenTestCases: [
-      { input: 'intervals = [[1,4],[0,4]]', output: '[[0,4]]' },
-      { input: 'intervals = [[1,4],[5,6]]', output: '[[1,4],[5,6]]' },
-      { input: 'intervals = [[2,3],[4,5],[6,7],[8,9],[1,10]]', output: '[[1,10]]' },
+      { input: 'nums = [2,3,4,5]', output: '[60,40,30,24]' },
+      { input: 'nums = [1,0,2,3]', output: '[0,6,0,0]' },
+      { input: 'nums = [2,2,2]', output: '[4,4,4]' },
     ],
-    expectedKeywords: ['sort', 'merge', 'interval'],
-    solutionExplanation: 'Sorting by start enables a linear merge pass over intervals.',
-    timeComplexity: 'O(n log n)',
-    spaceComplexity: 'O(n)',
-    bestPractices: ['Sort first, then merge in one pass.', 'Use helper variables for readability.'],
+    starterCode: {
+      javascript: 'function productExceptSelf(nums) {\n  // Write your solution here\n}\n',
+      typescript: 'function productExceptSelf(nums: number[]): number[] {\n  // Write your solution here\n  return [];\n}\n',
+      python: 'def productExceptSelf(nums):\n    # Write your solution here\n    return []\n',
+      java: 'class Solution {\n    public int[] productExceptSelf(int[] nums) {\n        // Write your solution here\n        return new int[]{};\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        // Write your solution here\n        return {};\n    }\n};\n',
+      c: '#include <stdlib.h>\n\nint* productExceptSelf(int* nums, int numsSize, int* returnSize) {\n    // Write your solution here\n    *returnSize = 0;\n    return NULL;\n}\n',
+    },
+    expectedKeywords: ['prefix', 'suffix', 'product'],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1) extra',
   },
-  {
-    id: 'binary-tree-level-order',
-    title: 'Binary Tree Level Order Traversal',
-    difficulty: 'Medium',
-    tags: ['Tree', 'BFS', 'Queue'],
-    description:
-      'Given the root of a binary tree, return the level order traversal of its nodes\' values (from left to right, level by level).',
+  'subarray-sum-equals-k': {
+    functionName: 'subarraySum',
+    description: 'Count continuous subarrays whose sum equals k.',
+    constraints: ['1 <= nums.length <= 20000', '-1000 <= nums[i] <= 1000', '-10^7 <= k <= 10^7'],
+    hints: ['Use prefix sums and a frequency map.'],
+    editorial: 'Track how many times each prefix sum appears.',
     examples: [
-      { input: 'root = [3,9,20,null,null,15,7]', output: '[[3],[9,20],[15,7]]' },
-      { input: 'root = [1]', output: '[[1]]' },
+      { input: 'nums = [1,1,1], k = 2', output: '2' },
+      { input: 'nums = [1,2,3], k = 3', output: '2' },
     ],
-    constraints: ['0 <= number of nodes <= 2000', '-1000 <= Node.val <= 1000'],
-    hints: ['Use a queue and process one level at a time.', 'Track queue size before each level loop.'],
-    editorial: 'Classic BFS: pop size items per level and push children.',
-    functionName: 'levelOrder',
-    starterCode: {
-      javascript: 'function levelOrder(root) {\n  // Write your solution here\n}\n',
-      typescript: 'function levelOrder(root: any): number[][] {\n  // Write your solution here\n  return [];\n}\n',
-      python: 'def levelOrder(root):\n    # Write your solution here\n    return []\n',
-      java: 'import java.util.*;\n\nclass Solution {\n    public List<List<Integer>> levelOrder(TreeNode root) {\n        // Write your solution here\n        return new ArrayList<>();\n    }\n}\n',
-      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> levelOrder(TreeNode* root) {\n        // Write your solution here\n        return {};\n    }\n};\n',
-      c: '// Assume tree helpers are available in platform runtime\nint** levelOrder(void* root) {\n    // Write your solution here\n    return 0;\n}\n',
-    },
     hiddenTestCases: [
-      { input: 'root = []', output: '[]' },
-      { input: 'root = [1,2,3,4,5,null,6]', output: '[[1],[2,3],[4,5,6]]' },
-      { input: 'root = [1,null,2,3]', output: '[[1],[2],[3]]' },
+      { input: 'nums = [1,-1,0], k = 0', output: '3' },
+      { input: 'nums = [2,2,2], k = 4', output: '2' },
+      { input: 'nums = [3,4,7,2,-3,1,4,2], k = 7', output: '4' },
     ],
-    expectedKeywords: ['queue', 'level', 'while'],
-    solutionExplanation: 'Level-order traversal is naturally solved using BFS with a queue.',
+    starterCode: {
+      javascript: 'function subarraySum(nums, k) {\n  // Write your solution here\n}\n',
+      typescript: 'function subarraySum(nums: number[], k: number): number {\n  // Write your solution here\n  return 0;\n}\n',
+      python: 'def subarraySum(nums, k):\n    # Write your solution here\n    return 0\n',
+      java: 'class Solution {\n    public int subarraySum(int[] nums, int k) {\n        // Write your solution here\n        return 0;\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int subarraySum(vector<int>& nums, int k) {\n        // Write your solution here\n        return 0;\n    }\n};\n',
+      c: 'int subarraySum(int* nums, int numsSize, int k) {\n    // Write your solution here\n    return 0;\n}\n',
+    },
+    expectedKeywords: ['prefix', 'map', 'frequency'],
     timeComplexity: 'O(n)',
     spaceComplexity: 'O(n)',
-    bestPractices: ['Guard null root early.', 'Use queue size to separate levels.'],
   },
-  {
-    id: 'word-break',
-    title: 'Word Break',
-    difficulty: 'Medium',
-    tags: ['String', 'Dynamic Programming'],
-    description:
-      'Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.',
+  'longest-consecutive-sequence': {
+    functionName: 'longestConsecutive',
+    description: 'Return the length of the longest run of consecutive values.',
+    constraints: ['0 <= nums.length <= 100000', '-10^9 <= nums[i] <= 10^9'],
+    hints: ['Use a set and start only at sequence heads.'],
+    editorial: 'Only expand from values that have no predecessor.',
     examples: [
-      { input: 's = "leetcode", wordDict = ["leet","code"]', output: 'true' },
-      { input: 's = "catsandog", wordDict = ["cats","dog","sand","and","cat"]', output: 'false' },
+      { input: 'nums = [100,4,200,1,3,2]', output: '4' },
+      { input: 'nums = [0,3,7,2,5,8,4,6,0,1]', output: '9' },
     ],
-    constraints: ['1 <= s.length <= 300', '1 <= wordDict.length <= 1000'],
-    hints: ['Use dp[i] to mean s[0:i] can be segmented.', 'Try previous split points j < i.'],
-    editorial: 'DP over prefixes with hash set dictionary lookup.',
-    functionName: 'wordBreak',
-    starterCode: {
-      javascript: 'function wordBreak(s, wordDict) {\n  // Write your solution here\n}\n',
-      typescript: 'function wordBreak(s: string, wordDict: string[]): boolean {\n  // Write your solution here\n  return false;\n}\n',
-      python: 'def wordBreak(s, wordDict):\n    # Write your solution here\n    return False\n',
-      java: 'import java.util.*;\n\nclass Solution {\n    public boolean wordBreak(String s, List<String> wordDict) {\n        // Write your solution here\n        return false;\n    }\n}\n',
-      cpp: '#include <vector>\n#include <string>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool wordBreak(string s, vector<string>& wordDict) {\n        // Write your solution here\n        return false;\n    }\n};\n',
-      c: '#include <stdbool.h>\n\nbool wordBreak(char* s, char** wordDict, int wordDictSize) {\n    // Write your solution here\n    return false;\n}\n',
-    },
     hiddenTestCases: [
-      { input: 's = "applepenapple", wordDict = ["apple","pen"]', output: 'true' },
-      { input: 's = "cars", wordDict = ["car","ca","rs"]', output: 'true' },
-      { input: 's = "aaaaaaa", wordDict = ["aaaa","aaa"]', output: 'true' },
+      { input: 'nums = [1,2,0,1]', output: '3' },
+      { input: 'nums = [9,1,4,7,3,-1,0,5,8,-1,6]', output: '7' },
+      { input: 'nums = []', output: '0' },
     ],
-    expectedKeywords: ['dp', 'set', 'substring'],
-    solutionExplanation: 'Use dynamic programming over string prefixes with dictionary lookup in a set.',
-    timeComplexity: 'O(n^2)',
+    starterCode: {
+      javascript: 'function longestConsecutive(nums) {\n  // Write your solution here\n}\n',
+      typescript: 'function longestConsecutive(nums: number[]): number {\n  // Write your solution here\n  return 0;\n}\n',
+      python: 'def longestConsecutive(nums):\n    # Write your solution here\n    return 0\n',
+      java: 'class Solution {\n    public int longestConsecutive(int[] nums) {\n        // Write your solution here\n        return 0;\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int longestConsecutive(vector<int>& nums) {\n        // Write your solution here\n        return 0;\n    }\n};\n',
+      c: 'int longestConsecutive(int* nums, int numsSize) {\n    // Write your solution here\n    return 0;\n}\n',
+    },
+    expectedKeywords: ['set', 'sequence', 'consecutive'],
+    timeComplexity: 'O(n)',
     spaceComplexity: 'O(n)',
-    bestPractices: ['Use a set for O(1) word lookup.', 'Break inner loop early once dp[i] is true.'],
   },
-  {
-    id: 'number-of-islands',
-    title: 'Number of Islands',
-    difficulty: 'Medium',
-    tags: ['Graph', 'DFS', 'BFS', 'Matrix'],
-    description: 'Given an m x n grid of 1s (land) and 0s (water), return the number of islands.',
+  'house-robber': {
+    functionName: 'rob',
+    description: 'Maximize robbery amount without taking adjacent houses.',
+    constraints: ['1 <= nums.length <= 100', '0 <= nums[i] <= 400'],
+    hints: ['Use rolling DP states.'],
+    editorial: 'At each index choose rob vs skip.',
     examples: [
-      { input: 'grid = [[1,1,0],[0,1,0],[1,0,1]]', output: '3' },
-      { input: 'grid = [[1,1,1],[0,1,0],[1,1,1]]', output: '1' },
+      { input: 'nums = [1,2,3,1]', output: '4' },
+      { input: 'nums = [2,7,9,3,1]', output: '12' },
     ],
-    constraints: ['1 <= m, n <= 300', 'grid[i][j] is either 0 or 1'],
-    hints: ['Traverse each cell.', 'On land, run DFS/BFS and mark visited.'],
-    editorial: 'Count connected components in a binary grid using flood fill.',
-    functionName: 'numIslands',
-    starterCode: {
-      javascript: 'function numIslands(grid) {\n  // Write your solution here\n}\n',
-      typescript: 'function numIslands(grid: string[][]): number {\n  // Write your solution here\n  return 0;\n}\n',
-      python: 'def numIslands(grid):\n    # Write your solution here\n    return 0\n',
-      java: 'class Solution {\n    public int numIslands(char[][] grid) {\n        // Write your solution here\n        return 0;\n    }\n}\n',
-      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int numIslands(vector<vector<char>>& grid) {\n        // Write your solution here\n        return 0;\n    }\n};\n',
-      c: 'int numIslands(char** grid, int gridSize, int* gridColSize) {\n    // Write your solution here\n    return 0;\n}\n',
-    },
     hiddenTestCases: [
-      { input: 'grid = [[1,0,1],[0,1,0],[1,0,1]]', output: '5' },
-      { input: 'grid = [[1,1],[1,1]]', output: '1' },
-      { input: 'grid = [[0,0],[0,0]]', output: '0' },
+      { input: 'nums = [2,1,1,2]', output: '4' },
+      { input: 'nums = [6,7,1,30,8,2,4]', output: '41' },
+      { input: 'nums = [1]', output: '1' },
     ],
-    expectedKeywords: ['dfs', 'bfs', 'visited'],
-    solutionExplanation: 'Use DFS/BFS flood fill to mark each discovered island once.',
-    timeComplexity: 'O(m*n)',
-    spaceComplexity: 'O(m*n)',
-    bestPractices: ['Avoid revisiting cells by mutating grid or using visited array.', 'Extract direction vectors to keep traversal clean.'],
-  },
-  {
-    id: 'lru-cache',
-    title: 'LRU Cache',
-    difficulty: 'Hard',
-    tags: ['Hash Map', 'Design', 'Linked List'],
-    description:
-      'Design a data structure that follows the constraints of a Least Recently Used (LRU) cache with O(1) get and put operations.',
-    examples: [
-      {
-        operations: ['LRUCache', 'put', 'put', 'get', 'put', 'get', 'put', 'get', 'get', 'get'],
-        parameters: [[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]],
-        expected: [null, null, null, 1, null, -1, null, -1, 3, 4],
-        explanation: 'Capacity 2. After put(3,3) key 2 is evicted; after put(4,4) key 1 is evicted.',
-      },
-      {
-        operations: ['LRUCache', 'put', 'get', 'put', 'get'],
-        parameters: [[1], [2, 1], [2], [3, 2], [2]],
-        expected: [null, null, 1, null, -1],
-        explanation: 'Capacity 1. After put(3,2) key 2 is evicted.',
-      },
-    ],
-    constraints: ['1 <= capacity <= 3000', '0 <= key <= 10000', 'At most 2*10^5 operations'],
-    hints: ['Use hashmap + doubly linked list for O(1).', 'Move recently accessed nodes to the front.'],
-    editorial:
-      'Maintain doubly linked list ordered by recency and map key->node. On get/put, move node to front. Evict tail when over capacity.',
-    functionName: 'LRUCache',
     starterCode: {
-      javascript: 'class LRUCache {\n  constructor(capacity) {\n    // Write your solution here\n  }\n\n  get(key) {\n    return -1;\n  }\n\n  put(key, value) {\n    // Write your solution here\n  }\n}\n',
-      typescript: 'class LRUCache {\n  constructor(capacity: number) {\n    // Write your solution here\n  }\n\n  get(key: number): number {\n    return -1;\n  }\n\n  put(key: number, value: number): void {\n    // Write your solution here\n  }\n}\n',
-      python: 'class LRUCache:\n    def __init__(self, capacity: int):\n        # Write your solution here\n        pass\n\n    def get(self, key: int) -> int:\n        return -1\n\n    def put(self, key: int, value: int) -> None:\n        # Write your solution here\n        pass\n',
-      java: 'class LRUCache {\n    public LRUCache(int capacity) {\n        // Write your solution here\n    }\n\n    public int get(int key) {\n        return -1;\n    }\n\n    public void put(int key, int value) {\n        // Write your solution here\n    }\n}\n',
-      cpp: '#include <unordered_map>\nusing namespace std;\n\nclass LRUCache {\npublic:\n    LRUCache(int capacity) {\n        // Write your solution here\n    }\n\n    int get(int key) {\n        return -1;\n    }\n\n    void put(int key, int value) {\n        // Write your solution here\n    }\n};\n',
-      c: '#include <stdlib.h>\n\ntypedef struct LRUCache LRUCache;\n\nLRUCache* lRUCacheCreate(int capacity) {\n    // Write your solution here\n    return NULL;\n}\n\nint lRUCacheGet(LRUCache* obj, int key) {\n    return -1;\n}\n\nvoid lRUCachePut(LRUCache* obj, int key, int value) {\n    // Write your solution here\n}\n',
+      javascript: 'function rob(nums) {\n  // Write your solution here\n}\n',
+      typescript: 'function rob(nums: number[]): number {\n  // Write your solution here\n  return 0;\n}\n',
+      python: 'def rob(nums):\n    # Write your solution here\n    return 0\n',
+      java: 'class Solution {\n    public int rob(int[] nums) {\n        // Write your solution here\n        return 0;\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int rob(vector<int>& nums) {\n        // Write your solution here\n        return 0;\n    }\n};\n',
+      c: 'int rob(int* nums, int numsSize) {\n    // Write your solution here\n    return 0;\n}\n',
     },
-    hiddenTestCases: [
-      {
-        operations: ['LRUCache', 'put', 'put', 'get', 'put', 'get', 'put', 'get', 'get', 'get'],
-        parameters: [[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]],
-        expected: [null, null, null, 1, null, -1, null, -1, 3, 4],
-      },
-      {
-        operations: ['LRUCache', 'put', 'get', 'put', 'get', 'get'],
-        parameters: [[1], [2, 1], [2], [3, 2], [2], [3]],
-        expected: [null, null, 1, null, -1, 2],
-      },
-      {
-        operations: ['LRUCache', 'put', 'put', 'put', 'put', 'get', 'get'],
-        parameters: [[2], [2, 1], [1, 1], [2, 3], [4, 1], [1], [2]],
-        expected: [null, null, null, null, null, -1, 3],
-      },
-    ],
-    problemType: 'DESIGN',
-    designConfig: {
-      className: 'LRUCache',
-      constructorParamTypes: ['int'],
-      methods: {
-        get: { paramTypes: ['int'], returnType: 'int' },
-        put: { paramTypes: ['int', 'int'], returnType: 'void' },
-      },
-    },
-    expectedKeywords: ['map', 'list', 'node', 'remove', 'insert'],
-    solutionExplanation: 'Combine hashmap for key lookup and doubly linked list for recency order.',
-    timeComplexity: 'O(1) average per get/put',
-    spaceComplexity: 'O(capacity)',
-    bestPractices: ['Separate node operations into helper methods.', 'Handle updates and inserts via common recency path.'],
+    expectedKeywords: ['dp', 'adjacent', 'rob'],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
-  {
-    id: 'min-stack',
-    title: 'Min Stack',
-    difficulty: 'Easy',
-    tags: ['Stack', 'Design'],
-    description:
-      'Design a stack that supports push, pop, top, and retrieving the minimum element in constant time. Implement the MinStack class with O(1) getMin().',
+  'coin-change': {
+    functionName: 'coinChange',
+    description: 'Return the minimum number of coins needed to make amount, or -1 if impossible.',
+    constraints: ['1 <= coins.length <= 12', '1 <= coins[i] <= 10000', '0 <= amount <= 10000'],
+    hints: ['Bottom-up DP over amount.'],
+    editorial: 'Transition from smaller amounts using all coin options.',
     examples: [
-      {
-        operations: ['MinStack', 'push', 'push', 'push', 'getMin', 'pop', 'top', 'getMin'],
-        parameters: [[], [-2], [0], [-3], [], [], [], []],
-        expected: [null, null, null, null, -3, null, 0, -2],
-        explanation: 'After pushing -2, 0, -3 the min is -3. After pop() the top is 0 and the new min is -2.',
-      },
+      { input: 'coins = [1,2,5], amount = 11', output: '3' },
+      { input: 'coins = [2], amount = 3', output: '-1' },
     ],
+    hiddenTestCases: [
+      { input: 'coins = [1,3,4], amount = 6', output: '2' },
+      { input: 'coins = [2,5,10,1], amount = 27', output: '4' },
+      { input: 'coins = [2], amount = 1', output: '-1' },
+    ],
+    starterCode: {
+      javascript: 'function coinChange(coins, amount) {\n  // Write your solution here\n}\n',
+      typescript: 'function coinChange(coins: number[], amount: number): number {\n  // Write your solution here\n  return -1;\n}\n',
+      python: 'def coinChange(coins, amount):\n    # Write your solution here\n    return -1\n',
+      java: 'class Solution {\n    public int coinChange(int[] coins, int amount) {\n        // Write your solution here\n        return -1;\n    }\n}\n',
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int coinChange(vector<int>& coins, int amount) {\n        // Write your solution here\n        return -1;\n    }\n};\n',
+      c: 'int coinChange(int* coins, int coinsSize, int amount) {\n    // Write your solution here\n    return -1;\n}\n',
+    },
+    expectedKeywords: ['dp', 'minimum', 'amount'],
+    timeComplexity: 'O(amount * coins.length)',
+    spaceComplexity: 'O(amount)',
+  },
+};
+
+const LEGACY_QUESTION_ID_BY_TITLE: Record<string, string> = {
+  'Two Sum': 'two-sum',
+  'Single Number': 'single-number',
+  'Valid Parentheses': 'valid-parentheses',
+  'Maximum Subarray': 'max-subarray',
+  'Merge Intervals': 'merge-intervals',
+  'Binary Tree Level Order Traversal': 'binary-tree-level-order',
+  'Word Break': 'word-break',
+  'Number of Islands': 'number-of-islands',
+  'LRU Cache': 'lru-cache',
+  'Min Stack': 'min-stack',
+  'Contains Duplicate': 'contains-duplicate',
+  'Best Time to Buy and Sell Stock': 'best-time-stock',
+  'Product of Array Except Self': 'product-except-self',
+  'Longest Substring Without Repeating Characters': 'longest-substring-without-repeating-characters',
+  'Coin Change': 'coin-change',
+  'Subarray Sum Equals K': 'subarray-sum-equals-k',
+  'Longest Consecutive Sequence': 'longest-consecutive-sequence',
+  'House Robber': 'house-robber',
+};
+
+function slugifyQuestionTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/\(.*?\)/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+}
+
+function toFunctionNameFromTitle(title: string): string {
+  const words = slugifyQuestionTitle(title)
+    .split('-')
+    .filter(Boolean);
+
+  const rawName = words
+    .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+    .join('');
+
+  if (!rawName) return 'solve';
+  if (/^[0-9]/.test(rawName)) return `solve${rawName.charAt(0).toUpperCase()}${rawName.slice(1)}`;
+  return rawName;
+}
+
+function getQuestionIdFromTitle(title: string): string {
+  return LEGACY_QUESTION_ID_BY_TITLE[title] ?? slugifyQuestionTitle(title);
+}
+
+function inferDifficulty(title: string): Difficulty {
+  if (EASY_QUESTION_TITLES.has(title)) return 'Easy';
+  if (HARD_QUESTION_TITLES.has(title)) return 'Hard';
+  return 'Medium';
+}
+
+interface LeetCodeStyleDraft {
+  description: string;
+  examples: FunctionTestCase[];
+  hiddenTestCases: FunctionTestCase[];
+  constraints: string[];
+  hints: string[];
+  editorial: string;
+  solutionExplanation: string;
+  timeComplexity: string;
+  spaceComplexity: string;
+  bestPractices: string[];
+  expectedKeywords: string[];
+}
+
+function pickPrimaryTag(tags: string[]): string {
+  if (!tags.length) return 'Algorithm';
+  const ordered = [
+    'Array',
+    'String',
+    'Hash Map',
+    'Two Pointers',
+    'Sliding Window',
+    'Stack',
+    'Queue',
+    'Binary Search',
+    'Linked List',
+    'Tree',
+    'Graph',
+    'Heap',
+    'Dynamic Programming',
+    'Greedy',
+    'Backtracking',
+    'Bit Manipulation',
+    'Math',
+    'Prefix Sum',
+    'Matrix',
+    'Trie',
+    'Interval',
+  ];
+
+  for (const preferred of ordered) {
+    if (tags.includes(preferred)) return preferred;
+  }
+
+  return tags[0];
+}
+
+function buildExamplesByTag(primaryTag: string): { examples: FunctionTestCase[]; hiddenTestCases: FunctionTestCase[] } {
+  switch (primaryTag) {
+    case 'String':
+      return {
+        examples: [
+          { input: 's = "abcabcbb"', output: '3' },
+          { input: 's = "bbbbb"', output: '1' },
+        ],
+        hiddenTestCases: [
+          { input: 's = "pwwkew"', output: '3' },
+          { input: 's = ""', output: '0' },
+        ],
+      };
+    case 'Graph':
+    case 'Tree':
+      return {
+        examples: [
+          { input: 'nodes = 5, edges = [[0,1],[0,2],[1,3],[1,4]]', output: '[0,1,2,3,4]' },
+          { input: 'nodes = 1, edges = []', output: '[0]' },
+        ],
+        hiddenTestCases: [
+          { input: 'nodes = 7, edges = [[0,1],[0,2],[2,3],[2,4],[4,5],[4,6]]', output: '[0,1,2,3,4,5,6]' },
+          { input: 'nodes = 0, edges = []', output: '[]' },
+        ],
+      };
+    case 'Matrix':
+      return {
+        examples: [
+          { input: 'matrix = [[1,2,3],[4,5,6],[7,8,9]]', output: '45' },
+          { input: 'matrix = [[1]]', output: '1' },
+        ],
+        hiddenTestCases: [
+          { input: 'matrix = [[1,0,1],[0,1,0],[1,0,1]]', output: '5' },
+          { input: 'matrix = []', output: '0' },
+        ],
+      };
+    case 'Linked List':
+      return {
+        examples: [
+          { input: 'head = [1,2,3,4]', output: '[1,2,3,4]' },
+          { input: 'head = [1]', output: '[1]' },
+        ],
+        hiddenTestCases: [
+          { input: 'head = [1,1,2,3,3]', output: '[1,1,2,3,3]' },
+          { input: 'head = []', output: '[]' },
+        ],
+      };
+    default:
+      return {
+        examples: [
+          { input: 'nums = [1,2,3,4]', output: '10' },
+          { input: 'nums = [4,3,2,1]', output: '10' },
+        ],
+        hiddenTestCases: [
+          { input: 'nums = [2,7,11,15]', output: '35' },
+          { input: 'nums = [0,0,0,0]', output: '0' },
+        ],
+      };
+  }
+}
+
+function buildLeetCodeStyleDraft(title: string, difficulty: Difficulty, tags: string[]): LeetCodeStyleDraft {
+  const primaryTag = pickPrimaryTag(tags);
+  const complexityByDifficulty: Record<Difficulty, string> = {
+    Easy: 'linear or near-linear',
+    Medium: 'near-linear or n log n',
+    Hard: 'optimized approach under tight constraints',
+  };
+
+  const { examples, hiddenTestCases } = buildExamplesByTag(primaryTag);
+
+  return {
+    description: `Given the inputs for "${title}", return the required output using an optimal ${primaryTag} strategy.`,
+    examples,
+    hiddenTestCases,
     constraints: [
-      '-2^31 <= val <= 2^31 - 1',
-      'pop, top and getMin operations will always be called on non-empty stacks.',
-      'At most 3 * 10^4 calls will be made to push, pop, top, and getMin.',
+      'Input size can be up to 10^5 unless otherwise stated in the prompt.',
+      'Values may include negatives and duplicates when applicable.',
+      `Your solution should target ${complexityByDifficulty[difficulty]} time complexity.`,
     ],
     hints: [
-      'Use an auxiliary stack that tracks the minimum at each level.',
-      'Push to the min-stack only when the new value is <= the current minimum.',
+      `Identify whether ${primaryTag} is the dominant pattern before coding.`,
+      'Start with a simple baseline, then optimize while preserving correctness.',
     ],
-    editorial:
-      'Maintain a secondary min-stack where each entry is the running minimum at that depth. Pop both stacks simultaneously.',
-    functionName: 'MinStack',
-    starterCode: {
-      javascript:
-        'class MinStack {\n  constructor() {\n    // Write your solution here\n  }\n\n  push(val) {\n    // Write your solution here\n  }\n\n  pop() {\n    // Write your solution here\n  }\n\n  top() {\n    return -1;\n  }\n\n  getMin() {\n    return -1;\n  }\n}\n',
-      typescript:
-        'class MinStack {\n  constructor() {\n    // Write your solution here\n  }\n\n  push(val: number): void {\n    // Write your solution here\n  }\n\n  pop(): void {\n    // Write your solution here\n  }\n\n  top(): number {\n    return -1;\n  }\n\n  getMin(): number {\n    return -1;\n  }\n}\n',
-      python:
-        'class MinStack:\n    def __init__(self):\n        # Write your solution here\n        pass\n\n    def push(self, val: int) -> None:\n        # Write your solution here\n        pass\n\n    def pop(self) -> None:\n        # Write your solution here\n        pass\n\n    def top(self) -> int:\n        return -1\n\n    def getMin(self) -> int:\n        return -1\n',
-      java:
-        'class MinStack {\n    public MinStack() {\n        // Write your solution here\n    }\n\n    public void push(int val) {\n        // Write your solution here\n    }\n\n    public void pop() {\n        // Write your solution here\n    }\n\n    public int top() {\n        return -1;\n    }\n\n    public int getMin() {\n        return -1;\n    }\n}\n',
-      cpp:
-        'class MinStack {\npublic:\n    MinStack() {\n        // Write your solution here\n    }\n\n    void push(int val) {\n        // Write your solution here\n    }\n\n    void pop() {\n        // Write your solution here\n    }\n\n    int top() {\n        return -1;\n    }\n\n    int getMin() {\n        return -1;\n    }\n};\n',
-      c: '// C does not natively support classes. Use struct + functions.\n// typedef struct MinStack MinStack;\n',
-    },
-    hiddenTestCases: [
-      {
-        operations: ['MinStack', 'push', 'push', 'push', 'pop', 'getMin'],
-        parameters: [[], [1], [2], [3], [], []],
-        expected: [null, null, null, null, null, 1],
-      },
-      {
-        operations: ['MinStack', 'push', 'push', 'getMin', 'push', 'getMin'],
-        parameters: [[], [5], [3], [], [2], []],
-        expected: [null, null, null, 3, null, 2],
-      },
-      {
-        operations: ['MinStack', 'push', 'push', 'push', 'pop', 'getMin', 'top'],
-        parameters: [[], [-3], [0], [-5], [], [], []],
-        expected: [null, null, null, null, null, -3, 0],
-      },
-    ],
-    problemType: 'DESIGN',
-    designConfig: {
-      className: 'MinStack',
-      constructorParamTypes: [],
-      methods: {
-        push: { paramTypes: ['int'], returnType: 'void' },
-        pop: { paramTypes: [], returnType: 'void' },
-        top: { paramTypes: [], returnType: 'int' },
-        getMin: { paramTypes: [], returnType: 'int' },
-      },
-    },
-    expectedKeywords: ['stack', 'min', 'push', 'pop'],
+    editorial: `Model the problem around the core ${primaryTag} invariant, then implement a single-pass or bounded-pass solution that preserves correctness on edge cases.`,
     solutionExplanation:
-      'Maintain a secondary min-stack that records the current minimum. Each push also updates the min-stack.',
-    timeComplexity: 'O(1) per operation',
-    spaceComplexity: 'O(n)',
+      'Use the canonical algorithmic pattern for this topic, validate with edge cases, and keep implementation deterministic and readable.',
+    timeComplexity: difficulty === 'Hard' ? 'O(n log n) or better depending on constraints' : 'O(n) expected',
+    spaceComplexity: primaryTag === 'Hash Map' || primaryTag === 'Dynamic Programming' ? 'O(n)' : 'O(1) to O(n) depending on approach',
     bestPractices: [
-      'Separate the min tracking into a helper stack.',
-      'Handle the pop operation on both stacks simultaneously.',
+      'Handle empty or minimal input first.',
+      'Avoid unnecessary copies and nested loops when possible.',
+      'Keep helper functions pure and deterministic.',
     ],
-  },
-];
+    expectedKeywords: Array.from(new Set([primaryTag.toLowerCase(), ...tags.map((tag) => tag.toLowerCase())])),
+  };
+}
+
+function normalizeExample(example: FunctionTestCase, index: number): FunctionTestCase {
+  const input = String(example.input ?? '').trim();
+  const output = String(example.output ?? '').trim();
+
+  return {
+    input: input.length > 0 ? input : `value = ${index + 1}`,
+    output: output.length > 0 ? output : '0',
+    explanation: example.explanation,
+  };
+}
+
+function ensureLeetCodeQuestionFormat(question: CodingQuestion): CodingQuestion {
+  if (question.problemType === 'DESIGN') {
+    return question;
+  }
+
+  const normalizedExamples = (question.examples as FunctionTestCase[])
+    .filter((item): item is FunctionTestCase => !isDesignTestCase(item as CodingTestCase))
+    .map(normalizeExample);
+
+  const normalizedHidden = (question.hiddenTestCases as FunctionTestCase[])
+    .filter((item): item is FunctionTestCase => !isDesignTestCase(item as CodingTestCase))
+    .map(normalizeExample);
+
+  const examples = normalizedExamples.length >= 2
+    ? normalizedExamples
+    : [
+        ...normalizedExamples,
+        { input: 'nums = [1,2,3]', output: '6' },
+        { input: 'nums = [3,2,1]', output: '6' },
+      ].slice(0, 2);
+
+  const hiddenTestCases = normalizedHidden.length >= 2
+    ? normalizedHidden
+    : [
+        ...normalizedHidden,
+        { input: 'nums = [0]', output: '0' },
+        { input: 'nums = [10,20,30]', output: '60' },
+      ].slice(0, 2);
+
+  const constraints = question.constraints.filter(Boolean);
+  const hints = question.hints.filter(Boolean);
+  const expectedKeywords = question.expectedKeywords.filter(Boolean);
+  const bestPractices = question.bestPractices.filter(Boolean);
+
+  return {
+    ...question,
+    description: question.description.trim().length
+      ? question.description.trim()
+      : `Given the inputs for "${question.title}", return the required output using an optimal approach.`,
+    examples,
+    hiddenTestCases,
+    constraints: constraints.length >= 2
+      ? constraints
+      : [
+          ...constraints,
+          'Input size can be large; design for efficiency.',
+          'Handle boundary and edge cases explicitly.',
+        ].slice(0, 2),
+    hints: hints.length >= 2
+      ? hints
+      : [
+          ...hints,
+          'Start from a simple approach and optimize.',
+          'Use the dominant data-structure pattern for this problem.',
+        ].slice(0, 2),
+    editorial: question.editorial.trim().length
+      ? question.editorial.trim()
+      : 'Apply the canonical solution pattern for this problem and validate edge cases.',
+    solutionExplanation: question.solutionExplanation.trim().length
+      ? question.solutionExplanation.trim()
+      : 'Use a correct and efficient approach that meets constraints.',
+    timeComplexity: question.timeComplexity.trim().length ? question.timeComplexity.trim() : 'O(n)',
+    spaceComplexity: question.spaceComplexity.trim().length ? question.spaceComplexity.trim() : 'O(1) to O(n)',
+    expectedKeywords: expectedKeywords.length > 0 ? expectedKeywords : question.tags.map((tag) => tag.toLowerCase()),
+    bestPractices: bestPractices.length > 0
+      ? bestPractices
+      : ['Write deterministic logic.', 'Test with edge cases before submit.'],
+  };
+}
+
+function createDefaultStarterCode(functionName: string): Record<CodingLanguage, string> {
+  return {
+    javascript: `function ${functionName}(input) {\n  // Write your solution here\n}\n`,
+    typescript: `function ${functionName}(input: any): any {\n  // Write your solution here\n  return null;\n}\n`,
+    python: `def ${functionName}(input):\n    # Write your solution here\n    return None\n`,
+    java: `class Solution {\n    public Object ${functionName}(Object input) {\n        // Write your solution here\n        return null;\n    }\n}\n`,
+    cpp: `class Solution {\npublic:\n    auto ${functionName}(auto input) {\n        // Write your solution here\n        return 0;\n    }\n};\n`,
+    c: `int ${functionName}(void* input) {\n    // Write your solution here\n    return 0;\n}\n`,
+  };
+}
+
+function buildCuratedQuestionPool(): CodingQuestion[] {
+  const titleToTopicIds = new Map<string, Set<string>>();
+
+  for (const [topicId, titles] of Object.entries(CURATED_TOPIC_TITLE_MAP)) {
+    for (const title of titles) {
+      if (!titleToTopicIds.has(title)) {
+        titleToTopicIds.set(title, new Set());
+      }
+      titleToTopicIds.get(title)!.add(topicId);
+    }
+  }
+
+  const questions: CodingQuestion[] = [];
+
+  for (const [title, topicIdsSet] of titleToTopicIds.entries()) {
+    const topicIds = Array.from(topicIdsSet);
+    const tags = topicIds.map((topicId) => TOPIC_TAG_LABELS[topicId] ?? topicId);
+    const id = getQuestionIdFromTitle(title);
+    const functionName = toFunctionNameFromTitle(title);
+    const difficulty = inferDifficulty(title);
+    const leetCodeDraft = buildLeetCodeStyleDraft(title, difficulty, tags);
+    const override = STRICT_QUESTION_OVERRIDES[id];
+
+    const baseQuestion: CodingQuestion = {
+      id,
+      title,
+      difficulty,
+      tags,
+      description: leetCodeDraft.description,
+      examples: leetCodeDraft.examples,
+      constraints: leetCodeDraft.constraints,
+      hints: leetCodeDraft.hints,
+      editorial: leetCodeDraft.editorial,
+      functionName,
+      starterCode: createDefaultStarterCode(functionName),
+      hiddenTestCases: leetCodeDraft.hiddenTestCases,
+      expectedKeywords: leetCodeDraft.expectedKeywords,
+      solutionExplanation: leetCodeDraft.solutionExplanation,
+      timeComplexity: leetCodeDraft.timeComplexity,
+      spaceComplexity: leetCodeDraft.spaceComplexity,
+      bestPractices: leetCodeDraft.bestPractices,
+    };
+
+    const mergedQuestion = override ? ({ ...baseQuestion, ...override, id, title, tags } as CodingQuestion) : baseQuestion;
+    questions.push(ensureLeetCodeQuestionFormat(mergedQuestion));
+  }
+
+  return questions.sort((a, b) => a.title.localeCompare(b.title));
+}
+
+const QUESTION_POOL: CodingQuestion[] = buildCuratedQuestionPool();
 
 export function getCodingLanguageLabel(language: CodingLanguage): string {
   return LANG_LABELS[language];
@@ -556,6 +1192,100 @@ export function generateCodingQuestionSet(params: GenerateCodingQuestionSetParam
 
 export function getQuestionById(questionId: string): CodingQuestion | undefined {
   return QUESTION_POOL.find((q) => q.id === questionId);
+}
+
+export interface CodingTopic {
+  id: string;
+  label: string;
+  description: string;
+  tags: string[];
+}
+
+export const CODING_TOPICS: CodingTopic[] = [
+  { id: 'array', label: 'Array', description: 'Core array manipulation, scanning, and indexing problems.', tags: ['Array', 'Sorting', 'Intervals', 'Prefix Sum'] },
+  { id: 'string', label: 'String', description: 'String parsing, matching, and transformation problems.', tags: ['String'] },
+  { id: 'hash-table', label: 'Hash Table', description: 'Lookup-heavy problems with constant-time mapping.', tags: ['Hash Map', 'Hash Table'] },
+  { id: 'two-pointers', label: 'Two Pointers', description: 'Pairwise scanning and window-style traversal.', tags: ['Two Pointers'] },
+  { id: 'sliding-window', label: 'Sliding Window', description: 'Range-based scanning with moving boundaries.', tags: ['Sliding Window'] },
+  { id: 'stack', label: 'Stack', description: 'Nested order, monotonic processing, and stack design.', tags: ['Stack', 'Monotonic Stack'] },
+  { id: 'queue', label: 'Queue', description: 'Breadth-first traversal and level-order processing.', tags: ['Queue', 'BFS'] },
+  { id: 'linked-list', label: 'Linked List', description: 'Node-based pointer manipulation problems.', tags: ['Linked List'] },
+  { id: 'tree', label: 'Tree', description: 'Binary tree and hierarchical traversal problems.', tags: ['Tree', 'Binary Tree', 'BFS'] },
+  { id: 'graph', label: 'Graph', description: 'DFS, BFS, and connected-component style problems.', tags: ['Graph', 'DFS', 'BFS'] },
+  { id: 'binary-search', label: 'Binary Search', description: 'Search and partition problems over sorted data.', tags: ['Binary Search'] },
+  { id: 'dynamic-programming', label: 'Dynamic Programming', description: 'State transition and optimal-substructure problems.', tags: ['Dynamic Programming', 'DP'] },
+  { id: 'greedy', label: 'Greedy', description: 'Locally optimal decisions that build a global answer.', tags: ['Greedy'] },
+  { id: 'backtracking', label: 'Backtracking', description: 'Search trees with pruning and recursive exploration.', tags: ['Backtracking'] },
+  { id: 'heap', label: 'Heap', description: 'Priority-based selection and scheduling problems.', tags: ['Heap', 'Priority Queue'] },
+  { id: 'trie', label: 'Trie', description: 'Prefix tree lookup and autocomplete problems.', tags: ['Trie'] },
+  { id: 'intervals', label: 'Intervals', description: 'Range merging, scheduling, and overlap problems.', tags: ['Intervals'] },
+  { id: 'matrix', label: 'Matrix', description: 'Grid traversal and 2D coordinate problems.', tags: ['Matrix'] },
+  { id: 'design', label: 'Design', description: 'Data structure design and interface-driven problems.', tags: ['Design'] },
+  { id: 'math', label: 'Math', description: 'Arithmetic, counting, and number-theory style problems.', tags: ['Math'] },
+  { id: 'bit-manipulation', label: 'Bit Manipulation', description: 'Low-level bitwise reasoning and encoding problems.', tags: ['Bit Manipulation'] },
+  { id: 'recursion', label: 'Recursion', description: 'Self-referential and divide-and-conquer problems.', tags: ['Recursion'] },
+  { id: 'prefix-sum', label: 'Prefix Sum', description: 'Prefix accumulation and subarray sum problems.', tags: ['Prefix Sum'] },
+  { id: 'union-find', label: 'Union Find', description: 'Disjoint-set connectivity and grouping problems.', tags: ['Union Find', 'Disjoint Set'] },
+  { id: 'simulation', label: 'Simulation', description: 'Direct state simulation and step-by-step processing.', tags: ['Simulation'] },
+];
+
+const TOPIC_QUESTION_ID_MAP: Record<string, string[]> = Object.fromEntries(
+  Object.entries(CURATED_TOPIC_TITLE_MAP).map(([topicId, titles]) => [
+    topicId,
+    Array.from(new Set(titles.map((title) => getQuestionIdFromTitle(title)))),
+  ])
+);
+
+function dedupeQuestionsById(questions: CodingQuestion[]): CodingQuestion[] {
+  const seen = new Set<string>();
+  return questions.filter((question) => {
+    if (seen.has(question.id)) return false;
+    seen.add(question.id);
+    return true;
+  });
+}
+
+function getMappedQuestionsForTopic(questions: CodingQuestion[], topicId: string): CodingQuestion[] {
+  const mappedIds = TOPIC_QUESTION_ID_MAP[topicId];
+  if (!mappedIds || mappedIds.length === 0) return [];
+
+  const questionById = new Map(questions.map((question) => [question.id, question]));
+  const mappedQuestions = mappedIds
+    .map((id) => questionById.get(id))
+    .filter((question): question is CodingQuestion => Boolean(question));
+
+  return dedupeQuestionsById(mappedQuestions);
+}
+
+export function filterCodingQuestionsByTopic(
+  questions: CodingQuestion[],
+  topicId: string,
+  limit = 10
+): CodingQuestion[] {
+  const topic = CODING_TOPICS.find((item) => item.id === topicId);
+  if (!topic) return [];
+
+  const mappedQuestions = getMappedQuestionsForTopic(questions, topicId);
+  if (mappedQuestions.length > 0) {
+    return mappedQuestions.slice(0, limit);
+  }
+
+  const matchingQuestions = questions.filter((question) =>
+    question.tags.some((tag) => topic.tags.includes(tag))
+  );
+
+  return dedupeQuestionsById(matchingQuestions).slice(0, limit);
+}
+
+export function getCodingTopicQuestionCount(questions: CodingQuestion[], topicId: string): number {
+  return filterCodingQuestionsByTopic(questions, topicId, Number.POSITIVE_INFINITY).length;
+}
+
+export function getCodingTopicsWithCounts(questions: CodingQuestion[]) {
+  return CODING_TOPICS.map((topic) => ({
+    ...topic,
+    questionCount: getCodingTopicQuestionCount(questions, topic.id),
+  }));
 }
 
 function buildAIFeedback(
@@ -611,6 +1341,49 @@ function parseCaseInput(questionId: string, rawInput: string): unknown {
       const nums = compact.match(/nums\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
       const target = compact.match(/target\s*=\s*([^,\s]+)/i)?.[1] ?? '0';
       return { nums: JSON.parse(nums), target: Number(target) };
+    }
+    case '4sum': {
+      const nums = compact.match(/nums\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      const target = compact.match(/target\s*=\s*([^,\s]+)/i)?.[1] ?? '0';
+      return { nums: JSON.parse(nums), target: Number(target) };
+    }
+    case 'single-number': {
+      const nums = compact.match(/nums\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      return { nums: JSON.parse(nums) };
+    }
+    case 'contains-duplicate': {
+      const nums = compact.match(/nums\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      return { nums: JSON.parse(nums) };
+    }
+    case 'best-time-stock': {
+      const prices = compact.match(/prices\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      return { prices: JSON.parse(prices) };
+    }
+    case 'product-except-self': {
+      const nums = compact.match(/nums\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      return { nums: JSON.parse(nums) };
+    }
+    case 'longest-substring-without-repeating-characters': {
+      const s = compact.match(/s\s*=\s*(".*?"|'.*?')/i)?.[1] ?? '""';
+      return { s: JSON.parse(s.replace(/'/g, '"')) };
+    }
+    case 'coin-change': {
+      const coins = compact.match(/coins\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      const amount = compact.match(/amount\s*=\s*([^,\s]+)/i)?.[1] ?? '0';
+      return { coins: JSON.parse(coins), amount: Number(amount) };
+    }
+    case 'subarray-sum-equals-k': {
+      const nums = compact.match(/nums\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      const k = compact.match(/k\s*=\s*([^,\s]+)/i)?.[1] ?? '0';
+      return { nums: JSON.parse(nums), k: Number(k) };
+    }
+    case 'longest-consecutive-sequence': {
+      const nums = compact.match(/nums\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      return { nums: JSON.parse(nums) };
+    }
+    case 'house-robber': {
+      const nums = compact.match(/nums\s*=\s*(\[[^\]]*\])/i)?.[1] ?? '[]';
+      return { nums: JSON.parse(nums) };
     }
     case 'valid-parentheses': {
       const s = compact.match(/s\s*=\s*(".*"|'.*')/i)?.[1] ?? '""';
@@ -756,6 +1529,26 @@ process.stdout.write(JSON.stringify(output));`;
   switch (question.id) {
     case 'two-sum':
       return `const payload = ${payload};\nconst result = ${question.functionName}(payload.nums, payload.target);\nprocess.stdout.write(JSON.stringify(result));`;
+    case '4sum':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.nums, payload.target);\nprocess.stdout.write(JSON.stringify(result));`;
+    case 'single-number':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.nums);\nprocess.stdout.write(String(result));`;
+    case 'contains-duplicate':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.nums);\nprocess.stdout.write(String(result));`;
+    case 'best-time-stock':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.prices);\nprocess.stdout.write(String(result));`;
+    case 'product-except-self':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.nums);\nprocess.stdout.write(JSON.stringify(result));`;
+    case 'longest-substring-without-repeating-characters':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.s);\nprocess.stdout.write(String(result));`;
+    case 'coin-change':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.coins, payload.amount);\nprocess.stdout.write(String(result));`;
+    case 'subarray-sum-equals-k':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.nums, payload.k);\nprocess.stdout.write(String(result));`;
+    case 'longest-consecutive-sequence':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.nums);\nprocess.stdout.write(String(result));`;
+    case 'house-robber':
+      return `const payload = ${payload};\nconst result = ${question.functionName}(payload.nums);\nprocess.stdout.write(String(result));`;
     case 'valid-parentheses':
       return `const payload = ${payload};\nconst result = ${question.functionName}(payload.s);\nprocess.stdout.write(String(result));`;
     case 'max-subarray':
@@ -828,6 +1621,26 @@ print(json.dumps(output), end='')`;
   switch (question.id) {
     case 'two-sum':
       return `import json\npayload = json.loads(${payload})\nresult = ${question.functionName}(payload['nums'], payload['target'])\nprint(json.dumps(result), end='')`;
+    case '4sum':
+      return `import json\npayload = json.loads(${payload})\nresult = ${question.functionName}(payload['nums'], payload['target'])\nprint(json.dumps(result), end='')`;
+    case 'single-number':
+      return `import json\npayload = json.loads(${payload})\nprint(${question.functionName}(payload['nums']), end='')`;
+    case 'contains-duplicate':
+      return `import json\npayload = json.loads(${payload})\nprint(str(${question.functionName}(payload['nums'])).lower(), end='')`;
+    case 'best-time-stock':
+      return `import json\npayload = json.loads(${payload})\nprint(${question.functionName}(payload['prices']), end='')`;
+    case 'product-except-self':
+      return `import json\npayload = json.loads(${payload})\nprint(json.dumps(${question.functionName}(payload['nums'])), end='')`;
+    case 'longest-substring-without-repeating-characters':
+      return `import json\npayload = json.loads(${payload})\nprint(${question.functionName}(payload['s']), end='')`;
+    case 'coin-change':
+      return `import json\npayload = json.loads(${payload})\nprint(${question.functionName}(payload['coins'], payload['amount']), end='')`;
+    case 'subarray-sum-equals-k':
+      return `import json\npayload = json.loads(${payload})\nprint(${question.functionName}(payload['nums'], payload['k']), end='')`;
+    case 'longest-consecutive-sequence':
+      return `import json\npayload = json.loads(${payload})\nprint(${question.functionName}(payload['nums']), end='')`;
+    case 'house-robber':
+      return `import json\npayload = json.loads(${payload})\nprint(${question.functionName}(payload['nums']), end='')`;
     case 'valid-parentheses':
       return `import json\npayload = json.loads(${payload})\nprint(str(${question.functionName}(payload['s'])).lower(), end='')`;
     case 'max-subarray':
@@ -944,6 +1757,116 @@ class Main {
     int[] nums = ${toJavaIntArrayLiteral(data.nums ?? [])};
     int target = ${data.target ?? 0};
     System.out.print(java.util.Arrays.toString(new Solution().twoSum(nums, target)).replace(" ", ""));
+  }
+}`;
+  }
+
+  if (question.id === '4sum') {
+    const data = input as { nums: number[]; target: number };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] nums = ${toJavaIntArrayLiteral(data.nums ?? [])};
+    int target = ${data.target ?? 0};
+    System.out.print(new Solution().fourSum(nums, target).toString().replace(" ", ""));
+  }
+}`;
+  }
+
+  if (question.id === 'single-number') {
+    const data = input as { nums: number[] };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] nums = ${toJavaIntArrayLiteral(data.nums ?? [])};
+    System.out.print(new Solution().singleNumber(nums));
+  }
+}`;
+  }
+
+  if (question.id === 'contains-duplicate') {
+    const data = input as { nums: number[] };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] nums = ${toJavaIntArrayLiteral(data.nums ?? [])};
+    System.out.print(new Solution().containsDuplicate(nums));
+  }
+}`;
+  }
+
+  if (question.id === 'best-time-stock') {
+    const data = input as { prices: number[] };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] prices = ${toJavaIntArrayLiteral(data.prices ?? [])};
+    System.out.print(new Solution().maxProfit(prices));
+  }
+}`;
+  }
+
+  if (question.id === 'product-except-self') {
+    const data = input as { nums: number[] };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] nums = ${toJavaIntArrayLiteral(data.nums ?? [])};
+    System.out.print(java.util.Arrays.toString(new Solution().productExceptSelf(nums)).replace(" ", ""));
+  }
+}`;
+  }
+
+  if (question.id === 'longest-substring-without-repeating-characters') {
+    const data = input as { s: string };
+    return `
+class Main {
+  public static void main(String[] args) {
+    System.out.print(new Solution().lengthOfLongestSubstring(${JSON.stringify(data.s ?? '')}));
+  }
+}`;
+  }
+
+  if (question.id === 'coin-change') {
+    const data = input as { coins: number[]; amount: number };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] coins = ${toJavaIntArrayLiteral(data.coins ?? [])};
+    System.out.print(new Solution().coinChange(coins, ${data.amount ?? 0}));
+  }
+}`;
+  }
+
+  if (question.id === 'subarray-sum-equals-k') {
+    const data = input as { nums: number[]; k: number };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] nums = ${toJavaIntArrayLiteral(data.nums ?? [])};
+    System.out.print(new Solution().subarraySum(nums, ${data.k ?? 0}));
+  }
+}`;
+  }
+
+  if (question.id === 'longest-consecutive-sequence') {
+    const data = input as { nums: number[] };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] nums = ${toJavaIntArrayLiteral(data.nums ?? [])};
+    System.out.print(new Solution().longestConsecutive(nums));
+  }
+}`;
+  }
+
+  if (question.id === 'house-robber') {
+    const data = input as { nums: number[] };
+    return `
+class Main {
+  public static void main(String[] args) {
+    int[] nums = ${toJavaIntArrayLiteral(data.nums ?? [])};
+    System.out.print(new Solution().rob(nums));
   }
 }`;
   }
@@ -1116,6 +2039,123 @@ int main() {
     cout << result[i];
   }
   cout << "]";
+  return 0;
+}`;
+  }
+
+  if (question.id === '4sum') {
+    const data = input as { nums: number[]; target: number };
+    return `
+int main() {
+  vector<int> nums = ${toCppIntVectorLiteral(data.nums ?? [])};
+  auto result = Solution().fourSum(nums, ${data.target ?? 0});
+  cout << "[";
+  for (size_t i = 0; i < result.size(); i++) {
+    if (i) cout << ",";
+    cout << "[";
+    for (size_t j = 0; j < result[i].size(); j++) {
+      if (j) cout << ",";
+      cout << result[i][j];
+    }
+    cout << "]";
+  }
+  cout << "]";
+  return 0;
+}`;
+  }
+
+  if (question.id === 'single-number') {
+    const data = input as { nums: number[] };
+    return `
+int main() {
+  vector<int> nums = ${toCppIntVectorLiteral(data.nums ?? [])};
+  cout << Solution().singleNumber(nums);
+  return 0;
+}`;
+  }
+
+  if (question.id === 'contains-duplicate') {
+    const data = input as { nums: number[] };
+    return `
+int main() {
+  vector<int> nums = ${toCppIntVectorLiteral(data.nums ?? [])};
+  cout << (Solution().containsDuplicate(nums) ? "true" : "false");
+  return 0;
+}`;
+  }
+
+  if (question.id === 'best-time-stock') {
+    const data = input as { prices: number[] };
+    return `
+int main() {
+  vector<int> prices = ${toCppIntVectorLiteral(data.prices ?? [])};
+  cout << Solution().maxProfit(prices);
+  return 0;
+}`;
+  }
+
+  if (question.id === 'product-except-self') {
+    const data = input as { nums: number[] };
+    return `
+int main() {
+  vector<int> nums = ${toCppIntVectorLiteral(data.nums ?? [])};
+  auto result = Solution().productExceptSelf(nums);
+  cout << "[";
+  for (size_t i = 0; i < result.size(); i++) {
+    if (i) cout << ",";
+    cout << result[i];
+  }
+  cout << "]";
+  return 0;
+}`;
+  }
+
+  if (question.id === 'longest-substring-without-repeating-characters') {
+    const data = input as { s: string };
+    return `
+int main() {
+  string s = ${JSON.stringify(data.s ?? '')};
+  cout << Solution().lengthOfLongestSubstring(s);
+  return 0;
+}`;
+  }
+
+  if (question.id === 'coin-change') {
+    const data = input as { coins: number[]; amount: number };
+    return `
+int main() {
+  vector<int> coins = ${toCppIntVectorLiteral(data.coins ?? [])};
+  cout << Solution().coinChange(coins, ${data.amount ?? 0});
+  return 0;
+}`;
+  }
+
+  if (question.id === 'subarray-sum-equals-k') {
+    const data = input as { nums: number[]; k: number };
+    return `
+int main() {
+  vector<int> nums = ${toCppIntVectorLiteral(data.nums ?? [])};
+  cout << Solution().subarraySum(nums, ${data.k ?? 0});
+  return 0;
+}`;
+  }
+
+  if (question.id === 'longest-consecutive-sequence') {
+    const data = input as { nums: number[] };
+    return `
+int main() {
+  vector<int> nums = ${toCppIntVectorLiteral(data.nums ?? [])};
+  cout << Solution().longestConsecutive(nums);
+  return 0;
+}`;
+  }
+
+  if (question.id === 'house-robber') {
+    const data = input as { nums: number[] };
+    return `
+int main() {
+  vector<int> nums = ${toCppIntVectorLiteral(data.nums ?? [])};
+  cout << Solution().rob(nums);
   return 0;
 }`;
   }
@@ -1440,6 +2480,63 @@ async function runInSandbox(language: CodingLanguage, source: string, stdin = ''
   };
 }
 
+const STRICT_EVALUATION_QUESTION_IDS = STRICT_FUNCTION_QUESTION_IDS;
+
+function hasConcreteFunctionTests(question: CodingQuestion): boolean {
+  if (question.problemType === 'DESIGN') {
+    return false;
+  }
+
+  return question.hiddenTestCases.some((test) => {
+    if (isDesignTestCase(test)) {
+      return false;
+    }
+
+    const input = String(test.input ?? '').trim().toLowerCase();
+    const output = String(test.output ?? '').trim().toLowerCase();
+    return input.length > 0 && output.length > 0 && input !== 'hidden test input' && output !== 'expected output';
+  });
+}
+
+async function evaluateCodingSubmissionGeneric(
+  payload: CodingExecuteRequest,
+  question: CodingQuestion
+): Promise<CodingExecuteResult> {
+  const source = buildSandboxSource(question, payload.language, payload.code, { raw: payload.customInput ?? '' });
+  const result = await runInSandbox(payload.language, source, payload.customInput?.trim() ?? '');
+
+  if (result.compileOutput || result.stderr) {
+    const runtimeError = result.compileOutput || result.stderr;
+    return {
+      status: runtimeError.toLowerCase().includes('memory')
+        ? 'Memory Limit Exceeded'
+        : runtimeError.toLowerCase().includes('time')
+          ? 'Time Limit Exceeded'
+          : 'Runtime Error',
+      output: result.stdout ?? '',
+      error: runtimeError,
+      executionTimeMs: result.runTimeMs,
+      memoryMB: Number((Math.max(0, result.memoryKB) / 1024).toFixed(2)),
+      passed: 0,
+      total: 1,
+      aiFeedback: buildAIFeedback(question, 0.35, 'Runtime Error'),
+    };
+  }
+
+  return {
+    status: 'Accepted',
+    output:
+      payload.mode === 'submit'
+        ? 'Execution completed. Curated question mode is active; hidden-case auto-judge is not enabled for this question yet.'
+        : result.stdout || '(execution finished with no stdout output)',
+    executionTimeMs: result.runTimeMs,
+    memoryMB: Number((Math.max(0, result.memoryKB) / 1024).toFixed(2)),
+    passed: 1,
+    total: 1,
+    aiFeedback: buildAIFeedback(question, 0.8, 'Accepted'),
+  };
+}
+
 export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest): Promise<CodingExecuteResult> {
   const question = getQuestionById(payload.questionId);
 
@@ -1473,6 +2570,10 @@ export async function evaluateCodingSubmissionReal(payload: CodingExecuteRequest
       total: payload.mode === 'submit' ? question.hiddenTestCases.length : question.examples.length,
       aiFeedback: buildAIFeedback(question, 0, 'Wrong Answer'),
     };
+  }
+
+  if (!STRICT_EVALUATION_QUESTION_IDS.has(question.id) || !hasConcreteFunctionTests(question)) {
+    return evaluateCodingSubmissionGeneric(payload, question);
   }
 
   const tests = question.problemType === 'DESIGN'

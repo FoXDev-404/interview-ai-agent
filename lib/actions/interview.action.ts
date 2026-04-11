@@ -64,6 +64,7 @@ export async function createCodingInterview(params: {
       techstack: [language],
       type: 'Coding',
       codingLanguage: language,
+      codingTopic: null,
       // Serialize to a JSON string to avoid Firestore's nested-array restriction
       // (DesignTestCase.parameters is unknown[][], which Firestore rejects)
       codingQuestions: JSON.stringify(codingQuestions),
@@ -118,6 +119,25 @@ export async function getInterview(interviewId: string) {
     return {
       success: false,
       message: 'Failed to fetch interview'
+    };
+  }
+}
+
+export async function setCodingInterviewTopic(interviewId: string, codingTopic: string | null) {
+  try {
+    await db.collection('interviews').doc(interviewId).update({
+      codingTopic,
+    });
+
+    return {
+      success: true,
+      message: 'Coding topic saved successfully',
+    };
+  } catch (error) {
+    console.error('Error saving coding topic:', error);
+    return {
+      success: false,
+      message: 'Failed to save coding topic',
     };
   }
 }

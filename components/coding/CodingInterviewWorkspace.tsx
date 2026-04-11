@@ -6,8 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  CheckCircle2,
-  Circle,
   ChevronDown,
   Clock3,
   Code2,
@@ -47,6 +45,8 @@ interface CodingInterviewWorkspaceProps {
   level: string;
   initialLanguage: CodingLanguage;
   questions: CodingQuestion[];
+  selectedTopicLabel?: string;
+  onChangeTopic?: () => void | Promise<void>;
 }
 
 interface QuestionStatus {
@@ -90,6 +90,8 @@ export default function CodingInterviewWorkspace({
   level,
   initialLanguage,
   questions,
+  selectedTopicLabel,
+  onChangeTopic,
 }: CodingInterviewWorkspaceProps) {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<{ name?: string; email?: string; photoURL?: string } | null>(null);
@@ -247,7 +249,7 @@ export default function CodingInterviewWorkspace({
       ...prev,
       [questionId]: {
         attempted: true,
-        solved,
+        solved: Boolean(prev[questionId]?.solved || solved),
       },
     }));
   };
@@ -279,7 +281,7 @@ export default function CodingInterviewWorkspace({
 
       const result = payload.result as CodingExecuteResult;
       setOutput(result);
-      setAttempted(activeQuestion.id, result.status === 'Accepted' && mode === 'submit');
+      setAttempted(activeQuestion.id, result.status === 'Accepted');
 
       if (mode === 'submit') {
         const item: SubmissionHistoryItem = {
@@ -320,8 +322,9 @@ export default function CodingInterviewWorkspace({
   };
 
   const renderCodingNavbar = () => (
-    <div className="h-12 rounded-xl border border-white/8 bg-dark-100/85 px-3 backdrop-blur-sm">
-      <div className="flex h-full items-center justify-between gap-3">
+    <div className="fixed left-0 right-0 top-0 z-50 px-2 pt-2 sm:px-3 lg:px-4">
+      <div className="h-12 rounded-xl border border-white/8 bg-dark-100/95 px-3 backdrop-blur-sm">
+        <div className="flex h-full items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo.svg" alt="logo" width={26} height={22} />
@@ -344,7 +347,7 @@ export default function CodingInterviewWorkspace({
           )}
         </div>
 
-        <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5">
           <button
             onClick={() => router.push(`/coding-interview/${interviewId}/feedback`)}
             className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/35 bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/22"
@@ -357,22 +360,23 @@ export default function CodingInterviewWorkspace({
             {formatRemaining(remainingSeconds)}
           </div>
 
-          {isLoadingUser ? (
-            <div className="h-7 w-7 rounded-full bg-white/10 animate-pulse" />
-          ) : (
-            <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1">
-              <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-xs font-semibold text-white">
-                {currentUser?.photoURL ? (
-                  <img src={currentUser.photoURL} alt="Profile" className="h-full w-full object-cover" />
-                ) : (
-                  currentUser?.name?.charAt(0)?.toUpperCase() || currentUser?.email?.charAt(0)?.toUpperCase() || 'U'
-                )}
+            {isLoadingUser ? (
+              <div className="h-7 w-7 rounded-full bg-white/10 animate-pulse" />
+            ) : (
+              <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1">
+                <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-xs font-semibold text-white">
+                  {currentUser?.photoURL ? (
+                    <img src={currentUser.photoURL} alt="Profile" className="h-full w-full object-cover" />
+                  ) : (
+                    currentUser?.name?.charAt(0)?.toUpperCase() || currentUser?.email?.charAt(0)?.toUpperCase() || 'U'
+                  )}
+                </div>
+                <span className="hidden sm:block max-w-[120px] truncate text-xs text-light-300">
+                  {currentUser?.name || 'Profile'}
+                </span>
               </div>
-              <span className="hidden sm:block max-w-[120px] truncate text-xs text-light-300">
-                {currentUser?.name || 'Profile'}
-              </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -380,7 +384,7 @@ export default function CodingInterviewWorkspace({
 
   if (questions.length === 0) {
     return (
-      <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-x-hidden py-16 px-4 sm:px-6 lg:px-8">
+      <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-x-hidden px-4 pb-16 pt-20 sm:px-6 lg:px-8">
         {renderCodingNavbar()}
         <div className="interview-glass p-8 text-center">
           <h2 className="text-2xl font-bold text-white">No coding questions available</h2>
@@ -392,19 +396,67 @@ export default function CodingInterviewWorkspace({
 
   if (activeQuestion === null) {
     return (
-      <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-x-hidden space-y-8 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="w-full overflow-x-hidden space-y-6 px-4 pb-6 pt-16 sm:px-6 lg:px-8">
         {renderCodingNavbar()}
-        <div className="interview-glass p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="section-label">Coding Interview Session</p>
-              <h1 className="mt-1 text-3xl font-bold text-white">{role}</h1>
-              <p className="mt-2 text-sm text-light-400">
-                {level} level · {questions.length} questions · {CODING_LANGUAGES.find((lang) => lang.value === selectedLanguage)?.label}
-              </p>
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/95 via-slate-900/80 to-blue-950/35 p-6">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-blue-500/10 blur-3xl" />
+            <div className="absolute -bottom-20 -left-20 h-52 w-52 rounded-full bg-cyan-500/10 blur-3xl" />
+          </div>
+
+          <div className="relative z-10 grid gap-5 lg:grid-cols-[1.45fr_0.95fr] lg:items-stretch">
+            <div className="space-y-4">
+              <div>
+                <p className="inline-flex items-center rounded-full border border-blue-300/25 bg-blue-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-blue-200">
+                  Coding Interview Session
+                </p>
+                <h1 className="mt-3 text-2xl font-bold text-white sm:text-3xl">{role}</h1>
+                <p className="mt-2 text-sm text-light-300">
+                  {level} level · {questions.length} questions · {CODING_LANGUAGES.find((lang) => lang.value === selectedLanguage)?.label}
+                </p>
+              </div>
+
+              <div className={`grid gap-3 ${selectedTopicLabel ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
+                <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.12em] text-light-400">Question Set</p>
+                  <p className="mt-1 text-base font-semibold text-white">{questions.length} Total</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.12em] text-light-400">Language</p>
+                  <p className="mt-1 text-base font-semibold text-white">{CODING_LANGUAGES.find((lang) => lang.value === selectedLanguage)?.label}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.12em] text-light-400">Session</p>
+                  <p className="mt-1 text-base font-semibold text-emerald-300">Ready</p>
+                </div>
+                {selectedTopicLabel && (
+                  <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+                    <p className="text-[11px] uppercase tracking-[0.12em] text-light-400">Topic</p>
+                    <p className="mt-1 text-base font-semibold text-white">{selectedTopicLabel}</p>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-light-300">
-              Coding session ready
+
+            <div className="grid h-full grid-rows-[auto_1fr] gap-3 lg:justify-items-end">
+              {selectedTopicLabel && onChangeTopic ? (
+                <div className="flex w-44 flex-col items-stretch gap-1.5">
+                  <button
+                    onClick={onChangeTopic}
+                    className="inline-flex w-44 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/15"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Change topic
+                  </button>
+                  <p className="text-center text-[11px] text-light-400">Switch to a different topic set</p>
+                </div>
+              ) : (
+                <div className="inline-flex w-44 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/12 px-4 py-2.5 text-sm font-medium text-emerald-300">
+                  Coding session ready
+                </div>
+              )}
+
+              <div />
             </div>
           </div>
 
@@ -423,9 +475,14 @@ export default function CodingInterviewWorkspace({
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:justify-items-start">
           {questions.map((question, index) => {
             const status = questionStatus[question.id];
+            const wasAccepted = submissionHistory.some(
+              (entry) => entry.questionId === question.id && entry.status === 'Accepted'
+            );
+            const isSolved = Boolean(status?.solved || wasAccepted);
+            const isAttempted = Boolean(status?.attempted || wasAccepted);
             const difficultyClasses =
               question.difficulty === 'Easy'
                 ? 'bg-emerald-500/15 text-emerald-300'
@@ -433,21 +490,27 @@ export default function CodingInterviewWorkspace({
                   ? 'bg-amber-500/15 text-amber-300'
                   : 'bg-red-500/15 text-red-300';
 
+            const cardStateClasses = isSolved
+              ? 'border-emerald-400/45 bg-emerald-500/10'
+              : isAttempted
+                ? 'border-amber-400/35 bg-amber-500/8'
+                : 'border-white/10 bg-transparent';
+
+            const dotStateClasses = isSolved
+              ? 'bg-emerald-400 ring-2 ring-emerald-400/25'
+              : isAttempted
+                ? 'bg-amber-400 ring-2 ring-amber-400/20'
+                : 'bg-light-400/60 ring-2 ring-white/10';
+
             return (
               <button
                 key={question.id}
                 onClick={() => setActiveIndex(index)}
-                className="interview-glass group p-5 text-left transition-all duration-200 hover:-translate-y-1"
+                className={`interview-glass group w-full max-w-[280px] border p-5 text-left transition-all duration-200 hover:-translate-y-1 ${cardStateClasses}`}
               >
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-xs font-semibold text-light-400">Question {index + 1}</span>
-                  {status?.solved ? (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                  ) : status?.attempted ? (
-                    <Circle className="h-4 w-4 text-amber-400" />
-                  ) : (
-                    <Circle className="h-4 w-4 text-light-400/60" />
-                  )}
+                  <span className={`h-3 w-3 rounded-full ${dotStateClasses}`} />
                 </div>
                 <h3 className="line-clamp-2 text-sm font-semibold text-white">{question.title}</h3>
                 <div className="mt-3 flex items-center justify-between">
@@ -468,11 +531,11 @@ export default function CodingInterviewWorkspace({
   const shouldScrollOutput = outputLineCount > 5;
 
   return (
-    <div className="relative left-1/2 right-1/2 h-screen w-screen -translate-x-1/2 overflow-x-hidden px-2 pb-3 sm:px-3 lg:px-4 flex min-h-0 flex-col">
+    <div className="relative left-1/2 right-1/2 h-screen w-screen -translate-x-1/2 overflow-x-hidden px-2 pb-3 pt-16 sm:px-3 lg:px-4 flex min-h-0 flex-col">
       {renderCodingNavbar()}
 
       <div
-        className="mt-2 flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-0"
+        className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-0"
         style={{
           ['--left-panel-width' as string]: `${leftPanelWidth}%`,
         }}
