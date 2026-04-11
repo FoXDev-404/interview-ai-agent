@@ -492,7 +492,6 @@ export default function CodingFeedbackDashboard({
               <tbody className="divide-y divide-white/8">
                 {questions.map((q, idx) => {
                   const best = bestSubmissions[q.id];
-                  const status = questionStatus[q.id];
                   const status = questionSummaries[q.id];
                   const attempts = attemptsPerQuestion[q.id] ?? 0;
                   const isSolved = status?.solved;
