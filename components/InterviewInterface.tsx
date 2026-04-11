@@ -148,7 +148,6 @@ const InterviewInterface = ({ interview, userId }: Props) => {
 
     setResponses(updatedResponses);
     setCurrentResponse("");
-    setShowAnswerPreview(false);
     setCurrentVoiceDurationSeconds(0);
     if (isLastQuestion) handleCompleteInterview(updatedResponses);
     else setCurrentQuestionIndex(prev => prev + 1);
