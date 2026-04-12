@@ -31,15 +31,17 @@ export default function ResumeAnalyzer() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-0 pb-4 lg:pt-6 lg:pb-6">
       {view === 'input' && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <Hero />
-          <InputPanel
-            onAnalyze={handleAnalyze}
-            isAnalyzing={false}
-            analysisError={analysisError}
-          />
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 lg:min-h-[calc(100vh-7rem)] lg:flex lg:items-center">
+          <div className="w-full space-y-4 lg:-mt-4">
+            <Hero />
+            <InputPanel
+              onAnalyze={handleAnalyze}
+              isAnalyzing={false}
+              analysisError={analysisError}
+            />
+          </div>
         </div>
       )}
 
