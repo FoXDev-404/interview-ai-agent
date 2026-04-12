@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { requireAuth } from '@/lib/auth';
 import { getInterview } from '@/lib/actions/interview.action';
 import CodingFeedbackDashboard from '@/components/coding/CodingFeedbackDashboard';
-import type { CodingQuestion } from '@/lib/codingInterview';
+import { filterCodingQuestionsByTopic, type CodingQuestion } from '@/lib/codingInterview';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +21,7 @@ export default async function CodingFeedbackPage({
   }
 
   const interview = response.interview as Interview & {
+    codingTopic?: string | null;
     codingQuestions?: CodingQuestion[];
   };
 
@@ -29,13 +30,16 @@ export default async function CodingFeedbackPage({
   }
 
   const questions = Array.isArray(interview.codingQuestions) ? interview.codingQuestions : [];
+  const filteredQuestions = interview.codingTopic
+    ? filterCodingQuestionsByTopic(questions, interview.codingTopic, 10)
+    : questions;
 
   return (
     <CodingFeedbackDashboard
       interviewId={interview.id}
       role={interview.role}
       level={interview.level}
-      questions={questions}
+      questions={filteredQuestions}
     />
   );
 }

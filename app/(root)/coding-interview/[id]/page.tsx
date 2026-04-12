@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import CodingInterviewWorkspace from '@/components/coding/CodingInterviewWorkspace';
+import CodingInterviewTopicGate from '@/components/coding/CodingInterviewTopicGate';
 import { getInterview } from '@/lib/actions/interview.action';
 import { requireAuth } from '@/lib/auth';
 import type { CodingLanguage, CodingQuestion } from '@/lib/codingInterview';
@@ -20,6 +20,7 @@ export default async function CodingInterviewPage({ params }: { params: Promise<
 
   const interview = response.interview as Interview & {
     codingLanguage?: string;
+    codingTopic?: string | null;
     codingQuestions?: CodingQuestion[];
   };
 
@@ -33,12 +34,13 @@ export default async function CodingInterviewPage({ params }: { params: Promise<
     : 'javascript';
 
   return (
-    <CodingInterviewWorkspace
+    <CodingInterviewTopicGate
       interviewId={interview.id}
       role={interview.role}
       level={interview.level}
       initialLanguage={language}
       questions={questions}
+      initialTopic={interview.codingTopic ?? null}
     />
   );
 }

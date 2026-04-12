@@ -10,8 +10,9 @@ export async function createInterview(params: {
   level: string;
   techstack: string[];
   type: string;
+  company?: string;
 }) {
-  const { userId, role, level, techstack, type } = params;
+  const { userId, role, level, techstack, type, company } = params;
 
   try {
     // Generate interview questions based on role, level, tech stack, and type
@@ -19,6 +20,7 @@ export async function createInterview(params: {
     
     const interviewData = {
       userId,
+      company: company || null,
       role,
       level,
       techstack,
@@ -51,19 +53,22 @@ export async function createCodingInterview(params: {
   role: string;
   level: string;
   language: CodingLanguage;
+  company?: string;
 }) {
-  const { userId, role, level, language } = params;
+  const { userId, role, level, language, company } = params;
 
   try {
     const codingQuestions = generateCodingQuestionSet({ role, level, language });
 
     const interviewData = {
       userId,
+      company: company || null,
       role,
       level,
       techstack: [language],
       type: 'Coding',
       codingLanguage: language,
+      codingTopic: null,
       // Serialize to a JSON string to avoid Firestore's nested-array restriction
       // (DesignTestCase.parameters is unknown[][], which Firestore rejects)
       codingQuestions: JSON.stringify(codingQuestions),
@@ -118,6 +123,25 @@ export async function getInterview(interviewId: string) {
     return {
       success: false,
       message: 'Failed to fetch interview'
+    };
+  }
+}
+
+export async function setCodingInterviewTopic(interviewId: string, codingTopic: string | null) {
+  try {
+    await db.collection('interviews').doc(interviewId).update({
+      codingTopic,
+    });
+
+    return {
+      success: true,
+      message: 'Coding topic saved successfully',
+    };
+  } catch (error) {
+    console.error('Error saving coding topic:', error);
+    return {
+      success: false,
+      message: 'Failed to save coding topic',
     };
   }
 }

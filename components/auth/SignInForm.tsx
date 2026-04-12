@@ -76,12 +76,13 @@ export default function SignInForm({
           <button
             type="button"
             onClick={onForgotPassword}
+            suppressHydrationWarning
             className="text-xs text-primary-200 hover:text-primary-100 font-medium transition-colors"
           >
             Forgot password?
           </button>
         </div>
-        <button type="submit" className="auth-submit-btn">
+        <button type="submit" suppressHydrationWarning className="auth-submit-btn">
           Sign In
         </button>
       </form>

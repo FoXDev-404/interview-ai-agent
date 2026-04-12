@@ -133,7 +133,7 @@ const page = async () => {
     <>
       <HomeAuthAutoRefresh />
       {/* ── HERO ──────────────────────────────────────────── */}
-      <section className="hero-section relative overflow-hidden rounded-3xl">
+      <section className="hero-section relative overflow-hidden rounded-3xl mt-0 lg:mt-4">
         {/* Animated gradient orbs */}
         <div className="hero-orb hero-orb-1" />
         <div className="hero-orb hero-orb-2" />
@@ -231,7 +231,7 @@ const page = async () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
           {faangCompanies.map((company) => {
             const interviewUrl = user
-              ? `/interview?${new URLSearchParams({ role: company.role, type: company.type.toLowerCase(), level: 'senior', techstack: company.techstack.join(',') }).toString()}`
+              ? `/interview?${new URLSearchParams({ company: company.name, role: company.role, type: company.type.toLowerCase(), level: 'senior', techstack: company.techstack.join(',') }).toString()}`
               : '/sign-in';
 
             return (
@@ -264,6 +264,7 @@ const page = async () => {
                 key={interview.id}
                 interviewId={interview.id}
                 userId={interview.userId}
+                company={interview.company}
                 role={interview.role}
                 type={interview.type}
                 techstack={interview.techstack}

@@ -4,15 +4,26 @@ export const analyzeResume = async (
   resumeText: string,
   jobDescription: string
 ): Promise<AnalysisResult> => {
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ resumeText, jobDescription }),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText, jobDescription }),
+    });
+  } catch {
+    throw new Error('Unable to reach the analysis service. Please check your connection and try again.');
+  }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Analysis failed' }));
-    throw new Error(error.error || 'Analysis failed');
+    const error = await response.json().catch(() => ({ error: '' }));
+
+    if (response.status >= 500) {
+      throw new Error('The analysis service is temporarily unavailable. Please try again in a few minutes.');
+    }
+
+    throw new Error(error.error || 'Resume analysis failed. Please review your input and try again.');
   }
 
   return response.json();

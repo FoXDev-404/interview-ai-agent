@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TECH_CATEGORIES: Record<string, string[]> = {
-  "Frontend": ["React", "Next.js", "Vue.js", "Angular", "TypeScript", "JavaScript", "Tailwind CSS", "Bootstrap"],
+  "Frontend": ["React", "Next.js", "Vue.js", "Angular", "TypeScript", "JavaScript", "Tailwind CSS", "Bootstrap" ,"HTML" ,"CSS"],
   "Backend": ["Node.js", "Express", "Python", "Django", "Flask", "Java", "Spring", "Go", "Rust"],
   "DevOps & Cloud": ["Docker", "Kubernetes", "AWS", "Azure", "GraphQL", "REST API"],
   "Databases": ["MongoDB", "PostgreSQL", "MySQL", "Redis"],
@@ -30,14 +30,10 @@ const ROLE_GROUPS: Array<{ label: string; roles: string[] }> = [
   {
     label: "Core Software",
     roles: [
-      "Software Engineer",
       "Software Developer",
       "Application Engineer",
-      "Full Stack Engineer",
       "Full Stack Developer",
-      "Backend Engineer",
       "Backend Developer",
-      "Frontend Engineer",
       "Frontend Developer",
     ],
   },
@@ -168,6 +164,7 @@ const InterviewForm = () => {
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
   const roleMenuRef = useRef<HTMLDivElement | null>(null);
   const [formData, setFormData] = useState({
+    company: "",
     role: "",
     level: "Junior",
     type: "Technical",
@@ -194,12 +191,14 @@ const InterviewForm = () => {
     loadCurrentUser();
 
     const role = searchParams.get('role');
+    const company = searchParams.get('company');
     const type = searchParams.get('type');
     const level = searchParams.get('level');
     const techstack = searchParams.get('techstack');
-    if (role || type || level || techstack) {
+    if (role || company || type || level || techstack) {
       setFormData(prev => ({
         ...prev,
+        company: company || prev.company,
         role: role || prev.role,
         type:
           type === 'mixed'
@@ -281,12 +280,14 @@ const InterviewForm = () => {
         formData.type === 'Coding'
           ? await createCodingInterview({
               userId: currentUser,
+              company: formData.company || undefined,
               role: formData.role,
               level: formData.level,
               language: formData.codingLanguage,
             })
           : await createInterview({
               userId: currentUser,
+              company: formData.company || undefined,
               role: formData.role,
               level: formData.level,
               techstack: formData.techstack,

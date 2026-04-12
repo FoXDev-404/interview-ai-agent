@@ -24,20 +24,6 @@ const teamMembers = [
     },
   },
   {
-    name: "Pallavi Rawat",
-    role: "Design Lead",
-    image: "/avatars/agent-maya.png",
-    avatarPosition: "center 30%",
-    vision:
-      "Design calm, confidence-boosting practice flows that make preparation feel structured, personal, and motivating.",
-    social: {
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      facebook: "https://facebook.com",
-      instagram: "https://instagram.com",
-    },
-  },
-  {
     name: "Rajpal Nishad",
     role: "CEO & Intelligence Specialist",
     image: "/avatars/Rajpal.jpeg",
@@ -65,6 +51,20 @@ const teamMembers = [
       instagram: "https://instagram.com",
     },
   },
+  {
+    name: "Pallavi Rawat",
+    role: "Design Lead",
+    image: "/avatars/agent-maya.png",
+    avatarPosition: "center 30%",
+    vision:
+      "Design calm, confidence-boosting practice flows that make preparation feel structured, personal, and motivating.",
+    social: {
+      github: "https://github.com",
+      linkedin: "https://linkedin.com",
+      facebook: "https://facebook.com",
+      instagram: "https://instagram.com",
+    },
+  }
 ];
 
 const capabilityItems = [

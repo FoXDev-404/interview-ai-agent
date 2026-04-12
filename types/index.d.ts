@@ -54,6 +54,7 @@ interface InterviewSpeechCoachSummary {
 
 interface Interview {
   id: string;
+  company?: string;
   role: string;
   level: string;
   questions: string[];
@@ -63,6 +64,7 @@ interface Interview {
   type: string;
   finalized: boolean;
   codingLanguage?: string;
+  codingTopic?: string;
   codingQuestions?: unknown[];
 }
 
