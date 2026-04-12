@@ -164,6 +164,7 @@ const InterviewForm = () => {
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
   const roleMenuRef = useRef<HTMLDivElement | null>(null);
   const [formData, setFormData] = useState({
+    company: "",
     role: "",
     level: "Junior",
     type: "Technical",
@@ -190,12 +191,14 @@ const InterviewForm = () => {
     loadCurrentUser();
 
     const role = searchParams.get('role');
+    const company = searchParams.get('company');
     const type = searchParams.get('type');
     const level = searchParams.get('level');
     const techstack = searchParams.get('techstack');
-    if (role || type || level || techstack) {
+    if (role || company || type || level || techstack) {
       setFormData(prev => ({
         ...prev,
+        company: company || prev.company,
         role: role || prev.role,
         type:
           type === 'mixed'
@@ -277,12 +280,14 @@ const InterviewForm = () => {
         formData.type === 'Coding'
           ? await createCodingInterview({
               userId: currentUser,
+              company: formData.company || undefined,
               role: formData.role,
               level: formData.level,
               language: formData.codingLanguage,
             })
           : await createInterview({
               userId: currentUser,
+              company: formData.company || undefined,
               role: formData.role,
               level: formData.level,
               techstack: formData.techstack,

@@ -16,5 +16,5 @@ export default async function ResumeBuilderPage() {
   const result = await getUserResumes(user.uid);
   const resumes = result.success ? result.resumes : [];
 
-  return <BuilderDashboard resumes={resumes} />;
+  return <BuilderDashboard resumes={resumes} userId={user.uid} />;
 }

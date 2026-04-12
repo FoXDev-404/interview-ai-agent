@@ -160,3 +160,40 @@ export async function duplicateResume(resumeId: string, userId: string) {
     return { success: false, resumeId: '', message: 'Failed to duplicate resume' };
   }
 }
+
+export async function deleteAllResumes(params: DeleteAllResumesParams) {
+  const { userId } = params;
+
+  try {
+    const snapshot = await db.collection('resumes').where('userId', '==', userId).get();
+
+    if (snapshot.empty) {
+      return { success: true, deletedCount: 0, message: 'No resumes found' };
+    }
+
+    const docs = snapshot.docs;
+    const chunkSize = 450;
+    let deletedCount = 0;
+
+    for (let i = 0; i < docs.length; i += chunkSize) {
+      const chunk = docs.slice(i, i + chunkSize);
+      const batch = db.batch();
+
+      chunk.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      deletedCount += chunk.length;
+    }
+
+    return {
+      success: true,
+      deletedCount,
+      message: `Deleted ${deletedCount} resume${deletedCount === 1 ? '' : 's'} successfully`,
+    };
+  } catch (error) {
+    console.error('Error deleting all resumes:', error);
+    return { success: false, deletedCount: 0, message: 'Failed to delete all resumes' };
+  }
+}

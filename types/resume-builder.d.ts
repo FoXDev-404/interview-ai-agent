@@ -134,3 +134,7 @@ interface DeleteResumeParams {
   resumeId: string;
   userId: string;
 }
+
+interface DeleteAllResumesParams {
+  userId: string;
+}

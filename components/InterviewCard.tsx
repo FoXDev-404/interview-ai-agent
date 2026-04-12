@@ -1,7 +1,7 @@
 import React from 'react'
 import dayjs from 'dayjs';
 import Image from 'next/image'
-import { getRandomInterviewCover, getInterviewCoverByIndex, getIconPairByIndex } from '@/lib/utils';
+import { getInterviewCoverByIndex, getIconPairByIndex } from '@/lib/utils';
 import  DisplayTechIcons from  './DisplayTechIcons';
 import { Button } from './ui/button';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import Link from 'next/link';
 interface InterviewCardProps {
   interviewId: string;
   userId: string;
+  company?: string;
   role: string;
   type: string;
   techstack: string[];
@@ -17,13 +18,36 @@ interface InterviewCardProps {
   index?: number; // Add index prop for deterministic icon/cover selection
 }
 
-const InterviewCard = ({interviewId, role,type,techstack,createdAt, isDummy = false, index = 0}: InterviewCardProps) => {
+const COMPANY_LOGO_MAP: Record<string, string> = {
+  google: '/covers/google.svg',
+  amazon: '/covers/amazon.png',
+  meta: '/covers/facebook.png',
+  apple: '/covers/apple.svg',
+  netflix: '/covers/netflix.svg',
+  microsoft: '/covers/microsoft.svg',
+};
+
+const getStableIndexFromInterviewId = (id: string) => {
+  let hash = 0;
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash + id.charCodeAt(i)) % 997;
+  }
+  return hash;
+};
+
+const InterviewCard = ({interviewId, company, role,type,techstack,createdAt, isDummy = false, index = 0}: InterviewCardProps) => {
     const feedback = null as Feedback | null;
     const normalixedType = /mix/gi.test(type) ? 'Mixed' :type;
     const formattedDate = dayjs(feedback?.createdAt || createdAt || Date.now()).format('DD/MM/YYYY');
+    const normalizedCompany = company?.trim().toLowerCase() || '';
+    const companyLogo = normalizedCompany ? COMPANY_LOGO_MAP[normalizedCompany] : undefined;
     
-    // For dummy interviews, use index-based selection for consistent different icons/covers
-    const coverImage = isDummy ? getInterviewCoverByIndex(index) : getRandomInterviewCover();
+    // Use selected FAANG company branding when available; otherwise fall back to a stable cover.
+    const coverImage = companyLogo
+      ? companyLogo
+      : isDummy
+        ? getInterviewCoverByIndex(index)
+        : getInterviewCoverByIndex(getStableIndexFromInterviewId(interviewId));
     const iconPair = isDummy ? getIconPairByIndex(index) : null;
   
   // For dummy interviews, create a URL with pre-filled data
@@ -58,7 +82,7 @@ const InterviewCard = ({interviewId, role,type,techstack,createdAt, isDummy = fa
             </div>
             <Image src={coverImage} alt='cover image' width={90} height={90} className='rounded-full object-fit size-[90px] '/>
             <h3 className='mt-5 capitalize'>
-                {role} Interview
+              {company ? `${company} • ${role}` : `${role} Interview`}
             </h3>
 
             <div className='flex flex-row gap-5 mt-3'>

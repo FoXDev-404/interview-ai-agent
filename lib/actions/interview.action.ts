@@ -10,8 +10,9 @@ export async function createInterview(params: {
   level: string;
   techstack: string[];
   type: string;
+  company?: string;
 }) {
-  const { userId, role, level, techstack, type } = params;
+  const { userId, role, level, techstack, type, company } = params;
 
   try {
     // Generate interview questions based on role, level, tech stack, and type
@@ -19,6 +20,7 @@ export async function createInterview(params: {
     
     const interviewData = {
       userId,
+      company: company || null,
       role,
       level,
       techstack,
@@ -51,14 +53,16 @@ export async function createCodingInterview(params: {
   role: string;
   level: string;
   language: CodingLanguage;
+  company?: string;
 }) {
-  const { userId, role, level, language } = params;
+  const { userId, role, level, language, company } = params;
 
   try {
     const codingQuestions = generateCodingQuestionSet({ role, level, language });
 
     const interviewData = {
       userId,
+      company: company || null,
       role,
       level,
       techstack: [language],

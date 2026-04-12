@@ -231,7 +231,7 @@ const page = async () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
           {faangCompanies.map((company) => {
             const interviewUrl = user
-              ? `/interview?${new URLSearchParams({ role: company.role, type: company.type.toLowerCase(), level: 'senior', techstack: company.techstack.join(',') }).toString()}`
+              ? `/interview?${new URLSearchParams({ company: company.name, role: company.role, type: company.type.toLowerCase(), level: 'senior', techstack: company.techstack.join(',') }).toString()}`
               : '/sign-in';
 
             return (
@@ -264,6 +264,7 @@ const page = async () => {
                 key={interview.id}
                 interviewId={interview.id}
                 userId={interview.userId}
+                company={interview.company}
                 role={interview.role}
                 type={interview.type}
                 techstack={interview.techstack}

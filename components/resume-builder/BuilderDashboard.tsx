@@ -1,19 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, Loader2, Trash2 } from 'lucide-react';
 import ResumeCard from './ResumeCard';
 import TemplateCard from './TemplateCard';
 import { useRouter } from 'next/navigation';
 import { getAllTemplates, getTemplateCategories } from '@/lib/resume-builder/template-registry';
+import { deleteAllResumes } from '@/lib/actions/resume-builder.action';
+import { toast } from 'sonner';
 
 interface BuilderDashboardProps {
   resumes: ResumeDocument[];
+  userId: string;
 }
 
-export default function BuilderDashboard({ resumes }: BuilderDashboardProps) {
+export default function BuilderDashboard({ resumes, userId }: BuilderDashboardProps) {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
 
   const templates = getAllTemplates();
   const categories = getTemplateCategories();
@@ -24,6 +28,25 @@ export default function BuilderDashboard({ resumes }: BuilderDashboardProps) {
 
   const handleChange = () => {
     router.refresh();
+  };
+
+  const handleDeleteAll = async () => {
+    if (isDeletingAll || resumes.length === 0) return;
+
+    setIsDeletingAll(true);
+    try {
+      const result = await deleteAllResumes({ userId });
+      if (result.success) {
+        toast.success(result.message || 'All resumes removed');
+        router.refresh();
+      } else {
+        toast.error(result.message || 'Failed to remove all resumes');
+      }
+    } catch {
+      toast.error('Failed to remove all resumes');
+    } finally {
+      setIsDeletingAll(false);
+    }
   };
 
   return (
@@ -104,7 +127,19 @@ export default function BuilderDashboard({ resumes }: BuilderDashboardProps) {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-white">Saved Resumes</h2>
-          <span className="text-sm text-light-400">{resumes.length} total</span>
+          <div className="flex items-center gap-3">
+            {resumes.length > 0 && (
+              <button
+                onClick={handleDeleteAll}
+                disabled={isDeletingAll}
+                className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-300 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isDeletingAll ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                {isDeletingAll ? 'Removing...' : 'Remove All'}
+              </button>
+            )}
+            <span className="text-sm text-light-400">{resumes.length} total</span>
+          </div>
         </div>
 
         {resumes.length === 0 ? (
