@@ -8,6 +8,7 @@ import { clsx } from 'clsx';
 interface InputPanelProps {
   onAnalyze: (resume: string, jd: string) => void;
   isAnalyzing: boolean;
+  analysisError?: string | null;
 }
 
 const JD_SUGGESTIONS = [
@@ -21,7 +22,7 @@ const JD_SUGGESTIONS = [
   "Mobile Developer",
 ];
 
-const InputPanel: React.FC<InputPanelProps> = ({ onAnalyze, isAnalyzing }) => {
+const InputPanel: React.FC<InputPanelProps> = ({ onAnalyze, isAnalyzing, analysisError }) => {
   const [activeTab, setActiveTab] = useState<'paste' | 'upload'>('upload');
   const [resumeText, setResumeText] = useState('');
   const [jdText, setJdText] = useState('');
@@ -58,6 +59,8 @@ const InputPanel: React.FC<InputPanelProps> = ({ onAnalyze, isAnalyzing }) => {
     setError(null);
     onAnalyze(resumeText, jdText);
   };
+
+  const displayError = error ?? analysisError;
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-6 md:p-8">
@@ -176,10 +179,20 @@ const InputPanel: React.FC<InputPanelProps> = ({ onAnalyze, isAnalyzing }) => {
         </div>
       </div>
 
-      {error && (
-        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm flex items-center gap-2">
-          <AlertCircle size={16} />
-          {error}
+      {displayError && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300"
+        >
+          <div className="flex items-center gap-2 font-semibold">
+            <AlertCircle size={16} />
+            We could not analyze your resume
+          </div>
+          <p className="mt-1">{displayError}</p>
+          <p className="mt-1 text-xs text-red-600/90 dark:text-red-300/90">
+            You can review your resume/JD input and try again.
+          </p>
         </div>
       )}
 

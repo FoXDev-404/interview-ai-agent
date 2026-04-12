@@ -10,8 +10,10 @@ import { analyzeResume } from '@/lib/resume/api';
 export default function ResumeAnalyzer() {
   const [view, setView] = useState<'input' | 'loading' | 'dashboard'>('input');
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const handleAnalyze = async (resume: string, jd: string) => {
+    setAnalysisError(null);
     setView('loading');
     try {
       const data = await analyzeResume(resume, jd);
@@ -19,7 +21,11 @@ export default function ResumeAnalyzer() {
       setView('dashboard');
     } catch (error) {
       console.error('AI analysis failed:', error);
-      alert(error instanceof Error ? error.message : 'Failed to analyze resume. Please try again.');
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Resume analysis failed. Please try again in a moment.';
+      setAnalysisError(message);
       setView('input');
     }
   };
@@ -29,7 +35,11 @@ export default function ResumeAnalyzer() {
       {view === 'input' && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <Hero />
-          <InputPanel onAnalyze={handleAnalyze} isAnalyzing={false} />
+          <InputPanel
+            onAnalyze={handleAnalyze}
+            isAnalyzing={view === 'loading'}
+            analysisError={analysisError}
+          />
         </div>
       )}
 
