@@ -37,7 +37,7 @@ export default function ResumeAnalyzer() {
           <Hero />
           <InputPanel
             onAnalyze={handleAnalyze}
-            isAnalyzing={view === 'loading'}
+            isAnalyzing={false}
             analysisError={analysisError}
           />
         </div>

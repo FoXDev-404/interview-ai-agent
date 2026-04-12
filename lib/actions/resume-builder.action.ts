@@ -179,7 +179,7 @@ export async function deleteAllResumes(params: DeleteAllResumesParams) {
       const chunk = docs.slice(i, i + chunkSize);
       const batch = db.batch();
 
-      chunk.forEach((doc) => {
+      chunk.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
         batch.delete(doc.ref);
       });
 
