@@ -133,7 +133,7 @@ const page = async () => {
     <>
       <HomeAuthAutoRefresh />
       {/* ── HERO ──────────────────────────────────────────── */}
-      <section className="hero-section relative overflow-hidden rounded-3xl">
+      <section className="hero-section relative overflow-hidden rounded-3xl mt-0 lg:mt-4">
         {/* Animated gradient orbs */}
         <div className="hero-orb hero-orb-1" />
         <div className="hero-orb hero-orb-2" />
