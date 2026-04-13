@@ -4,6 +4,16 @@ import { GoogleGenAI } from "@google/genai";
 const HF_MODEL =
   process.env.HUGGINGFACE_MODEL || "mistralai/Mistral-7B-Instruct";
 
+const GEMINI_MODEL_CANDIDATES = [
+  process.env.GEMINI_MODEL,
+  "gemini-3.1-flash-lite",
+  "gemini-2.5-flash-lite",
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
+  "gemini-1.5-flash",
+  "gemini-3-flash-preview",
+];
+
 const STOP_WORDS = new Set([
   "the",
   "and",
@@ -198,6 +208,13 @@ type ResumeAnalysisPayload = {
   skills_alignment: number;
   experience_alignment: number;
   format_compliance: number;
+};
+
+type GeminiAttemptResult = {
+  analysis: PlainObject | null;
+  modelUsed?: string;
+  retryAfterSeconds?: number;
+  diagnostic?: string;
 };
 
 function clampScore(value: number): number {
@@ -778,6 +795,140 @@ function parseProviderError(error: unknown): {
   };
 }
 
+function getGeminiApiKeys(): string[] {
+  const combined =
+    process.env.GEMINI_API_KEYS || process.env.GOOGLE_GEMINI_API_KEYS || "";
+
+  const list = [
+    process.env.GEMINI_API_KEY,
+    process.env.GOOGLE_GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_2,
+    process.env.GEMINI_API_KEY_3,
+    process.env.GEMINI_API_KEY_4,
+    process.env.GEMINI_API_KEY_5,
+    process.env.GEMINI_API_KEY_6,
+    process.env.GEMINI_API_KEY_7,
+    process.env.GEMINI_API_KEY_8,
+    process.env.GEMINI_API_KEY_9,
+    process.env.GEMINI_API_KEY_10,
+    ...combined
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean),
+  ]
+    .map((entry) => (entry || "").trim())
+    .filter(Boolean);
+
+  const unique: string[] = [];
+  const seen = new Set<string>();
+
+  for (const key of list) {
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(key);
+  }
+
+  return unique;
+}
+
+function getGeminiModels(): string[] {
+  const unique: string[] = [];
+  const seen = new Set<string>();
+
+  for (const model of GEMINI_MODEL_CANDIDATES) {
+    const normalized = (model || "").trim();
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    unique.push(normalized);
+  }
+
+  return unique;
+}
+
+async function askGeminiForAnalysis(
+  prompt: string,
+  systemInstruction: string,
+): Promise<GeminiAttemptResult> {
+  const keys = getGeminiApiKeys();
+  if (keys.length === 0) {
+    return { analysis: null, diagnostic: "no-gemini-keys" };
+  }
+
+  const models = getGeminiModels();
+  let retryAfterSeconds: number | undefined;
+  let sawQuotaError = false;
+  let sawAuthError = false;
+
+  for (const key of keys) {
+    const ai = new GoogleGenAI({ apiKey: key });
+
+    for (const model of models) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            systemInstruction,
+            responseMimeType: "application/json",
+            temperature: 0.3,
+          },
+        });
+
+        const parsed = extractFirstJson(response.text || "");
+        if (parsed) {
+          return { analysis: parsed, modelUsed: model, retryAfterSeconds };
+        }
+      } catch (error) {
+        const providerError = parseProviderError(error);
+        if (providerError.retryAfterSeconds) {
+          retryAfterSeconds = Math.max(
+            retryAfterSeconds || 0,
+            providerError.retryAfterSeconds,
+          );
+        }
+
+        const status = providerError.status;
+        if (providerError.isQuotaExceeded) {
+          sawQuotaError = true;
+        }
+        if (status === 401 || status === 403) {
+          sawAuthError = true;
+        }
+
+        const shouldTryNextKey =
+          providerError.isQuotaExceeded ||
+          status === 401 ||
+          status === 403 ||
+          status === 429;
+
+        const canTryNextModel = status === 400 || status === 404;
+
+        if (canTryNextModel) {
+          continue;
+        }
+
+        if (shouldTryNextKey) {
+          break;
+        }
+
+        console.error("Gemini resume analysis model attempt failed", {
+          model,
+          status: providerError.status,
+        });
+      }
+    }
+  }
+
+  let diagnostic = "gemini-unavailable";
+  if (sawQuotaError) {
+    diagnostic = "gemini-quota-exhausted";
+  } else if (sawAuthError) {
+    diagnostic = "gemini-auth-failed";
+  }
+
+  return { analysis: null, retryAfterSeconds, diagnostic };
+}
+
 async function askHuggingFaceForAnalysis(
   prompt: string,
 ): Promise<PlainObject | null> {
@@ -855,10 +1006,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Provider setup
-    const apiKey =
-      process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
-
     // 3. Prompt Engineering
     const systemInstruction = `
       You are an expert ATS (Applicant Tracking System) simulator and elite resume coach.
@@ -915,37 +1062,23 @@ export async function POST(request: NextRequest) {
     let rawAnalysis: unknown = null;
     let source: "gemini" | "huggingface" | "heuristic" = "heuristic";
     let retryAfterSeconds: number | undefined;
+    let modelUsed: string | undefined;
+    let fallbackReason: string | undefined;
 
-    if (apiKey) {
-      try {
-        const ai = new GoogleGenAI({ apiKey });
-        const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: prompt,
-          config: {
-            systemInstruction: systemInstruction,
-            responseMimeType: "application/json",
-            temperature: 0.3,
-          },
+    const geminiResult = await askGeminiForAnalysis(prompt, systemInstruction);
+    if (geminiResult.analysis) {
+      rawAnalysis = geminiResult.analysis;
+      source = "gemini";
+      retryAfterSeconds = geminiResult.retryAfterSeconds;
+      modelUsed = geminiResult.modelUsed;
+      if (geminiResult.modelUsed) {
+        console.info("Resume analysis used Gemini model", {
+          model: geminiResult.modelUsed,
         });
-
-        rawAnalysis = extractFirstJson(response.text || "");
-        source = rawAnalysis ? "gemini" : "heuristic";
-      } catch (error) {
-        const providerError = parseProviderError(error);
-        retryAfterSeconds = providerError.retryAfterSeconds;
-
-        if (providerError.isQuotaExceeded) {
-          console.warn(
-            "Gemini quota exceeded for resume analysis. Falling back.",
-            {
-              retryAfterSeconds,
-            },
-          );
-        } else {
-          console.error("Gemini resume analysis failed. Falling back.", error);
-        }
       }
+    } else {
+      retryAfterSeconds = geminiResult.retryAfterSeconds;
+      fallbackReason = geminiResult.diagnostic;
     }
 
     // 5. Try Hugging Face if Gemini is unavailable or exhausted.
@@ -954,6 +1087,7 @@ export async function POST(request: NextRequest) {
       if (hfAnalysis) {
         rawAnalysis = hfAnalysis;
         source = "huggingface";
+        modelUsed = HF_MODEL;
       }
     }
 
@@ -963,11 +1097,28 @@ export async function POST(request: NextRequest) {
       source = "heuristic";
     }
 
+    const requireRealAi = process.env.REQUIRE_RESUME_AI === "true";
+    if (requireRealAi && source === "heuristic") {
+      return NextResponse.json(
+        {
+          error:
+            "AI providers are unavailable. Configure GEMINI_API_KEY (and optional GEMINI_API_KEY_2..5 or HUGGINGFACE_API_KEY) in Vercel Environment Variables, then redeploy.",
+        },
+        { status: 503 },
+      );
+    }
+
     // 7. Normalize shape for safe UI rendering.
     const data = normalizeAnalysis(rawAnalysis, resumeText, jobDescription);
-    const payload = retryAfterSeconds
-      ? { ...data, retryAfterSeconds, source }
-      : { ...data, source };
+    const payloadBase = {
+      ...data,
+      source,
+      ...(retryAfterSeconds ? { retryAfterSeconds } : {}),
+      ...(modelUsed ? { modelUsed } : {}),
+      ...(fallbackReason && source === "heuristic" ? { fallbackReason } : {}),
+    };
+
+    const payload = payloadBase;
 
     return NextResponse.json(payload);
   } catch (error: unknown) {
