@@ -3,6 +3,7 @@ import {Mona_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const mona_Sans = Mona_Sans({
   variable: "--font-mona-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         </ThemeProvider>
 
         <Toaster/>
+        <SpeedInsights />
       </body>
     </html>
   );
