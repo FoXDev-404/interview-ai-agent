@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import {Mona_Sans } from "next/font/google";
+import { Mona_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const mona_Sans = Mona_Sans({
   variable: "--font-mona-sans",
   subsets: ["latin"],
 });
-
 
 export const metadata: Metadata = {
   title: "Interview AI",
@@ -22,9 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${mona_Sans.className} antialiased`}
-      >
+      <body className={`${mona_Sans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -34,7 +32,8 @@ export default function RootLayout({
           {children}
         </ThemeProvider>
 
-        <Toaster/>
+        <Toaster />
+        <SpeedInsights />
       </body>
     </html>
   );
