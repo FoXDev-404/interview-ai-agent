@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { X, Send, UserRound } from "lucide-react";
@@ -6,7 +6,7 @@ import { X, Send, UserRound } from "lucide-react";
 interface Message {
   id: string;
   text: string;
-  sender: 'user' | 'assistant';
+  sender: "user" | "assistant";
   timestamp: Date;
 }
 
@@ -21,16 +21,28 @@ type AgentProfile = {
 };
 
 const AGENT_PROFILES: AgentProfile[] = [
-  { name: 'Agent John', avatar: '/avatars/agent-maya.png' },
-  { name: 'Agent Maya', avatar: '/avatars/agent-maya.png' },
-  { name: 'Agent Alex', avatar: '/avatars/agent-maya.png' },
+  { name: "Agent John", avatar: "/avatars/agent-maya.png" },
+  { name: "Agent Maya", avatar: "/avatars/agent-maya.png" },
+  { name: "Agent Alex", avatar: "/avatars/agent-maya.png" },
 ];
 
-function ProfileAvatar({ src, alt, size, fallback }: { src: string; alt: string; size: string; fallback: string }) {
+function ProfileAvatar({
+  src,
+  alt,
+  size,
+  fallback,
+}: {
+  src: string;
+  alt: string;
+  size: string;
+  fallback: string;
+}) {
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className={`relative overflow-hidden rounded-full bg-slate-700 ${size}`}>
+    <div
+      className={`relative overflow-hidden rounded-full bg-slate-700 ${size}`}
+    >
       {!imgError ? (
         <img
           src={src}
@@ -48,16 +60,18 @@ function ProfileAvatar({ src, alt, size, fallback }: { src: string; alt: string;
 }
 
 export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
-  const [activeAgent, setActiveAgent] = useState<AgentProfile>(AGENT_PROFILES[0]);
+  const [activeAgent, setActiveAgent] = useState<AgentProfile>(
+    AGENT_PROFILES[0],
+  );
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      text: 'Hello, welcome to AI MockPrep Support. I am your intelligent assistant and can help with interviews, resume tools, account issues, and technical troubleshooting. How can I assist you today?',
-      sender: 'assistant',
-      timestamp: new Date()
-    }
+      id: "1",
+      text: "Hello, welcome to AI MockPrep Support. I am your intelligent assistant and can help with interviews, resume tools, account issues, and technical troubleshooting. How can I assist you today?",
+      sender: "assistant",
+      timestamp: new Date(),
+    },
   ]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
   const [errorText, setErrorText] = useState<string | null>(null);
@@ -70,11 +84,11 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
     "I cannot sign in to my account",
     "My microphone is not working",
     "Where can I view interview feedback?",
-    "Explain your plans and pricing"
+    "Explain your plans and pricing",
   ];
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
   useEffect(() => {
@@ -82,7 +96,8 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
       return;
     }
 
-    const randomAgent = AGENT_PROFILES[Math.floor(Math.random() * AGENT_PROFILES.length)];
+    const randomAgent =
+      AGENT_PROFILES[Math.floor(Math.random() * AGENT_PROFILES.length)];
     setActiveAgent(randomAgent);
 
     setIsConnecting(true);
@@ -95,19 +110,22 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
 
   const buildApiHistory = (currentMessages: Message[]) =>
     currentMessages.slice(-10).map((message) => ({
-      role: message.sender === 'user' ? 'user' : 'assistant',
+      role: message.sender === "user" ? "user" : "assistant",
       content: message.text,
     }));
 
-  const requestAssistantReply = async (userText: string, history: Message[]) => {
+  const requestAssistantReply = async (
+    userText: string,
+    history: Message[],
+  ) => {
     setErrorText(null);
     setIsTyping(true);
 
     try {
-      const response = await fetch('/api/support/chat', {
-        method: 'POST',
+      const response = await fetch("/api/support/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           message: userText,
@@ -116,29 +134,32 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Support service unavailable');
+        throw new Error("Support service unavailable");
       }
 
       const data = (await response.json()) as { reply?: string };
-      const replyText = data.reply?.trim() || 'I can help with that. Could you share a bit more detail so I can guide you precisely?';
+      const replyText =
+        data.reply?.trim() ||
+        "I can help with that. Could you share a bit more detail so I can guide you precisely?";
 
       const assistantMessage: Message = {
         id: `${Date.now()}-assistant`,
         text: replyText,
-        sender: 'assistant',
+        sender: "assistant",
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch {
-      const fallbackText = 'I am having trouble connecting right now. Please try again in a moment, or email localghost678@gmail.com for urgent help.';
-      setErrorText('Temporary connection issue. Retrying may help.');
+      const fallbackText =
+        "I am having trouble connecting right now. Please try again in a moment, or email localghost678@gmail.com for urgent help.";
+      setErrorText("Temporary connection issue. Retrying may help.");
       setMessages((prev) => [
         ...prev,
         {
           id: `${Date.now()}-assistant-fallback`,
           text: fallbackText,
-          sender: 'assistant',
+          sender: "assistant",
           timestamp: new Date(),
         },
       ]);
@@ -153,8 +174,8 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
     const userMessage: Message = {
       id: `${Date.now()}-user`,
       text: action,
-      sender: 'user',
-      timestamp: new Date()
+      sender: "user",
+      timestamp: new Date(),
     };
 
     const nextHistory = [...messages, userMessage];
@@ -170,14 +191,14 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
     const userMessage: Message = {
       id: `${Date.now()}-user`,
       text: newMessage.trim(),
-      sender: 'user',
-      timestamp: new Date()
+      sender: "user",
+      timestamp: new Date(),
     };
 
     const nextHistory = [...messages, userMessage];
     setMessages(nextHistory);
     const currentMessage = newMessage.trim();
-    setNewMessage('');
+    setNewMessage("");
     await requestAssistantReply(currentMessage, nextHistory);
   };
 
@@ -189,18 +210,35 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="rounded-full border border-white/40">
-              <ProfileAvatar src={activeAgent.avatar} alt={activeAgent.name} size="h-8 w-8" fallback={activeAgent.name.slice(0, 1)} />
+              <ProfileAvatar
+                src={activeAgent.avatar}
+                alt={activeAgent.name}
+                size="h-8 w-8"
+                fallback={activeAgent.name.slice(0, 1)}
+              />
             </div>
             <div className="leading-tight">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-cyan-100">AI MockPrep Chat Support</p>
-              <p className="text-sm font-semibold text-white">{activeAgent.name}</p>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-cyan-100">
+                AI MockPrep Chat Support
+              </p>
+              <p className="text-sm font-semibold text-white">
+                {activeAgent.name}
+              </p>
               <p className="flex items-center gap-1.5 text-[11px] text-cyan-100">
-                <span className={`h-1.5 w-1.5 rounded-full ${isConnecting ? 'animate-pulse bg-amber-300' : 'bg-emerald-300'}`} />
-                {isConnecting ? 'Connecting...' : 'Online'}
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${isConnecting ? "animate-pulse bg-amber-300" : "bg-emerald-300"}`}
+                />
+                {isConnecting ? "Connecting..." : "Online"}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="rounded-md p-1 text-white transition-colors hover:bg-white/15">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 text-white transition-colors hover:bg-white/15"
+            aria-label="Close chat"
+            title="Close chat"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -209,32 +247,50 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
       <div className="h-[18.5rem] overflow-y-auto bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 px-4 py-4 space-y-3">
         {isConnecting && (
           <div className="rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
-            We are connecting you to {activeAgent.name}. You can start typing now, and your message will be sent as soon as the chat is ready.
+            We are connecting you to {activeAgent.name}. You can start typing
+            now, and your message will be sent as soon as the chat is ready.
           </div>
         )}
 
         {messages.map((message) => (
-          <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`flex max-w-[86%] items-start gap-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-              {message.sender === 'user' ? (
+          <div
+            key={message.id}
+            className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`flex max-w-[86%] items-start gap-2 ${message.sender === "user" ? "flex-row-reverse" : "flex-row"}`}
+            >
+              {message.sender === "user" ? (
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 ring-2 ring-violet-300/40">
                   <UserRound className="h-3.5 w-3.5 text-white" />
                 </div>
               ) : (
                 <div className="rounded-full border border-emerald-300/50 ring-2 ring-emerald-400/20">
-                  <ProfileAvatar src={activeAgent.avatar} alt={activeAgent.name} size="h-7 w-7" fallback={activeAgent.name.slice(0, 1)} />
+                  <ProfileAvatar
+                    src={activeAgent.avatar}
+                    alt={activeAgent.name}
+                    size="h-7 w-7"
+                    fallback={activeAgent.name.slice(0, 1)}
+                  />
                 </div>
               )}
-              <div className={`rounded-2xl px-3 py-2.5 ${message.sender === 'user' ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20' : 'border border-white/10 bg-slate-800/90 text-slate-100'}`}>
-                <p className="whitespace-pre-line text-sm leading-relaxed">{message.text}</p>
+              <div
+                className={`rounded-2xl px-3 py-2.5 ${message.sender === "user" ? "bg-sky-500 text-white shadow-md shadow-sky-500/20" : "border border-white/10 bg-slate-800/90 text-slate-100"}`}
+              >
+                <p className="whitespace-pre-line text-sm leading-relaxed">
+                  {message.text}
+                </p>
                 <p className="mt-1 text-[10px] opacity-75">
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {message.timestamp.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
               </div>
             </div>
           </div>
         ))}
-        
+
         {errorText && (
           <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs text-amber-300">
             {errorText}
@@ -257,18 +313,29 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
             </div>
           </div>
         )}
-        
+
         {isTyping && (
           <div className="flex justify-start">
             <div className="flex items-start gap-2">
               <div className="rounded-full border border-emerald-300/50 ring-2 ring-emerald-400/20">
-                <ProfileAvatar src={activeAgent.avatar} alt={activeAgent.name} size="h-7 w-7" fallback={activeAgent.name.slice(0, 1)} />
+                <ProfileAvatar
+                  src={activeAgent.avatar}
+                  alt={activeAgent.name}
+                  size="h-7 w-7"
+                  fallback={activeAgent.name.slice(0, 1)}
+                />
               </div>
               <div className="rounded-2xl border border-white/10 bg-slate-800/90 p-3 text-slate-100">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  ></div>
                 </div>
               </div>
             </div>
@@ -283,20 +350,27 @@ export default function LiveChat({ isOpen, onClose }: LiveChatProps) {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 void sendMessage();
               }
             }}
-            placeholder={isConnecting ? `Connecting to ${activeAgent.name}...` : `Message ${activeAgent.name}...`}
+            placeholder={
+              isConnecting
+                ? `Connecting to ${activeAgent.name}...`
+                : `Message ${activeAgent.name}...`
+            }
             rows={2}
             disabled={isConnecting}
             className="min-h-[44px] flex-1 resize-none rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-60"
           />
           <button
+            type="button"
             onClick={() => void sendMessage()}
             disabled={!newMessage.trim() || isTyping || isConnecting}
             className="rounded-xl bg-cyan-500 p-2.5 text-slate-950 transition-colors hover:bg-cyan-400 disabled:bg-slate-600 disabled:text-slate-300"
+            aria-label="Send message"
+            title="Send message"
           >
             <Send className="w-4 h-4" />
           </button>

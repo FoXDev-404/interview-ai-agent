@@ -255,7 +255,7 @@ const page = async () => {
             Three Steps to{" "}
             <span className="hero-gradient-text">Interview Success</span>
           </h2>
-          <p className="mt-3 text-light-400">
+          <p className="mt-3 text-light-300">
             No signup friction. Pick a path, practice, and improve — all powered
             by AI.
           </p>
@@ -285,7 +285,7 @@ const page = async () => {
             Practice for <span className="hero-gradient-text">FAANG</span> &
             Beyond
           </h2>
-          <p className="mt-3 text-light-400">
+          <p className="mt-3 text-light-300">
             Tailored mock interviews for the world&apos;s most competitive tech
             companies.
           </p>

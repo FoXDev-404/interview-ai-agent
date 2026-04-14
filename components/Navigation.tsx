@@ -1,28 +1,46 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
-import { Menu, X, User, Home, LogOut, Settings, ChevronDown, Mic, PenTool, Search, Code2, FileText } from 'lucide-react';
+import Link from "next/link";
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import {
+  Menu,
+  X,
+  User,
+  Home,
+  LogOut,
+  Settings,
+  ChevronDown,
+  Mic,
+  PenTool,
+  Search,
+  Code2,
+  FileText,
+} from "lucide-react";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [isMobileResumeOpen, setIsMobileResumeOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{uid: string; email: string; name: string; photoURL?: string} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{
+    uid: string;
+    email: string;
+    name: string;
+    photoURL?: string;
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getCurrentUser = async () => {
       try {
-        const response = await fetch('/api/auth/current-user');
+        const response = await fetch("/api/auth/current-user");
         if (response.ok) {
           const user = await response.json();
           setCurrentUser(user);
         }
       } catch (error) {
-        console.error('Error getting current user:', error);
+        console.error("Error getting current user:", error);
       } finally {
         setIsLoading(false);
       }
@@ -35,36 +53,36 @@ export default function Navigation() {
       getCurrentUser();
     };
 
-    window.addEventListener('profileUpdated', handleProfileUpdate);
-    
+    window.addEventListener("profileUpdated", handleProfileUpdate);
+
     return () => {
-      window.removeEventListener('profileUpdated', handleProfileUpdate);
+      window.removeEventListener("profileUpdated", handleProfileUpdate);
     };
   }, []);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/logout', { 
-        method: 'POST',
+      const response = await fetch("/api/logout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok && data.success) {
         // Force a hard refresh to clear all client-side state
-        window.location.href = '/sign-in';
+        window.location.href = "/sign-in";
       } else {
-        console.error('Logout failed:', data.message);
+        console.error("Logout failed:", data.message);
         // Still redirect even if server logout fails to clear client state
-        window.location.href = '/sign-in';
+        window.location.href = "/sign-in";
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       // Fallback: still redirect to clear client state
-      window.location.href = '/sign-in';
+      window.location.href = "/sign-in";
     }
   };
 
@@ -84,16 +102,16 @@ export default function Navigation() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.profile-dropdown')) {
+      if (!target.closest(".profile-dropdown")) {
         setIsProfileOpen(false);
       }
-      if (!target.closest('.resume-dropdown')) {
+      if (!target.closest(".resume-dropdown")) {
         setIsResumeOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -119,11 +137,13 @@ export default function Navigation() {
               <button
                 type="button"
                 onClick={toggleResume}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${isResumeOpen ? 'text-white bg-gray-800 border border-gray-700' : 'text-gray-300 hover:text-white hover:bg-gray-800/70 border border-transparent'}`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${isResumeOpen ? "text-white bg-gray-800 border border-gray-700" : "text-gray-300 hover:text-white hover:bg-gray-800/70 border border-transparent"}`}
               >
                 <FileText className="w-4 h-4" />
                 Resume
-                <ChevronDown className={`w-4 h-4 transition-transform ${isResumeOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${isResumeOpen ? "rotate-180" : ""}`}
+                />
               </button>
 
               {isResumeOpen && (
@@ -160,24 +180,28 @@ export default function Navigation() {
               <div className="w-8 h-8 bg-gray-700 rounded-full animate-pulse"></div>
             ) : currentUser ? (
               <div className="relative profile-dropdown">
-                <button 
+                <button
                   onClick={toggleProfile}
                   className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-800"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-sm overflow-hidden">
                     {currentUser.photoURL ? (
-                      <img 
-                        src={currentUser.photoURL} 
-                        alt="Profile" 
+                      <img
+                        src={currentUser.photoURL}
+                        alt="Profile"
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      currentUser.name?.charAt(0)?.toUpperCase() || currentUser.email?.charAt(0)?.toUpperCase() || 'U'
+                      currentUser.name?.charAt(0)?.toUpperCase() ||
+                      currentUser.email?.charAt(0)?.toUpperCase() ||
+                      "U"
                     )}
                   </div>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${isProfileOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
-                
+
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50">
                     {/* Profile Header */}
@@ -185,22 +209,23 @@ export default function Navigation() {
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-lg overflow-hidden">
                           {currentUser.photoURL ? (
-                            <img 
-                              src={currentUser.photoURL} 
-                              alt="Profile" 
+                            <img
+                              src={currentUser.photoURL}
+                              alt="Profile"
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            currentUser.name?.charAt(0)?.toUpperCase() || 'U'
+                            currentUser.name?.charAt(0)?.toUpperCase() || "U"
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-white font-medium truncate">{currentUser.name || 'User'}</div>
-                          
+                          <div className="text-white font-medium truncate">
+                            {currentUser.name || "User"}
+                          </div>
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Profile Menu */}
                     <div className="py-2">
                       <Link
@@ -250,14 +275,23 @@ export default function Navigation() {
           <div className="md:hidden flex items-center gap-4">
             {currentUser && (
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
-                {currentUser.name?.charAt(0)?.toUpperCase() || currentUser.email?.charAt(0)?.toUpperCase() || 'U'}
+                {currentUser.name?.charAt(0)?.toUpperCase() ||
+                  currentUser.email?.charAt(0)?.toUpperCase() ||
+                  "U"}
               </div>
             )}
             <button
+              type="button"
               onClick={toggleMenu}
               className="text-gray-300 hover:text-white focus:outline-none focus:text-white"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              title={isMenuOpen ? "Close menu" : "Open menu"}
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
@@ -276,7 +310,7 @@ export default function Navigation() {
               </Link>
               <button
                 type="button"
-                className={`flex items-center justify-between gap-2 w-full text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors ${isMobileResumeOpen ? 'bg-gray-700/50 text-white' : ''}`}
+                className={`flex items-center justify-between gap-2 w-full text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors ${isMobileResumeOpen ? "bg-gray-700/50 text-white" : ""}`}
                 onClick={() => {
                   setIsMobileResumeOpen((prev) => !prev);
                 }}
@@ -285,7 +319,9 @@ export default function Navigation() {
                   <FileText className="w-4 h-4" />
                   Resume
                 </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isMobileResumeOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${isMobileResumeOpen ? "rotate-180" : ""}`}
+                />
               </button>
               {isMobileResumeOpen && (
                 <div className="ml-5 mr-2 mt-1 space-y-1 rounded-lg border border-gray-700/70 bg-gray-900/55 p-2">
@@ -336,18 +372,21 @@ export default function Navigation() {
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium overflow-hidden">
                         {currentUser.photoURL ? (
-                          <img 
-                            src={currentUser.photoURL} 
-                            alt="Profile" 
+                          <img
+                            src={currentUser.photoURL}
+                            alt="Profile"
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          currentUser.name?.charAt(0)?.toUpperCase() || currentUser.email?.charAt(0)?.toUpperCase() || 'U'
+                          currentUser.name?.charAt(0)?.toUpperCase() ||
+                          currentUser.email?.charAt(0)?.toUpperCase() ||
+                          "U"
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-white font-medium truncate">{currentUser.name || 'User'}</div>
-                        
+                        <div className="text-white font-medium truncate">
+                          {currentUser.name || "User"}
+                        </div>
                       </div>
                     </div>
                   </div>

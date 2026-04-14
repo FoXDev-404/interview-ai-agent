@@ -1,14 +1,17 @@
-'use client';
+"use client";
 
-import { createExperienceEntry } from '@/lib/resume-builder/default-data';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { createExperienceEntry } from "@/lib/resume-builder/default-data";
+import { Plus, Trash2, GripVertical } from "lucide-react";
 
 interface ExperienceFormProps {
   data: ResumeExperience[];
   onChange: (data: ResumeExperience[]) => void;
 }
 
-export default function ExperienceForm({ data, onChange }: ExperienceFormProps) {
+export default function ExperienceForm({
+  data,
+  onChange,
+}: ExperienceFormProps) {
   const addEntry = () => {
     onChange([...data, createExperienceEntry()]);
   };
@@ -17,26 +20,37 @@ export default function ExperienceForm({ data, onChange }: ExperienceFormProps) 
     onChange(data.filter((e) => e.id !== id));
   };
 
-  const updateEntry = (id: string, field: keyof ResumeExperience, value: string | string[]) => {
+  const updateEntry = (
+    id: string,
+    field: keyof ResumeExperience,
+    value: string | string[],
+  ) => {
     onChange(data.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
   };
 
-  const moveEntry = (index: number, direction: 'up' | 'down') => {
+  const moveEntry = (index: number, direction: "up" | "down") => {
     const newData = [...data];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= newData.length) return;
-    [newData[index], newData[targetIndex]] = [newData[targetIndex], newData[index]];
+    [newData[index], newData[targetIndex]] = [
+      newData[targetIndex],
+      newData[index],
+    ];
     onChange(newData);
   };
 
-  const updateHighlight = (entryId: string, highlightIndex: number, value: string) => {
+  const updateHighlight = (
+    entryId: string,
+    highlightIndex: number,
+    value: string,
+  ) => {
     onChange(
       data.map((e) => {
         if (e.id !== entryId) return e;
         const newHighlights = [...e.highlights];
         newHighlights[highlightIndex] = value;
         return { ...e, highlights: newHighlights };
-      })
+      }),
     );
   };
 
@@ -44,8 +58,8 @@ export default function ExperienceForm({ data, onChange }: ExperienceFormProps) 
     onChange(
       data.map((e) => {
         if (e.id !== entryId) return e;
-        return { ...e, highlights: [...e.highlights, ''] };
-      })
+        return { ...e, highlights: [...e.highlights, ""] };
+      }),
     );
   };
 
@@ -53,8 +67,11 @@ export default function ExperienceForm({ data, onChange }: ExperienceFormProps) 
     onChange(
       data.map((e) => {
         if (e.id !== entryId) return e;
-        return { ...e, highlights: e.highlights.filter((_, i) => i !== highlightIndex) };
-      })
+        return {
+          ...e,
+          highlights: e.highlights.filter((_, i) => i !== highlightIndex),
+        };
+      }),
     );
   };
 
@@ -89,12 +106,34 @@ export default function ExperienceForm({ data, onChange }: ExperienceFormProps) 
               </div>
               <div className="flex items-center gap-2">
                 {index > 0 && (
-                  <button onClick={() => moveEntry(index, 'up')} className="text-xs text-light-400 hover:text-white">↑</button>
+                  <button
+                    type="button"
+                    onClick={() => moveEntry(index, "up")}
+                    className="text-xs text-light-400 hover:text-white"
+                    aria-label="Move experience up"
+                    title="Move up"
+                  >
+                    ↑
+                  </button>
                 )}
                 {index < data.length - 1 && (
-                  <button onClick={() => moveEntry(index, 'down')} className="text-xs text-light-400 hover:text-white">↓</button>
+                  <button
+                    type="button"
+                    onClick={() => moveEntry(index, "down")}
+                    className="text-xs text-light-400 hover:text-white"
+                    aria-label="Move experience down"
+                    title="Move down"
+                  >
+                    ↓
+                  </button>
                 )}
-                <button onClick={() => removeEntry(entry.id)} className="text-destructive-100 hover:text-destructive-200 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => removeEntry(entry.id)}
+                  className="text-destructive-100 hover:text-destructive-200 transition-colors"
+                  aria-label={`Remove experience at ${entry.company || `position ${index + 1}`}`}
+                  title="Remove experience"
+                >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -102,49 +141,85 @@ export default function ExperienceForm({ data, onChange }: ExperienceFormProps) 
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm text-light-400 mb-1">Company</label>
+                <label className="block text-sm text-light-400 mb-1">
+                  Company
+                </label>
                 <input
                   type="text"
                   value={entry.company}
-                  onChange={(e) => updateEntry(entry.id, 'company', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(entry.id, "company", e.target.value)
+                  }
                   placeholder="Stripe"
                   className="interview-input w-full"
                 />
               </div>
               <div>
-                <label className="block text-sm text-light-400 mb-1">Role</label>
+                <label className="block text-sm text-light-400 mb-1">
+                  Role
+                </label>
                 <input
                   type="text"
                   value={entry.role}
-                  onChange={(e) => updateEntry(entry.id, 'role', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(entry.id, "role", e.target.value)
+                  }
                   placeholder="Senior Software Engineer"
                   className="interview-input w-full"
                 />
               </div>
               <div>
-                <label className="block text-sm text-light-400 mb-1">Start Date</label>
+                <label
+                  htmlFor={`experience-start-${entry.id}`}
+                  className="block text-sm text-light-400 mb-1"
+                >
+                  Start Date
+                </label>
                 <input
+                  id={`experience-start-${entry.id}`}
                   type="month"
                   value={entry.startDate}
-                  onChange={(e) => updateEntry(entry.id, 'startDate', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(entry.id, "startDate", e.target.value)
+                  }
+                  title="Start date"
                   className="interview-input w-full"
                 />
               </div>
               <div>
-                <label className="block text-sm text-light-400 mb-1">End Date</label>
+                <label
+                  htmlFor={`experience-end-${entry.id}`}
+                  className="block text-sm text-light-400 mb-1"
+                >
+                  End Date
+                </label>
                 <div className="flex items-center gap-2">
                   <input
+                    id={`experience-end-${entry.id}`}
                     type="month"
-                    value={entry.endDate === 'Present' ? '' : entry.endDate}
-                    onChange={(e) => updateEntry(entry.id, 'endDate', e.target.value || 'Present')}
+                    value={entry.endDate === "Present" ? "" : entry.endDate}
+                    onChange={(e) =>
+                      updateEntry(
+                        entry.id,
+                        "endDate",
+                        e.target.value || "Present",
+                      )
+                    }
                     className="interview-input w-full"
-                    disabled={entry.endDate === 'Present'}
+                    disabled={entry.endDate === "Present"}
+                    title="End date"
                   />
                   <label className="flex items-center gap-1 text-xs text-light-400 whitespace-nowrap cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={entry.endDate === 'Present'}
-                      onChange={(e) => updateEntry(entry.id, 'endDate', e.target.checked ? 'Present' : '')}
+                      checked={entry.endDate === "Present"}
+                      onChange={(e) =>
+                        updateEntry(
+                          entry.id,
+                          "endDate",
+                          e.target.checked ? "Present" : "",
+                        )
+                      }
                       className="rounded border-gray-600"
                     />
                     Current
@@ -152,11 +227,15 @@ export default function ExperienceForm({ data, onChange }: ExperienceFormProps) 
                 </div>
               </div>
               <div className="col-span-2">
-                <label className="block text-sm text-light-400 mb-1">Location</label>
+                <label className="block text-sm text-light-400 mb-1">
+                  Location
+                </label>
                 <input
                   type="text"
-                  value={entry.location || ''}
-                  onChange={(e) => updateEntry(entry.id, 'location', e.target.value)}
+                  value={entry.location || ""}
+                  onChange={(e) =>
+                    updateEntry(entry.id, "location", e.target.value)
+                  }
                   placeholder="San Francisco, CA"
                   className="interview-input w-full"
                 />
@@ -165,8 +244,11 @@ export default function ExperienceForm({ data, onChange }: ExperienceFormProps) 
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm text-light-400">Key Achievements / Bullets</label>
+                <label className="block text-sm text-light-400">
+                  Key Achievements / Bullets
+                </label>
                 <button
+                  type="button"
                   onClick={() => addHighlight(entry.id)}
                   className="text-xs text-primary-200 hover:text-white transition-colors"
                 >
@@ -179,13 +261,18 @@ export default function ExperienceForm({ data, onChange }: ExperienceFormProps) 
                   <input
                     type="text"
                     value={highlight}
-                    onChange={(e) => updateHighlight(entry.id, hIndex, e.target.value)}
+                    onChange={(e) =>
+                      updateHighlight(entry.id, hIndex, e.target.value)
+                    }
                     placeholder="Led a team of 5 engineers to redesign..."
                     className="interview-input w-full"
                   />
                   <button
+                    type="button"
                     onClick={() => removeHighlight(entry.id, hIndex)}
                     className="text-light-600 hover:text-destructive-100 mt-2 transition-colors"
+                    aria-label={`Remove bullet ${hIndex + 1}`}
+                    title="Remove bullet"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

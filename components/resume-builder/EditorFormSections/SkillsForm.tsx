@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { createSkillCategory } from '@/lib/resume-builder/default-data';
-import { Plus, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
+import { createSkillCategory } from "@/lib/resume-builder/default-data";
+import { Plus, Trash2, X } from "lucide-react";
+import { useState } from "react";
 
 interface SkillsFormProps {
   data: ResumeSkill[];
@@ -29,10 +29,10 @@ export default function SkillsForm({ data, onChange }: SkillsFormProps) {
     if (!value) return;
     onChange(
       data.map((s, i) =>
-        i === categoryIndex ? { ...s, items: [...s.items, value] } : s
-      )
+        i === categoryIndex ? { ...s, items: [...s.items, value] } : s,
+      ),
     );
-    setInputValues((prev) => ({ ...prev, [categoryIndex]: '' }));
+    setInputValues((prev) => ({ ...prev, [categoryIndex]: "" }));
   };
 
   const removeSkill = (categoryIndex: number, skillIndex: number) => {
@@ -40,8 +40,8 @@ export default function SkillsForm({ data, onChange }: SkillsFormProps) {
       data.map((s, i) =>
         i === categoryIndex
           ? { ...s, items: s.items.filter((_, si) => si !== skillIndex) }
-          : s
-      )
+          : s,
+      ),
     );
   };
 
@@ -76,8 +76,11 @@ export default function SkillsForm({ data, onChange }: SkillsFormProps) {
                 className="interview-input flex-1 mr-2"
               />
               <button
+                type="button"
                 onClick={() => removeCategory(cIndex)}
                 className="text-destructive-100 hover:text-destructive-200 transition-colors"
+                aria-label={`Remove ${category.category || `category ${cIndex + 1}`}`}
+                title="Remove category"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -91,8 +94,11 @@ export default function SkillsForm({ data, onChange }: SkillsFormProps) {
                 >
                   {skill}
                   <button
+                    type="button"
                     onClick={() => removeSkill(cIndex, sIndex)}
                     className="hover:text-destructive-100 transition-colors"
+                    aria-label={`Remove skill ${skill}`}
+                    title={`Remove ${skill}`}
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -103,12 +109,15 @@ export default function SkillsForm({ data, onChange }: SkillsFormProps) {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={inputValues[cIndex] || ''}
+                value={inputValues[cIndex] || ""}
                 onChange={(e) =>
-                  setInputValues((prev) => ({ ...prev, [cIndex]: e.target.value }))
+                  setInputValues((prev) => ({
+                    ...prev,
+                    [cIndex]: e.target.value,
+                  }))
                 }
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
                     addSkill(cIndex);
                   }
