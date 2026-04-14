@@ -1,16 +1,30 @@
-'use client';
+"use client";
 
-import { useReducer, useRef, useEffect, useCallback, useState } from 'react';
-import { ArrowLeft, Palette, ZoomIn, ZoomOut, Check, Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import { toast } from 'sonner';
-import { updateResume } from '@/lib/actions/resume-builder.action';
-import { getTemplate } from '@/lib/resume-builder/template-registry';
-import EditorSidebar from './EditorSidebar';
-import LivePreview from './LivePreview';
-import type { LivePreviewHandle } from './LivePreview';
-import PdfExportButton from './PdfExportButton';
-import TemplatePicker from './TemplatePicker';
+import {
+  useReducer,
+  useRef,
+  useEffect,
+  useCallback,
+  useState,
+  startTransition,
+} from "react";
+import {
+  ArrowLeft,
+  Palette,
+  ZoomIn,
+  ZoomOut,
+  Check,
+  Loader2,
+} from "lucide-react";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { toast } from "sonner";
+import { updateResume } from "@/lib/actions/resume-builder.action";
+import { getTemplate } from "@/lib/resume-builder/template-registry";
+import EditorSidebar from "./EditorSidebar";
+import LivePreview from "./LivePreview";
+import type { LivePreviewHandle } from "./LivePreview";
+import PdfExportButton from "./PdfExportButton";
 
 interface EditorState {
   resumeId: string;
@@ -25,33 +39,38 @@ interface EditorState {
 }
 
 type EditorAction =
-  | { type: 'SET_TITLE'; payload: string }
-  | { type: 'SET_TEMPLATE'; payload: string }
-  | { type: 'UPDATE_SECTION'; section: ResumeSectionKey; payload: unknown }
-  | { type: 'SET_ACTIVE_SECTION'; payload: ResumeSectionKey }
-  | { type: 'SAVE_START' }
-  | { type: 'SAVE_SUCCESS'; payload: string }
-  | { type: 'SAVE_FAILURE' };
+  | { type: "SET_TITLE"; payload: string }
+  | { type: "SET_TEMPLATE"; payload: string }
+  | { type: "UPDATE_SECTION"; section: ResumeSectionKey; payload: unknown }
+  | { type: "SET_ACTIVE_SECTION"; payload: ResumeSectionKey }
+  | { type: "SAVE_START" }
+  | { type: "SAVE_SUCCESS"; payload: string }
+  | { type: "SAVE_FAILURE" };
 
 function editorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
-    case 'SET_TITLE':
+    case "SET_TITLE":
       return { ...state, title: action.payload, isDirty: true };
-    case 'SET_TEMPLATE':
+    case "SET_TEMPLATE":
       return { ...state, templateId: action.payload, isDirty: true };
-    case 'UPDATE_SECTION':
+    case "UPDATE_SECTION":
       return {
         ...state,
         data: { ...state.data, [action.section]: action.payload },
         isDirty: true,
       };
-    case 'SET_ACTIVE_SECTION':
+    case "SET_ACTIVE_SECTION":
       return { ...state, activeSection: action.payload };
-    case 'SAVE_START':
+    case "SAVE_START":
       return { ...state, isSaving: true };
-    case 'SAVE_SUCCESS':
-      return { ...state, isSaving: false, isDirty: false, lastSavedAt: action.payload };
-    case 'SAVE_FAILURE':
+    case "SAVE_SUCCESS":
+      return {
+        ...state,
+        isSaving: false,
+        isDirty: false,
+        lastSavedAt: action.payload,
+      };
+    case "SAVE_FAILURE":
       return { ...state, isSaving: false };
     default:
       return state;
@@ -62,6 +81,18 @@ interface ResumeEditorProps {
   resume: ResumeDocument;
 }
 
+const TemplatePicker = dynamic(() => import("./TemplatePicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="relative rounded-xl border border-gray-700 bg-dark-200 px-5 py-4 text-sm text-light-400">
+        Loading templates...
+      </div>
+    </div>
+  ),
+});
+
 export default function ResumeEditor({ resume }: ResumeEditorProps) {
   const [state, dispatch] = useReducer(editorReducer, {
     resumeId: resume.id,
@@ -69,7 +100,7 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
     title: resume.title,
     templateId: resume.templateId,
     data: resume.data,
-    activeSection: 'personalInfo',
+    activeSection: "personalInfo",
     isDirty: false,
     isSaving: false,
     lastSavedAt: resume.updatedAt,
@@ -83,7 +114,7 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
   const templateEntry = getTemplate(state.templateId);
 
   const save = useCallback(async () => {
-    dispatch({ type: 'SAVE_START' });
+    dispatch({ type: "SAVE_START" });
     try {
       const result = await updateResume({
         resumeId: state.resumeId,
@@ -93,14 +124,14 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
         data: state.data,
       });
       if (result.success) {
-        dispatch({ type: 'SAVE_SUCCESS', payload: new Date().toISOString() });
+        dispatch({ type: "SAVE_SUCCESS", payload: new Date().toISOString() });
       } else {
-        dispatch({ type: 'SAVE_FAILURE' });
-        toast.error('Failed to save resume');
+        dispatch({ type: "SAVE_FAILURE" });
+        toast.error("Failed to save resume");
       }
     } catch {
-      dispatch({ type: 'SAVE_FAILURE' });
-      toast.error('Failed to save resume');
+      dispatch({ type: "SAVE_FAILURE" });
+      toast.error("Failed to save resume");
     }
   }, [state.resumeId, state.userId, state.title, state.templateId, state.data]);
 
@@ -118,9 +149,31 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
     };
   }, [state.isDirty, save]);
 
-  const handleSectionDataChange = (section: ResumeSectionKey, value: unknown) => {
-    dispatch({ type: 'UPDATE_SECTION', section, payload: value });
-  };
+  const handleSectionDataChange = useCallback(
+    (section: ResumeSectionKey, value: unknown) => {
+      dispatch({ type: "UPDATE_SECTION", section, payload: value });
+    },
+    [],
+  );
+
+  const handleSectionChange = useCallback((section: ResumeSectionKey) => {
+    dispatch({ type: "SET_ACTIVE_SECTION", payload: section });
+  }, []);
+
+  const openTemplatePicker = useCallback(() => {
+    // Mark template picker open as non-urgent to keep click interactions snappy.
+    startTransition(() => {
+      setShowTemplatePicker(true);
+    });
+  }, []);
+
+  const closeTemplatePicker = useCallback(() => {
+    setShowTemplatePicker(false);
+  }, []);
+
+  const handleTemplateSelect = useCallback((id: string) => {
+    dispatch({ type: "SET_TEMPLATE", payload: id });
+  }, []);
 
   const zoomIn = () => setZoom((z) => Math.min(z + 0.1, 1));
   const zoomOut = () => setZoom((z) => Math.max(z - 0.1, 0.3));
@@ -143,7 +196,9 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
           <input
             type="text"
             value={state.title}
-            onChange={(e) => dispatch({ type: 'SET_TITLE', payload: e.target.value })}
+            onChange={(e) =>
+              dispatch({ type: "SET_TITLE", payload: e.target.value })
+            }
             className="bg-transparent text-white font-medium text-sm border-none outline-none focus:ring-0 w-64"
             placeholder="Resume title"
           />
@@ -158,7 +213,7 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
                 Saving...
               </>
             ) : state.isDirty ? (
-              'Unsaved changes'
+              "Unsaved changes"
             ) : (
               <>
                 <Check className="w-3 h-3 text-success-100" />
@@ -169,22 +224,32 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
 
           {/* Template switcher */}
           <button
-            onClick={() => setShowTemplatePicker(true)}
+            onClick={openTemplatePicker}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-light-400 hover:text-white hover:bg-gray-700 transition-colors border border-gray-700"
           >
             <Palette className="w-3.5 h-3.5" />
-            {templateEntry?.name || 'Template'}
+            {templateEntry?.name || "Template"}
           </button>
 
           {/* Zoom controls */}
           <div className="flex items-center gap-1 border border-gray-700 rounded-lg">
-            <button onClick={zoomOut} className="p-1.5 text-light-400 hover:text-white transition-colors">
+            <button
+              onClick={zoomOut}
+              title="Zoom out"
+              aria-label="Zoom out"
+              className="p-1.5 text-light-400 hover:text-white transition-colors"
+            >
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
             <span className="text-xs text-light-400 w-10 text-center">
               {Math.round(zoom * 100)}%
             </span>
-            <button onClick={zoomIn} className="p-1.5 text-light-400 hover:text-white transition-colors">
+            <button
+              onClick={zoomIn}
+              title="Zoom in"
+              aria-label="Zoom in"
+              className="p-1.5 text-light-400 hover:text-white transition-colors"
+            >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -192,9 +257,11 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
           {/* PDF Export */}
           <PdfExportButton
             previewRef={previewRef}
-            fileName={state.data.personalInfo.fullName
-              ? `${state.data.personalInfo.fullName}_Resume`
-              : state.title}
+            fileName={
+              state.data.personalInfo.fullName
+                ? `${state.data.personalInfo.fullName}_Resume`
+                : state.title
+            }
           />
         </div>
       </div>
@@ -206,7 +273,7 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
           <EditorSidebar
             data={state.data}
             activeSection={state.activeSection}
-            onSectionChange={(s) => dispatch({ type: 'SET_ACTIVE_SECTION', payload: s })}
+            onSectionChange={handleSectionChange}
             onDataChange={handleSectionDataChange}
           />
         </div>
@@ -226,8 +293,8 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
       {showTemplatePicker && (
         <TemplatePicker
           currentTemplateId={state.templateId}
-          onSelect={(id) => dispatch({ type: 'SET_TEMPLATE', payload: id })}
-          onClose={() => setShowTemplatePicker(false)}
+          onSelect={handleTemplateSelect}
+          onClose={closeTemplatePicker}
         />
       )}
     </div>

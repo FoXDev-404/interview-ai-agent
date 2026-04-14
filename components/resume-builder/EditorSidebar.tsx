@@ -1,22 +1,34 @@
-'use client';
+"use client";
 
-import { User, FileText, GraduationCap, Briefcase, Wrench, FolderOpen, Award } from 'lucide-react';
-import PersonalInfoForm from './EditorFormSections/PersonalInfoForm';
-import SummaryForm from './EditorFormSections/SummaryForm';
-import EducationForm from './EditorFormSections/EducationForm';
-import ExperienceForm from './EditorFormSections/ExperienceForm';
-import SkillsForm from './EditorFormSections/SkillsForm';
-import ProjectsForm from './EditorFormSections/ProjectsForm';
-import CertificationsForm from './EditorFormSections/CertificationsForm';
+import { memo } from "react";
+import {
+  User,
+  FileText,
+  GraduationCap,
+  Briefcase,
+  Wrench,
+  FolderOpen,
+  Award,
+} from "lucide-react";
+import PersonalInfoForm from "./EditorFormSections/PersonalInfoForm";
+import SummaryForm from "./EditorFormSections/SummaryForm";
+import EducationForm from "./EditorFormSections/EducationForm";
+import ExperienceForm from "./EditorFormSections/ExperienceForm";
+import SkillsForm from "./EditorFormSections/SkillsForm";
+import ProjectsForm from "./EditorFormSections/ProjectsForm";
+import CertificationsForm from "./EditorFormSections/CertificationsForm";
 
-const sectionMeta: Record<ResumeSectionKey, { label: string; icon: React.ElementType }> = {
-  personalInfo: { label: 'Personal Info', icon: User },
-  summary: { label: 'Summary', icon: FileText },
-  education: { label: 'Education', icon: GraduationCap },
-  experience: { label: 'Experience', icon: Briefcase },
-  skills: { label: 'Skills', icon: Wrench },
-  projects: { label: 'Projects', icon: FolderOpen },
-  certifications: { label: 'Certifications', icon: Award },
+const sectionMeta: Record<
+  ResumeSectionKey,
+  { label: string; icon: React.ElementType }
+> = {
+  personalInfo: { label: "Personal Info", icon: User },
+  summary: { label: "Summary", icon: FileText },
+  education: { label: "Education", icon: GraduationCap },
+  experience: { label: "Experience", icon: Briefcase },
+  skills: { label: "Skills", icon: Wrench },
+  projects: { label: "Projects", icon: FolderOpen },
+  certifications: { label: "Certifications", icon: Award },
 };
 
 interface EditorSidebarProps {
@@ -26,7 +38,7 @@ interface EditorSidebarProps {
   onDataChange: (section: ResumeSectionKey, value: unknown) => void;
 }
 
-export default function EditorSidebar({
+function EditorSidebar({
   data,
   activeSection,
   onSectionChange,
@@ -34,53 +46,53 @@ export default function EditorSidebar({
 }: EditorSidebarProps) {
   const renderForm = () => {
     switch (activeSection) {
-      case 'personalInfo':
+      case "personalInfo":
         return (
           <PersonalInfoForm
             data={data.personalInfo}
-            onChange={(val) => onDataChange('personalInfo', val)}
+            onChange={(val) => onDataChange("personalInfo", val)}
           />
         );
-      case 'summary':
+      case "summary":
         return (
           <SummaryForm
             data={data.summary}
-            onChange={(val) => onDataChange('summary', val)}
+            onChange={(val) => onDataChange("summary", val)}
           />
         );
-      case 'education':
+      case "education":
         return (
           <EducationForm
             data={data.education}
-            onChange={(val) => onDataChange('education', val)}
+            onChange={(val) => onDataChange("education", val)}
           />
         );
-      case 'experience':
+      case "experience":
         return (
           <ExperienceForm
             data={data.experience}
-            onChange={(val) => onDataChange('experience', val)}
+            onChange={(val) => onDataChange("experience", val)}
           />
         );
-      case 'skills':
+      case "skills":
         return (
           <SkillsForm
             data={data.skills}
-            onChange={(val) => onDataChange('skills', val)}
+            onChange={(val) => onDataChange("skills", val)}
           />
         );
-      case 'projects':
+      case "projects":
         return (
           <ProjectsForm
             data={data.projects}
-            onChange={(val) => onDataChange('projects', val)}
+            onChange={(val) => onDataChange("projects", val)}
           />
         );
-      case 'certifications':
+      case "certifications":
         return (
           <CertificationsForm
             data={data.certifications}
-            onChange={(val) => onDataChange('certifications', val)}
+            onChange={(val) => onDataChange("certifications", val)}
           />
         );
       default:
@@ -101,8 +113,8 @@ export default function EditorSidebar({
               onClick={() => onSectionChange(section)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                 activeSection === section
-                  ? 'bg-primary-200/20 text-primary-200'
-                  : 'text-light-400 hover:text-white hover:bg-gray-800'
+                  ? "bg-primary-200/20 text-primary-200"
+                  : "text-light-400 hover:text-white hover:bg-gray-800"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -113,9 +125,9 @@ export default function EditorSidebar({
       </div>
 
       {/* Active Form */}
-      <div className="flex-1 overflow-y-auto p-4 pb-6">
-        {renderForm()}
-      </div>
+      <div className="flex-1 overflow-y-auto p-4 pb-6">{renderForm()}</div>
     </div>
   );
 }
+
+export default memo(EditorSidebar);
