@@ -11,6 +11,11 @@ type HomeAuthAutoRefreshProps = {
   serverUid?: string | null;
 };
 
+type IdleSchedulerWindow = Window & {
+  requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => number;
+  cancelIdleCallback?: (id: number) => void;
+};
+
 export default function HomeAuthAutoRefresh({
   serverUid,
 }: HomeAuthAutoRefreshProps) {
@@ -19,6 +24,7 @@ export default function HomeAuthAutoRefresh({
   useEffect(() => {
     let timeoutId: number | null = null;
     let idleId: number | null = null;
+    const idleSchedulerWindow = window as IdleSchedulerWindow;
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) return;
@@ -35,15 +41,9 @@ export default function HomeAuthAutoRefresh({
       }
 
       // Schedule refresh away from active input to improve interaction timing.
-      if ("requestIdleCallback" in window) {
-        idleId = (
-          window as Window & {
-            requestIdleCallback: (
-              cb: () => void,
-              opts?: { timeout?: number },
-            ) => number;
-          }
-        ).requestIdleCallback(
+      const requestIdleCallback = idleSchedulerWindow.requestIdleCallback;
+      if (typeof requestIdleCallback === "function") {
+        idleId = requestIdleCallback(
           () => {
             router.refresh();
           },
@@ -64,10 +64,9 @@ export default function HomeAuthAutoRefresh({
         window.clearTimeout(timeoutId);
       }
 
-      if (idleId !== null && "cancelIdleCallback" in window) {
-        (
-          window as Window & { cancelIdleCallback: (id: number) => void }
-        ).cancelIdleCallback(idleId);
+      const cancelIdleCallback = idleSchedulerWindow.cancelIdleCallback;
+      if (idleId !== null && typeof cancelIdleCallback === "function") {
+        cancelIdleCallback(idleId);
       }
     };
   }, [router, serverUid]);

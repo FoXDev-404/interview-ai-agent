@@ -17,6 +17,11 @@ interface TemplatePickerProps {
   onClose: () => void;
 }
 
+type IdleSchedulerWindow = Window & {
+  requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => number;
+  cancelIdleCallback?: (id: number) => void;
+};
+
 export default function TemplatePicker({
   currentTemplateId,
   onSelect,
@@ -60,21 +65,16 @@ export default function TemplatePicker({
     // Defer heavy grid work until after initial modal paint and idle time.
     let timeoutId: number | null = null;
     let idleId: number | null = null;
+    const idleSchedulerWindow = window as IdleSchedulerWindow;
 
     const hydrateGrid = () => {
       setIsGridReady(true);
       setVisibleCount(INITIAL_VISIBLE_TEMPLATES);
     };
 
-    if ("requestIdleCallback" in window) {
-      idleId = (
-        window as Window & {
-          requestIdleCallback: (
-            cb: () => void,
-            opts?: { timeout?: number },
-          ) => number;
-        }
-      ).requestIdleCallback(hydrateGrid, { timeout: 900 });
+    const requestIdleCallback = idleSchedulerWindow.requestIdleCallback;
+    if (typeof requestIdleCallback === "function") {
+      idleId = requestIdleCallback(hydrateGrid, { timeout: 900 });
     } else {
       timeoutId = window.setTimeout(hydrateGrid, 32);
     }
@@ -84,10 +84,9 @@ export default function TemplatePicker({
         window.clearTimeout(timeoutId);
       }
 
-      if (idleId !== null && "cancelIdleCallback" in window) {
-        (
-          window as Window & { cancelIdleCallback: (id: number) => void }
-        ).cancelIdleCallback(idleId);
+      const cancelIdleCallback = idleSchedulerWindow.cancelIdleCallback;
+      if (idleId !== null && typeof cancelIdleCallback === "function") {
+        cancelIdleCallback(idleId);
       }
     };
   }, [isInteractiveReady]);
