@@ -22,15 +22,41 @@ export default function TemplatePicker({
   onSelect,
   onClose,
 }: TemplatePickerProps) {
+  const [isInteractiveReady, setIsInteractiveReady] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [isGridReady, setIsGridReady] = useState(false);
   const [visibleCount, setVisibleCount] = useState(0);
-  const categories = useMemo(() => getTemplateCategories(), []);
-  const allTemplates = useMemo(() => getAllTemplates(), []);
+  const categories = useMemo(
+    () => (isInteractiveReady ? getTemplateCategories() : []),
+    [isInteractiveReady],
+  );
+  const allTemplates = useMemo(
+    () => (isInteractiveReady ? getAllTemplates() : []),
+    [isInteractiveReady],
+  );
   const listRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    // Allow one paint cycle before mounting expensive interactive content.
+    let firstFrame = 0;
+    let secondFrame = 0;
+
+    firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        setIsInteractiveReady(true);
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isInteractiveReady) return;
+
     // Defer heavy grid work until after initial modal paint and idle time.
     let timeoutId: number | null = null;
     let idleId: number | null = null;
@@ -64,7 +90,7 @@ export default function TemplatePicker({
         ).cancelIdleCallback(idleId);
       }
     };
-  }, []);
+  }, [isInteractiveReady]);
 
   const filteredTemplates = useMemo(
     () =>
@@ -126,7 +152,9 @@ export default function TemplatePicker({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className={`absolute inset-0 ${
+          isInteractiveReady ? "bg-black/60 backdrop-blur-sm" : "bg-black/70"
+        }`}
         onClick={onClose}
       />
 
@@ -137,7 +165,9 @@ export default function TemplatePicker({
           <div>
             <h2 className="text-xl font-bold text-white">Choose a Template</h2>
             <p className="text-sm text-light-400 mt-0.5">
-              {allTemplates.length} professionally designed templates
+              {isInteractiveReady
+                ? `${allTemplates.length} professionally designed templates`
+                : "Loading template catalog..."}
             </p>
           </div>
           <button
@@ -151,31 +181,35 @@ export default function TemplatePicker({
         </div>
 
         {/* Category tabs */}
-        <div className="flex gap-2 px-5 py-3 border-b border-gray-700 overflow-x-auto">
-          <button
-            onClick={() => setActiveCategory("all")}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-              activeCategory === "all"
-                ? "bg-primary-200/20 text-primary-200"
-                : "text-light-400 hover:text-white hover:bg-gray-700"
-            }`}
-          >
-            All ({allTemplates.length})
-          </button>
-          {categories.map((cat) => (
+        {isInteractiveReady ? (
+          <div className="flex gap-2 px-5 py-3 border-b border-gray-700 overflow-x-auto">
             <button
-              key={cat.category}
-              onClick={() => setActiveCategory(cat.category)}
+              onClick={() => setActiveCategory("all")}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                activeCategory === cat.category
+                activeCategory === "all"
                   ? "bg-primary-200/20 text-primary-200"
                   : "text-light-400 hover:text-white hover:bg-gray-700"
               }`}
             >
-              {cat.label} ({cat.count})
+              All ({allTemplates.length})
             </button>
-          ))}
-        </div>
+            {categories.map((cat) => (
+              <button
+                key={cat.category}
+                onClick={() => setActiveCategory(cat.category)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                  activeCategory === cat.category
+                    ? "bg-primary-200/20 text-primary-200"
+                    : "text-light-400 hover:text-white hover:bg-gray-700"
+                }`}
+              >
+                {cat.label} ({cat.count})
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="h-[52px] border-b border-gray-700" />
+        )}
 
         {/* Template grid */}
         <div ref={listRef} className="flex-1 overflow-y-auto p-5">
