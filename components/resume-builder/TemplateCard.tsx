@@ -89,7 +89,7 @@ function TemplateCard({ entry, isSelected, onSelect }: TemplateCardProps) {
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-sm font-medium text-white">{entry.name}</h4>
-            <p className="text-xs text-light-600 capitalize">
+            <p className="text-xs text-light-300 capitalize">
               {entry.category}
             </p>
           </div>
