@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import {
   getAllTemplates,
   getTemplateCategories,
 } from "@/lib/resume-builder/template-registry";
 import TemplateCard from "./TemplateCard";
+
+const INITIAL_VISIBLE_TEMPLATES = 12;
+const LOAD_MORE_STEP = 12;
 
 interface TemplatePickerProps {
   currentTemplateId: string;
@@ -21,17 +24,45 @@ export default function TemplatePicker({
 }: TemplatePickerProps) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [isGridReady, setIsGridReady] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(0);
   const categories = useMemo(() => getTemplateCategories(), []);
   const allTemplates = useMemo(() => getAllTemplates(), []);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Defer heavy grid mount to the next frame so modal shell can paint first.
-    const frameId = window.requestAnimationFrame(() => {
+    // Defer heavy grid work until after initial modal paint and idle time.
+    let timeoutId: number | null = null;
+    let idleId: number | null = null;
+
+    const hydrateGrid = () => {
       setIsGridReady(true);
-    });
+      setVisibleCount(INITIAL_VISIBLE_TEMPLATES);
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleId = (
+        window as Window & {
+          requestIdleCallback: (
+            cb: () => void,
+            opts?: { timeout?: number },
+          ) => number;
+        }
+      ).requestIdleCallback(hydrateGrid, { timeout: 900 });
+    } else {
+      timeoutId = window.setTimeout(hydrateGrid, 32);
+    }
 
     return () => {
-      window.cancelAnimationFrame(frameId);
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+      }
+
+      if (idleId !== null && "cancelIdleCallback" in window) {
+        (
+          window as Window & { cancelIdleCallback: (id: number) => void }
+        ).cancelIdleCallback(idleId);
+      }
     };
   }, []);
 
@@ -42,6 +73,46 @@ export default function TemplatePicker({
         : allTemplates.filter((t) => t.category === activeCategory),
     [activeCategory, allTemplates],
   );
+
+  useEffect(() => {
+    if (!isGridReady) return;
+    setVisibleCount(INITIAL_VISIBLE_TEMPLATES);
+  }, [activeCategory, isGridReady]);
+
+  const visibleTemplates = useMemo(
+    () => filteredTemplates.slice(0, visibleCount),
+    [filteredTemplates, visibleCount],
+  );
+
+  const hasMoreTemplates = visibleCount < filteredTemplates.length;
+
+  useEffect(() => {
+    if (!isGridReady || !hasMoreTemplates) return;
+
+    const root = listRef.current;
+    const target = loadMoreRef.current;
+    if (!root || !target || !("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setVisibleCount((prev) =>
+            Math.min(prev + LOAD_MORE_STEP, filteredTemplates.length),
+          );
+        }
+      },
+      {
+        root,
+        rootMargin: "200px",
+      },
+    );
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [filteredTemplates.length, hasMoreTemplates, isGridReady]);
 
   const handleSelect = useCallback(
     (id: string) => {
@@ -107,18 +178,22 @@ export default function TemplatePicker({
         </div>
 
         {/* Template grid */}
-        <div className="flex-1 overflow-y-auto p-5">
+        <div ref={listRef} className="flex-1 overflow-y-auto p-5">
           {isGridReady ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredTemplates.map((entry) => (
-                <TemplateCard
-                  key={entry.id}
-                  entry={entry}
-                  isSelected={entry.id === currentTemplateId}
-                  onSelect={handleSelect}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {visibleTemplates.map((entry) => (
+                  <TemplateCard
+                    key={entry.id}
+                    entry={entry}
+                    isSelected={entry.id === currentTemplateId}
+                    onSelect={handleSelect}
+                  />
+                ))}
+              </div>
+
+              {hasMoreTemplates && <div ref={loadMoreRef} className="h-8" />}
+            </>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {Array.from({ length: 12 }).map((_, index) => (

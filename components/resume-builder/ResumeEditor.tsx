@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useReducer,
-  useRef,
-  useEffect,
-  useCallback,
-  useState,
-  startTransition,
-} from "react";
+import { useReducer, useRef, useEffect, useCallback, useState } from "react";
 import {
   ArrowLeft,
   Palette,
@@ -110,6 +103,7 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const previewRef = useRef<LivePreviewHandle>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const templatePickerPreloadRef = useRef<Promise<unknown> | null>(null);
 
   const templateEntry = getTemplate(state.templateId);
 
@@ -160,12 +154,51 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
     dispatch({ type: "SET_ACTIVE_SECTION", payload: section });
   }, []);
 
-  const openTemplatePicker = useCallback(() => {
-    // Mark template picker open as non-urgent to keep click interactions snappy.
-    startTransition(() => {
-      setShowTemplatePicker(true);
-    });
+  const preloadTemplatePicker = useCallback(() => {
+    if (!templatePickerPreloadRef.current) {
+      templatePickerPreloadRef.current = import("./TemplatePicker");
+    }
+    return templatePickerPreloadRef.current;
   }, []);
+
+  useEffect(() => {
+    let timeoutId: number | null = null;
+    let idleId: number | null = null;
+
+    const runPreload = () => {
+      void preloadTemplatePicker();
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleId = (
+        window as Window & {
+          requestIdleCallback: (
+            cb: () => void,
+            opts?: { timeout?: number },
+          ) => number;
+        }
+      ).requestIdleCallback(runPreload, { timeout: 1800 });
+    } else {
+      timeoutId = window.setTimeout(runPreload, 250);
+    }
+
+    return () => {
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+      }
+
+      if (idleId !== null && "cancelIdleCallback" in window) {
+        (
+          window as Window & { cancelIdleCallback: (id: number) => void }
+        ).cancelIdleCallback(idleId);
+      }
+    };
+  }, [preloadTemplatePicker]);
+
+  const openTemplatePicker = useCallback(() => {
+    void preloadTemplatePicker();
+    setShowTemplatePicker(true);
+  }, [preloadTemplatePicker]);
 
   const closeTemplatePicker = useCallback(() => {
     setShowTemplatePicker(false);
@@ -225,6 +258,8 @@ export default function ResumeEditor({ resume }: ResumeEditorProps) {
           {/* Template switcher */}
           <button
             onClick={openTemplatePicker}
+            onPointerEnter={preloadTemplatePicker}
+            onFocus={preloadTemplatePicker}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-light-400 hover:text-white hover:bg-gray-700 transition-colors border border-gray-700"
           >
             <Palette className="w-3.5 h-3.5" />
