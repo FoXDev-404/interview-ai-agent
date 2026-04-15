@@ -2733,3 +2733,214 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Light Mode Overrides ─────────────────────────────────
+   These override the dark-specific utility classes when
+   the site is rendered in light mode (no .dark on <html>).
+   ─────────────────────────────────────────────────────── */
+
+html:not(.dark) {
+
+  /* dark-gradient → light card */
+  .dark-gradient {
+    background: var(--card) !important;
+  }
+
+  /* blue-gradient-dark → soft indigo tint */
+  .blue-gradient-dark {
+    background: linear-gradient(168deg, rgba(224, 231, 255, 0.5) 0%, rgba(237, 233, 254, 0.6) 100%) !important;
+  }
+
+  /* border-gradient → light border */
+  .border-gradient {
+    background: linear-gradient(to bottom, var(--border), rgba(0,0,0,0.05)) !important;
+  }
+
+  /* interview-glass → light card with border */
+  .interview-glass {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-color: var(--border) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* interview-glass hover */
+  .interview-glass:hover {
+    border-color: rgba(202, 197, 254, 0.4) !important;
+    box-shadow: 0 12px 44px -14px rgba(124, 111, 255, 0.10) !important;
+  }
+
+  /* Hero section → light */
+  .hero-section {
+    background: linear-gradient(160deg, #f8f9ff 0%, #f0f1ff 40%, #f8f9ff 100%) !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Stats bar → light */
+  .stats-bar {
+    background: linear-gradient(168deg, rgba(248, 249, 255, 0.9) 0%, rgba(240, 241, 255, 0.95) 100%) !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* faang card glass → light card */
+  .faang-card-glass {
+    background: linear-gradient(168deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 255, 0.98) 100%) !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Step card → light */
+  .step-card {
+    background: linear-gradient(168deg, rgba(248, 249, 255, 0.8) 0%, rgba(240, 241, 255, 0.9) 100%) !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* CTA bottom → light */
+  .cta-bottom {
+    background: linear-gradient(160deg, #f0f1ff 0%, #f5f5ff 50%, #f0f1ff 100%) !important;
+    border-color: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Auth background → light */
+  .auth-bg {
+    background: linear-gradient(160deg, #f0f2ff 0%, #f5f5ff 50%, #f0f2ff 100%) !important;
+  }
+
+  /* Auth container → light */
+  .auth-container {
+    background: linear-gradient(168deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 255, 0.98) 100%) !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 25px 80px -20px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  /* Auth brand panel → light */
+  .auth-brand-panel {
+    background: linear-gradient(170deg, rgba(240, 241, 255, 0.6) 0%, rgba(224, 225, 255, 0.4) 100%) !important;
+    border-color: rgba(0, 0, 0, 0.04) !important;
+  }
+
+  /* Auth google button → light */
+  .auth-google-btn {
+    color: #1a1a2e !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .auth-google-btn:hover {
+    background: rgba(0, 0, 0, 0.07) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Auth divider */
+  .auth-divider-line {
+    background: rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* Interview select inputs → light */
+  .interview-select,
+  .interview-input,
+  .interview-textarea {
+    color: var(--foreground) !important;
+    background: rgba(0, 0, 0, 0.03) !important;
+    border-color: var(--border) !important;
+  }
+
+  .interview-select option {
+    background: var(--card) !important;
+    color: var(--foreground) !important;
+  }
+
+  .interview-tech-btn {
+    color: var(--foreground) !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: var(--border) !important;
+  }
+
+  .interview-tech-btn:hover {
+    color: var(--foreground) !important;
+    border-color: rgba(124, 111, 255, 0.3) !important;
+    background: rgba(124, 111, 255, 0.06) !important;
+  }
+
+  .interview-instruction-card {
+    background: rgba(240, 241, 255, 0.6) !important;
+    border-color: var(--border) !important;
+  }
+
+  .interview-stat-card {
+    background: rgba(202, 197, 254, 0.08) !important;
+    border-color: rgba(124, 111, 255, 0.15) !important;
+  }
+
+  .interview-ready-item {
+    color: var(--foreground) !important;
+    background: rgba(124, 111, 255, 0.05) !important;
+    border-color: rgba(124, 111, 255, 0.15) !important;
+  }
+
+  .interview-ai-bubble {
+    background: rgba(240, 241, 255, 0.7) !important;
+    border-color: var(--border) !important;
+  }
+
+  /* interview-side cards → light */
+  .interview-side-note,
+  .interview-side-framework {
+    background: rgba(248, 249, 255, 0.8) !important;
+    border-color: var(--border) !important;
+  }
+
+  .interview-side-label {
+    color: var(--foreground) !important;
+    opacity: 0.6;
+  }
+
+  .interview-side-value {
+    color: var(--foreground) !important;
+  }
+
+  /* saas-interview-page → light */
+  .saas-interview-page {
+    background:
+      radial-gradient(84% 72% at 2% 0%, rgba(167, 139, 250, 0.08), transparent 58%),
+      radial-gradient(86% 70% at 100% 100%, rgba(45, 212, 191, 0.06), transparent 64%),
+      radial-gradient(52% 44% at 50% 46%, rgba(79, 70, 229, 0.04), transparent 70%),
+      linear-gradient(135deg, #f8f9ff, #f0f2ff) !important;
+  }
+
+  /* Progress track → light */
+  .interview-progress-track {
+    background: rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* interview-side-card → light */
+  .interview-side-card {
+    background: rgba(124, 111, 255, 0.06) !important;
+    border-color: rgba(124, 111, 255, 0.15) !important;
+  }
+
+  /* interview-outline-btn → light */
+  .interview-outline-btn {
+    color: var(--foreground) !important;
+    border-color: var(--border) !important;
+  }
+
+  .interview-outline-btn:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(124, 111, 255, 0.25) !important;
+  }
+
+  /* interview-label → light */
+  .interview-label {
+    color: var(--foreground) !important;
+  }
+
+  /* feedback-score-ring → light inner */
+  .feedback-score-ring::before {
+    background: linear-gradient(168deg, rgba(248, 249, 255, 0.98) 0%, rgba(240, 241, 255, 1) 100%) !important;
+  }
+
+  /* feedback-bar-track → light */
+  .feedback-bar-track {
+    background: rgba(0, 0, 0, 0.06) !important;
+  }
+}

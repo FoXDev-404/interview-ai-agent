@@ -228,7 +228,7 @@ const page = async () => {
         {stats.map((stat, i) => (
           <React.Fragment key={stat.label}>
             <div className="flex flex-col items-center gap-1">
-              <span className="text-2xl sm:text-3xl font-bold text-white">
+              <span className="text-2xl sm:text-3xl font-bold text-foreground">
                 {stat.value}
               </span>
               <span className="text-xs sm:text-sm text-light-400">
@@ -266,7 +266,7 @@ const page = async () => {
             <div key={step.number} className="step-card group">
               <div className="step-card-number">{step.number}</div>
               <div className="step-card-icon">{step.icon}</div>
-              <h3 className="text-lg font-bold text-white mt-4 mb-2">
+              <h3 className="text-lg font-bold text-foreground mt-4 mb-2">
                 {step.title}
               </h3>
               <p className="text-sm text-light-100/70 leading-relaxed">

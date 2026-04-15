@@ -44,7 +44,7 @@ function ScoreGauge({ score, label }: { score: number; label: string }) {
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 mt-2 text-center">
-        <span className="text-4xl font-bold text-white block">{safeScore}</span>
+        <span className="text-4xl font-bold text-foreground block">{safeScore}</span>
         <span className="text-xs text-light-400 uppercase tracking-wider font-semibold">{label}</span>
       </div>
     </div>
@@ -64,7 +64,7 @@ function StatCard({ icon: Icon, label, value, color }: {
         <Icon className="w-6 h-6 text-white" />
       </div>
       <div>
-        <p className="text-2xl font-bold text-white">{value}</p>
+        <p className="text-2xl font-bold text-foreground">{value}</p>
         <p className="text-sm text-light-400">{label}</p>
       </div>
     </div>

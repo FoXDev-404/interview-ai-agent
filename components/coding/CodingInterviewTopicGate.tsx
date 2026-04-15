@@ -88,14 +88,14 @@ export default function CodingInterviewTopicGate({
 
   const renderCodingNavbar = () => (
     <div className="fixed left-0 right-0 top-0 z-50 px-4 pt-2 sm:px-6 lg:px-8">
-      <div className="h-12 rounded-xl border border-white/8 bg-dark-100/95 px-3 backdrop-blur-sm">
+      <div className="h-12 rounded-xl border border-border/50 bg-background/95 px-3 backdrop-blur-sm">
         <div className="flex h-full items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo.svg" alt="logo" width={26} height={22} />
             <span className="text-sm font-bold text-primary-100">AI MockPrep</span>
           </Link>
-          <span className="hidden sm:inline rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-light-300">
+          <span className="hidden sm:inline rounded-md border border-border/50 bg-muted/30 px-2 py-1 text-xs text-foreground/70">
             Topic Selection
           </span>
         </div>
@@ -103,7 +103,7 @@ export default function CodingInterviewTopicGate({
           <div className="flex items-center gap-2.5">
           <button
             onClick={() => router.push(`/coding-interview/${interviewId}/feedback`)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/35 bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/22"
+            className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/35 bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold text-emerald-400 transition hover:bg-emerald-500/22"
           >
             <Flag className="h-3.5 w-3.5" />
             Finish
@@ -115,9 +115,9 @@ export default function CodingInterviewTopicGate({
           </div>
 
             {isLoadingUser ? (
-              <div className="h-7 w-7 rounded-full bg-white/10 animate-pulse" />
+              <div className="h-7 w-7 rounded-full bg-muted animate-pulse" />
             ) : (
-              <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1">
+              <div className="flex items-center gap-2 rounded-md border border-border/50 bg-muted/30 px-2 py-1">
                 <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-xs font-semibold text-white">
                   {currentUser?.photoURL ? (
                     <img src={currentUser.photoURL} alt="Profile" className="h-full w-full object-cover" />
@@ -125,7 +125,7 @@ export default function CodingInterviewTopicGate({
                     currentUser?.name?.charAt(0)?.toUpperCase() || currentUser?.email?.charAt(0)?.toUpperCase() || 'U'
                   )}
                 </div>
-                <span className="hidden sm:block max-w-[120px] truncate text-xs text-light-300">
+                <span className="hidden sm:block max-w-[120px] truncate text-xs text-foreground/70">
                   {currentUser?.name || 'Profile'}
                 </span>
               </div>
@@ -200,7 +200,7 @@ export default function CodingInterviewTopicGate({
     <div className="space-y-6 px-4 pb-6 pt-16 sm:px-6 lg:px-8">
       {renderCodingNavbar()}
 
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-indigo-900/40 p-6 md:p-8">
+      <section className="relative overflow-hidden rounded-3xl border border-border/50 bg-card p-6 md:p-8">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-20 right-0 h-48 w-48 rounded-full bg-cyan-500/15 blur-3xl" />
           <div className="absolute -bottom-24 left-0 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
@@ -208,38 +208,38 @@ export default function CodingInterviewTopicGate({
 
         <div className="relative z-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-300/30 bg-blue-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-blue-200">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-300/30 bg-blue-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-blue-400">
               <Target className="h-3.5 w-3.5" />
               Choose a LeetCode-style topic
             </div>
 
-            <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-white md:text-5xl">
+            <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-foreground md:text-5xl">
               Pick a topic first, then solve a focused coding set.
             </h1>
 
-            <p className="mt-4 max-w-2xl text-base leading-7 text-light-300 md:text-lg">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-foreground/70 md:text-lg">
               Topics are grouped like LeetCode so you can practice exactly the pattern you want, from arrays and strings
               to dynamic programming, graphs, stacks, trees, and design problems.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-black/25 p-5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-blue-200/80">
+          <div className="rounded-2xl border border-border/50 bg-background/50 p-5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-blue-400/80">
               <Sparkles className="h-3.5 w-3.5" />
               Session snapshot
             </div>
             <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
-                <span className="text-sm text-light-400">Role</span>
-                <span className="text-sm font-semibold text-white">{role}</span>
+              <div className="flex items-center justify-between gap-3 border-b border-border/50 pb-3">
+                <span className="text-sm text-foreground/60">Role</span>
+                <span className="text-sm font-semibold text-foreground">{role}</span>
               </div>
-              <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
-                <span className="text-sm text-light-400">Level</span>
-                <span className="text-sm font-semibold text-white">{level}</span>
+              <div className="flex items-center justify-between gap-3 border-b border-border/50 pb-3">
+                <span className="text-sm text-foreground/60">Level</span>
+                <span className="text-sm font-semibold text-foreground">{level}</span>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className="text-sm text-light-400">Curated question cap</span>
-                <span className="text-sm font-semibold text-white">All available</span>
+                <span className="text-sm text-foreground/60">Curated question cap</span>
+                <span className="text-sm font-semibold text-foreground">All available</span>
               </div>
             </div>
           </div>
@@ -248,8 +248,8 @@ export default function CodingInterviewTopicGate({
 
       <section>
         <div className="mb-4 flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-blue-300" />
-          <h2 className="text-xl font-bold text-white">Topic list</h2>
+          <BookOpen className="h-5 w-5 text-blue-400" />
+          <h2 className="text-xl font-bold text-foreground">Topic list</h2>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -265,19 +265,19 @@ export default function CodingInterviewTopicGate({
                 disabled={isDisabled || savingTopicId !== null}
                 className={`group rounded-2xl border p-5 text-left transition duration-200 hover:-translate-y-1 disabled:cursor-not-allowed disabled:hover:translate-y-0 ${
                   isDisabled
-                    ? 'border-white/8 bg-white/5 opacity-55'
-                    : 'border-white/10 bg-gray-900/55 hover:border-blue-400/40'
+                    ? 'border-border/30 bg-muted/20 opacity-55'
+                    : 'border-border/50 bg-card hover:border-blue-400/40'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] uppercase tracking-[0.14em] text-light-400">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-muted/30 px-2.5 py-1 text-[11px] uppercase tracking-[0.14em] text-foreground/60">
                       Topic
                     </div>
-                    <h3 className="mt-3 text-lg font-semibold text-white">{topic.label}</h3>
+                    <h3 className="mt-3 text-lg font-semibold text-foreground">{topic.label}</h3>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-right">
-                    <p className="text-xl font-bold text-white">{topic.questionCount}</p>
+                  <div className="rounded-xl border border-border/50 bg-muted/30 px-3 py-2 text-right">
+                    <p className="text-xl font-bold text-foreground">{topic.questionCount}</p>
                     <p className="text-[11px] text-light-400">questions</p>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function CodingInterviewTopicGate({
                   <span className="text-xs text-light-400">
                     {isDisabled ? 'Coming soon' : `Ready to solve ${topic.questionCount} questions`}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-sm font-medium text-blue-300 transition group-hover:translate-x-0.5">
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-blue-400 transition group-hover:translate-x-0.5">
                     {isLoading ? 'Loading' : isDisabled ? 'Locked' : 'Start'}
                     <ChevronRight className="h-4 w-4" />
                   </span>

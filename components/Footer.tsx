@@ -4,11 +4,7 @@ import Image from "next/image";
 const Footer = () => {
   return (
     <footer
-      className="relative overflow-hidden mt-auto"
-      style={{
-        background:
-          "linear-gradient(160deg, #0d0f18 0%, #111327 50%, #0d0f18 100%)",
-      }}
+      className="relative overflow-hidden mt-auto bg-card/80 border-t border-border/30"
     >
       {/* Glow effect — matches cta-bottom-glow */}
       <div
@@ -49,7 +45,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="Twitter"
                 title="Twitter"
-                className="w-9 h-9 rounded-full border border-white/10 hover:border-primary-200/50 flex items-center justify-center text-light-100/50 hover:text-primary-200 transition-all duration-200"
+                className="w-9 h-9 rounded-full border border-border/30 hover:border-primary-200/50 flex items-center justify-center text-foreground/40 hover:text-primary-200 transition-all duration-200"
               >
                 <span className="sr-only">Twitter</span>
                 <svg
@@ -66,7 +62,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
                 title="LinkedIn"
-                className="w-9 h-9 rounded-full border border-white/10 hover:border-primary-200/50 flex items-center justify-center text-light-100/50 hover:text-primary-200 transition-all duration-200"
+                className="w-9 h-9 rounded-full border border-border/30 hover:border-primary-200/50 flex items-center justify-center text-foreground/40 hover:text-primary-200 transition-all duration-200"
               >
                 <span className="sr-only">LinkedIn</span>
                 <svg
@@ -83,7 +79,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="GitHub"
                 title="GitHub"
-                className="w-9 h-9 rounded-full border border-white/10 hover:border-primary-200/50 flex items-center justify-center text-light-100/50 hover:text-primary-200 transition-all duration-200"
+                className="w-9 h-9 rounded-full border border-border/30 hover:border-primary-200/50 flex items-center justify-center text-foreground/40 hover:text-primary-200 transition-all duration-200"
               >
                 <span className="sr-only">GitHub</span>
                 <svg
@@ -189,7 +185,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Divider + Copyright */}
-        <div className="border-t border-white/5 mt-10 pt-6 text-center">
+        <div className="border-t border-border/30 mt-10 pt-6 text-center">
           <p className="text-light-100/40 text-sm">
             &copy; {new Date().getFullYear()} AI MockPrep. All rights reserved.
           </p>

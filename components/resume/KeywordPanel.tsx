@@ -52,15 +52,15 @@ const KeywordPanel: React.FC<KeywordPanelProps> = ({ data }) => {
       <div className="mb-6 grid grid-cols-3 gap-3">
         <div className="rounded-xl border border-primary-200/30 bg-primary-200/10 p-3">
           <p className="text-xs uppercase tracking-wide text-primary-200 font-semibold">Matched</p>
-          <p className="text-xl font-bold text-white">{data.matched.length}</p>
+          <p className="text-xl font-bold text-foreground">{data.matched.length}</p>
         </div>
-        <div className="rounded-xl border border-white/20 bg-white/5 p-3">
-          <p className="text-xs uppercase tracking-wide text-light-100 font-semibold">Partial</p>
-          <p className="text-xl font-bold text-white">{data.partial.length}</p>
+        <div className="rounded-xl border border-foreground/15 bg-foreground/5 p-3">
+          <p className="text-xs uppercase tracking-wide text-foreground/70 font-semibold">Partial</p>
+          <p className="text-xl font-bold text-foreground">{data.partial.length}</p>
         </div>
         <div className="rounded-xl border border-destructive-100/30 bg-destructive-100/10 p-3">
           <p className="text-xs uppercase tracking-wide text-destructive-100 font-semibold">Missing</p>
-          <p className="text-xl font-bold text-white">{data.missing.length}</p>
+          <p className="text-xl font-bold text-foreground">{data.missing.length}</p>
         </div>
       </div>
 
@@ -73,7 +73,7 @@ const KeywordPanel: React.FC<KeywordPanelProps> = ({ data }) => {
               "px-3 py-2 text-sm font-medium rounded-lg transition-colors capitalize",
               activeTab === cat
                 ? "text-primary-200 bg-primary-200/10 border border-primary-200/35"
-                : "text-light-100 hover:text-white bg-white/5 border border-white/15"
+                : "text-foreground/70 hover:text-foreground bg-foreground/5 border border-foreground/15"
             )}
           >
             {cat}
@@ -90,7 +90,7 @@ const KeywordPanel: React.FC<KeywordPanelProps> = ({ data }) => {
               className={clsx(
                 "px-3 py-1.5 rounded-lg text-sm font-medium border flex items-center gap-1.5",
                 status === 'matched' && "bg-primary-200/15 text-primary-200 border-primary-200/35",
-                status === 'partial' && "bg-white/10 text-light-100 border-white/20",
+                status === 'partial' && "bg-foreground/8 text-foreground/70 border-foreground/20",
                 status === 'missing' && "bg-destructive-100/10 text-destructive-100 border-destructive-100/30"
               )}
             >
@@ -109,10 +109,10 @@ const KeywordPanel: React.FC<KeywordPanelProps> = ({ data }) => {
       <div className="mt-5 rounded-2xl border border-primary-200/20 bg-dark-100/70 p-4">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-sm font-semibold text-light-100 capitalize">{activeTab} Coverage</p>
-          <p className="text-sm font-bold text-white">{activeCoverage}%</p>
+          <p className="text-sm font-bold text-foreground">{activeCoverage}%</p>
         </div>
 
-        <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-foreground/10">
           <div
             className="h-full rounded-full bg-gradient-to-r from-[#cac5fe] to-[#7c6fff] transition-all duration-500"
             style={{ width: `${activeCoverage}%` }}
@@ -123,7 +123,7 @@ const KeywordPanel: React.FC<KeywordPanelProps> = ({ data }) => {
           <div className="rounded-lg border border-primary-200/35 bg-primary-200/10 px-2.5 py-2 text-center text-primary-200 font-semibold">
             {activeMatched} matched
           </div>
-          <div className="rounded-lg border border-white/20 bg-white/5 px-2.5 py-2 text-center text-light-100 font-semibold">
+          <div className="rounded-lg border border-foreground/15 bg-foreground/5 px-2.5 py-2 text-center text-foreground/70 font-semibold">
             {activePartial} partial
           </div>
           <div className="rounded-lg border border-destructive-100/30 bg-destructive-100/10 px-2.5 py-2 text-center text-destructive-100 font-semibold">

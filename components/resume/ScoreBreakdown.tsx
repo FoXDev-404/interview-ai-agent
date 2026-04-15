@@ -26,9 +26,9 @@ const ScoreBreakdown: React.FC<ScoreBreakdownProps> = ({ data }) => {
           <div key={idx}>
             <div className="flex justify-between mb-2 text-sm font-medium">
               <span className="text-light-100">{metric.label}</span>
-              <span className="text-white">{metric.value}%</span>
+              <span className="text-foreground">{metric.value}%</span>
             </div>
-            <div className="h-2.5 w-full bg-white/10 rounded-full overflow-hidden">
+            <div className="h-2.5 w-full bg-foreground/10 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${metric.value}%` }}

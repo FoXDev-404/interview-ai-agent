@@ -239,14 +239,14 @@ export default function SettingsPage() {
                 <a
                   key={item.id}
                   href={`#${item.id}`}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-light-400 transition-all hover:bg-white/5 hover:text-white"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground/60 transition-all hover:bg-muted/30 hover:text-foreground"
                 >
                   <item.icon className={`h-4 w-4 ${item.color}`} />
                   {item.label}
                 </a>
               ))}
             </nav>
-            <div className="mt-5 border-t border-white/6 pt-4">
+            <div className="mt-5 border-t border-border/30 pt-4">
               <a
                 href="#danger"
                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400/60 transition-all hover:bg-red-500/5 hover:text-red-400"
@@ -269,7 +269,7 @@ export default function SettingsPage() {
                   <User className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-white">Profile</h2>
+                  <h2 className="text-base font-bold text-foreground">Profile</h2>
                   <p className="text-xs text-light-400">
                     Manage your public identity
                   </p>
@@ -289,7 +289,7 @@ export default function SettingsPage() {
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder="Enter your full name"
-                      className="flex-1 rounded-xl border border-white/8 bg-white/5 px-4 py-2.5 text-sm text-light-100 placeholder:text-light-400 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
+                      className="flex-1 rounded-xl border border-border/50 bg-input px-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
                     />
                     <button
                       onClick={handleProfileUpdate}
@@ -323,7 +323,7 @@ export default function SettingsPage() {
                   <Bell className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-white">
+                  <h2 className="text-base font-bold text-foreground">
                     Notifications
                   </h2>
                   <p className="text-xs text-light-400">
@@ -331,7 +331,7 @@ export default function SettingsPage() {
                   </p>
                 </div>
               </div>
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-border/30">
                 {(
                   [
                     {
@@ -382,7 +382,7 @@ export default function SettingsPage() {
                         aria-label={item.label}
                         title={item.label}
                       />
-                      <div className="h-6 w-11 rounded-full bg-white/10 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-200 peer-checked:after:translate-x-full peer-focus:outline-none" />
+                      <div className="h-6 w-11 rounded-full bg-muted/40 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-200 peer-checked:after:translate-x-full peer-focus:outline-none" />
                     </label>
                   </div>
                 ))}
@@ -399,7 +399,7 @@ export default function SettingsPage() {
                   <Shield className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-white">
+                  <h2 className="text-base font-bold text-foreground">
                     Privacy & Security
                   </h2>
                   <p className="text-xs text-light-400">
@@ -418,14 +418,14 @@ export default function SettingsPage() {
                       placeholder="Current password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="rounded-xl border border-white/8 bg-white/5 px-4 py-2.5 text-sm text-light-100 placeholder:text-light-400 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
+                      className="rounded-xl border border-border/50 bg-input px-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
                     />
                     <input
                       type="password"
                       placeholder="New password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="rounded-xl border border-white/8 bg-white/5 px-4 py-2.5 text-sm text-light-100 placeholder:text-light-400 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
+                      className="rounded-xl border border-border/50 bg-input px-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
                     />
                   </div>
                   <button
@@ -436,7 +436,7 @@ export default function SettingsPage() {
                     {isUpdatingPassword ? "Updating…" : "Update Password"}
                   </button>
                 </div>
-                <div className="flex items-center justify-between border-t border-white/5 pt-5">
+                <div className="flex items-center justify-between border-t border-border/30 pt-5">
                   <div>
                     <p className="text-sm font-medium text-light-100">
                       Two-Factor Authentication
@@ -462,7 +462,7 @@ export default function SettingsPage() {
                   <Palette className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-white">Appearance</h2>
+                  <h2 className="text-base font-bold text-foreground">Appearance</h2>
                   <p className="text-xs text-light-400">
                     Personalise how the app looks
                   </p>
@@ -487,10 +487,10 @@ export default function SettingsPage() {
                       aria-label="Dark mode"
                       title="Dark mode"
                     />
-                    <div className="h-6 w-11 rounded-full bg-white/10 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-200 peer-checked:after:translate-x-full peer-focus:outline-none" />
+                    <div className="h-6 w-11 rounded-full bg-muted/40 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-200 peer-checked:after:translate-x-full peer-focus:outline-none" />
                   </label>
                 </div>
-                <div className="border-t border-white/5 pt-5">
+                <div className="border-t border-border/30 pt-5">
                   <label
                     htmlFor="settings-language"
                     className="section-label mb-3 block"
@@ -499,12 +499,12 @@ export default function SettingsPage() {
                   </label>
                   <select
                     id="settings-language"
-                    className="rounded-xl border border-white/8 bg-white/5 px-4 py-2.5 text-sm text-light-100 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
+                    className="rounded-xl border border-border/50 bg-input px-4 py-2.5 text-sm text-foreground focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
                   >
-                    <option className="bg-dark-200">English</option>
-                    <option className="bg-dark-200">Spanish</option>
-                    <option className="bg-dark-200">French</option>
-                    <option className="bg-dark-200">German</option>
+                    <option className="bg-card text-foreground">English</option>
+                    <option className="bg-card text-foreground">Spanish</option>
+                    <option className="bg-card text-foreground">French</option>
+                    <option className="bg-card text-foreground">German</option>
                   </select>
                 </div>
               </div>
@@ -520,7 +520,7 @@ export default function SettingsPage() {
                   <Eye className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-white">
+                  <h2 className="text-base font-bold text-foreground">
                     Interview Preferences
                   </h2>
                   <p className="text-xs text-light-400">
@@ -539,12 +539,12 @@ export default function SettingsPage() {
                     </label>
                     <select
                       id="settings-default-duration"
-                      className="w-full rounded-xl border border-white/8 bg-white/5 px-4 py-2.5 text-sm text-light-100 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
+                      className="w-full rounded-xl border border-border/50 bg-input px-4 py-2.5 text-sm text-foreground focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
                     >
-                      <option className="bg-dark-200">15 minutes</option>
-                      <option className="bg-dark-200">30 minutes</option>
-                      <option className="bg-dark-200">45 minutes</option>
-                      <option className="bg-dark-200">60 minutes</option>
+                      <option className="bg-card text-foreground">15 minutes</option>
+                      <option className="bg-card text-foreground">30 minutes</option>
+                      <option className="bg-card text-foreground">45 minutes</option>
+                      <option className="bg-card text-foreground">60 minutes</option>
                     </select>
                   </div>
                   <div>
@@ -556,16 +556,16 @@ export default function SettingsPage() {
                     </label>
                     <select
                       id="settings-difficulty-level"
-                      className="w-full rounded-xl border border-white/8 bg-white/5 px-4 py-2.5 text-sm text-light-100 focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
+                      className="w-full rounded-xl border border-border/50 bg-input px-4 py-2.5 text-sm text-foreground focus:border-primary-200/40 focus:outline-none focus:ring-1 focus:ring-primary-200/20"
                     >
-                      <option className="bg-dark-200">Beginner</option>
-                      <option className="bg-dark-200">Intermediate</option>
-                      <option className="bg-dark-200">Advanced</option>
-                      <option className="bg-dark-200">Expert</option>
+                      <option className="bg-card text-foreground">Beginner</option>
+                      <option className="bg-card text-foreground">Intermediate</option>
+                      <option className="bg-card text-foreground">Advanced</option>
+                      <option className="bg-card text-foreground">Expert</option>
                     </select>
                   </div>
                 </div>
-                <div className="flex items-center justify-between border-t border-white/5 pt-5">
+                <div className="flex items-center justify-between border-t border-border/30 pt-5">
                   <div>
                     <p className="text-sm font-medium text-light-100">
                       Auto-save Progress
@@ -585,7 +585,7 @@ export default function SettingsPage() {
                       aria-label="Auto-save progress"
                       title="Auto-save progress"
                     />
-                    <div className="h-6 w-11 rounded-full bg-white/10 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-200 peer-checked:after:translate-x-full peer-focus:outline-none" />
+                    <div className="h-6 w-11 rounded-full bg-muted/40 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-200 peer-checked:after:translate-x-full peer-focus:outline-none" />
                   </label>
                 </div>
               </div>
