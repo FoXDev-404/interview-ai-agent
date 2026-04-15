@@ -1,7 +1,31 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { auth } from "@/firebase/admin";
+import { getSafeNextPath } from "@/lib/security/redirect";
 
-export function proxy(request: NextRequest) {
+const PUBLIC_PATHS = new Set([
+  "/",
+  "/sign-in",
+  "/sign-up",
+  "/verify-email",
+  "/about",
+  "/contact",
+  "/help",
+  "/privacy",
+  "/terms",
+]);
+
+function redirectToSignIn(request: NextRequest, nextPath: string) {
+  const signInUrl = new URL("/sign-in", request.url);
+
+  if (nextPath !== "/") {
+    signInUrl.searchParams.set("next", nextPath);
+  }
+
+  return NextResponse.redirect(signInUrl);
+}
+
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip API routes and static assets
@@ -14,27 +38,29 @@ export function proxy(request: NextRequest) {
   }
 
   // Public pages — accessible without login
-  const publicPaths = [
-    "/",
-    "/sign-in",
-    "/sign-up",
-    "/verify-email",
-    "/about",
-    "/contact",
-    "/help",
-    "/privacy",
-    "/terms",
-  ];
-
-  if (publicPaths.includes(pathname)) {
+  if (PUBLIC_PATHS.has(pathname)) {
     return NextResponse.next();
   }
 
-  // Everything else requires a session cookie
-  const sessionCookie = request.cookies.get("session");
+  const nextPath = getSafeNextPath(
+    `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    "/",
+  );
+  const sessionCookie = request.cookies.get("session")?.value;
 
-  if (!sessionCookie || !sessionCookie.value) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+  if (!sessionCookie) {
+    return redirectToSignIn(request, nextPath);
+  }
+
+  // Fail closed when auth service is unavailable.
+  if (!auth) {
+    return redirectToSignIn(request, nextPath);
+  }
+
+  try {
+    await auth.verifySessionCookie(sessionCookie, true);
+  } catch {
+    return redirectToSignIn(request, nextPath);
   }
 
   return NextResponse.next();

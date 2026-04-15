@@ -1,20 +1,23 @@
-import { notFound } from 'next/navigation';
-import { requireAuth } from '@/lib/auth';
-import { getInterview } from '@/lib/actions/interview.action';
-import CodingFeedbackDashboard from '@/components/coding/CodingFeedbackDashboard';
-import { filterCodingQuestionsByTopic, type CodingQuestion } from '@/lib/coding/interviewEngine';
+import { notFound } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
+import { getInterview } from "@/lib/actions/interview.action";
+import CodingFeedbackDashboard from "@/components/coding/CodingFeedbackDashboard";
+import {
+  filterCodingQuestionsByTopic,
+  type CodingQuestion,
+} from "@/lib/coding/interviewEngine";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function CodingFeedbackPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAuth();
+  const user = await requireAuth();
 
   const { id } = await params;
-  const response = await getInterview(id);
+  const response = await getInterview(id, user.uid);
 
   if (!response.success || !response.interview) {
     notFound();
@@ -25,11 +28,13 @@ export default async function CodingFeedbackPage({
     codingQuestions?: CodingQuestion[];
   };
 
-  if (interview.type !== 'Coding') {
+  if (interview.type !== "Coding") {
     notFound();
   }
 
-  const questions = Array.isArray(interview.codingQuestions) ? interview.codingQuestions : [];
+  const questions = Array.isArray(interview.codingQuestions)
+    ? interview.codingQuestions
+    : [];
   const filteredQuestions = interview.codingTopic
     ? filterCodingQuestionsByTopic(questions, interview.codingTopic, 10)
     : questions;

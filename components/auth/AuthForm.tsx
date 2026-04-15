@@ -8,11 +8,19 @@ import GoogleLoginButton from "./GoogleLoginButton";
 import EmailVerification from "@/components/EmailVerification";
 import PasswordReset from "@/components/PasswordReset";
 import Link from "next/link";
+import { getSafeNextPath } from "@/lib/security/redirect";
 
-export default function AuthForm({ type }: { type: FormType }) {
+export default function AuthForm({
+  type,
+  nextPath = "/",
+}: {
+  type: FormType;
+  nextPath?: string;
+}) {
   const [email, setEmail] = useState("");
   const [showVerify, setShowVerify] = useState(false);
   const [showReset, setShowReset] = useState(false);
+  const redirectTarget = getSafeNextPath(nextPath, "/");
 
   // Password reset screen
   if (showReset && type === "sign-in") {
@@ -40,7 +48,11 @@ export default function AuthForm({ type }: { type: FormType }) {
 
       {/* Google login */}
       {type === "sign-in" && (
-        <GoogleLoginButton onSuccess={() => { window.location.href = "/"; }} />
+        <GoogleLoginButton
+          onSuccess={() => {
+            window.location.href = redirectTarget;
+          }}
+        />
       )}
 
       {/* Divider */}
@@ -54,7 +66,10 @@ export default function AuthForm({ type }: { type: FormType }) {
 
       {/* Forms */}
       {type === "sign-in" ? (
-        <SignInForm onForgotPassword={() => setShowReset(true)} />
+        <SignInForm
+          onForgotPassword={() => setShowReset(true)}
+          nextPath={redirectTarget}
+        />
       ) : (
         <SignUpForm
           onVerificationRequired={(email) => {

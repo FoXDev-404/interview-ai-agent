@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { requireApiAuth, toApiAuthErrorResponse } from "@/lib/apiAuth";
 
 const HF_MODEL =
   process.env.HUGGINGFACE_MODEL || "mistralai/Mistral-7B-Instruct";
@@ -989,6 +990,12 @@ async function askHuggingFaceForAnalysis(
 }
 
 export async function POST(request: NextRequest) {
+  try {
+    await requireApiAuth();
+  } catch (error) {
+    return toApiAuthErrorResponse(error);
+  }
+
   try {
     const { resumeText, jobDescription } = await request.json();
 

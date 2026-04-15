@@ -1,8 +1,12 @@
-'use server';
+"use server";
 
 import { db } from "@/firebase/admin";
 import { generateQuestions } from "@/lib/interview/questionGenerator";
-import { generateCodingQuestionSet, type CodingLanguage } from "@/lib/coding/interviewEngine";
+import {
+  generateCodingQuestionSet,
+  type CodingLanguage,
+} from "@/lib/coding/interviewEngine";
+import { getCurrentUser } from "@/lib/auth";
 
 export async function createInterview(params: {
   userId: string;
@@ -12,14 +16,23 @@ export async function createInterview(params: {
   type: string;
   company?: string;
 }) {
-  const { userId, role, level, techstack, type, company } = params;
+  const { role, level, techstack, type, company } = params;
 
   try {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "Not authenticated",
+      };
+    }
+
     // Generate interview questions based on role, level, tech stack, and type
     const questions = await generateQuestions(role, level, techstack, type);
-    
+
     const interviewData = {
-      userId,
+      userId: currentUser.uid,
       company: company || null,
       role,
       level,
@@ -31,19 +44,18 @@ export async function createInterview(params: {
     };
 
     // Create interview document in Firestore
-    const docRef = await db.collection('interviews').add(interviewData);
+    const docRef = await db.collection("interviews").add(interviewData);
 
     return {
       success: true,
       interviewId: docRef.id,
-      message: 'Interview created successfully'
+      message: "Interview created successfully",
     };
-
   } catch (error) {
-    console.error('Error creating interview:', error);
+    console.error("Error creating interview:", error);
     return {
       success: false,
-      message: 'Failed to create interview'
+      message: "Failed to create interview",
     };
   }
 }
@@ -55,18 +67,31 @@ export async function createCodingInterview(params: {
   language: CodingLanguage;
   company?: string;
 }) {
-  const { userId, role, level, language, company } = params;
+  const { role, level, language, company } = params;
 
   try {
-    const codingQuestions = generateCodingQuestionSet({ role, level, language });
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "Not authenticated",
+      };
+    }
+
+    const codingQuestions = generateCodingQuestionSet({
+      role,
+      level,
+      language,
+    });
 
     const interviewData = {
-      userId,
+      userId: currentUser.uid,
       company: company || null,
       role,
       level,
       techstack: [language],
-      type: 'Coding',
+      type: "Coding",
       codingLanguage: language,
       codingTopic: null,
       // Serialize to a JSON string to avoid Firestore's nested-array restriction
@@ -77,36 +102,47 @@ export async function createCodingInterview(params: {
       createdAt: new Date().toISOString(),
     };
 
-    const docRef = await db.collection('interviews').add(interviewData);
+    const docRef = await db.collection("interviews").add(interviewData);
 
     return {
       success: true,
       interviewId: docRef.id,
-      message: 'Coding interview created successfully',
+      message: "Coding interview created successfully",
     };
   } catch (error) {
-    console.error('Error creating coding interview:', error);
+    console.error("Error creating coding interview:", error);
     return {
       success: false,
-      message: 'Failed to create coding interview',
+      message: "Failed to create coding interview",
     };
   }
 }
 
-export async function getInterview(interviewId: string) {
+export async function getInterview(
+  interviewId: string,
+  requestingUserId?: string,
+) {
   try {
-    const doc = await db.collection('interviews').doc(interviewId).get();
-    
+    const doc = await db.collection("interviews").doc(interviewId).get();
+
     if (!doc.exists) {
       return {
         success: false,
-        message: 'Interview not found'
+        message: "Interview not found",
       };
     }
 
     const data = doc.data()!;
+
+    if (requestingUserId && data.userId !== requestingUserId) {
+      return {
+        success: false,
+        message: "Interview not found",
+      };
+    }
+
     // Parse codingQuestions back from JSON string if it was serialized on save
-    if (typeof data.codingQuestions === 'string') {
+    if (typeof data.codingQuestions === "string") {
       try {
         data.codingQuestions = JSON.parse(data.codingQuestions);
       } catch {
@@ -117,79 +153,141 @@ export async function getInterview(interviewId: string) {
       success: true,
       interview: { id: doc.id, ...data } as Interview,
     };
-
   } catch (error) {
-    console.error('Error fetching interview:', error);
+    console.error("Error fetching interview:", error);
     return {
       success: false,
-      message: 'Failed to fetch interview'
+      message: "Failed to fetch interview",
     };
   }
 }
 
-export async function setCodingInterviewTopic(interviewId: string, codingTopic: string | null) {
+export async function setCodingInterviewTopic(
+  interviewId: string,
+  codingTopic: string | null,
+) {
   try {
-    await db.collection('interviews').doc(interviewId).update({
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "Not authenticated",
+      };
+    }
+
+    const interviewRef = db.collection("interviews").doc(interviewId);
+    const interviewDoc = await interviewRef.get();
+
+    if (!interviewDoc.exists) {
+      return {
+        success: false,
+        message: "Interview not found",
+      };
+    }
+
+    const interview = interviewDoc.data() as Interview;
+
+    if (interview.userId !== currentUser.uid) {
+      return {
+        success: false,
+        message: "Not authorized to update this interview",
+      };
+    }
+
+    await interviewRef.update({
       codingTopic,
     });
 
     return {
       success: true,
-      message: 'Coding topic saved successfully',
+      message: "Coding topic saved successfully",
     };
   } catch (error) {
-    console.error('Error saving coding topic:', error);
+    console.error("Error saving coding topic:", error);
     return {
       success: false,
-      message: 'Failed to save coding topic',
+      message: "Failed to save coding topic",
     };
   }
 }
 
 export async function getUserInterviews(userId: string) {
   try {
-    const snapshot = await db.collection('interviews')
-      .where('userId', '==', userId)
+    const snapshot = await db
+      .collection("interviews")
+      .where("userId", "==", userId)
       .get();
 
-    const interviews = snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({
-      id: doc.id,
-      ...doc.data()
-    })) as Interview[];
+    const interviews = snapshot.docs.map(
+      (doc: FirebaseFirestore.QueryDocumentSnapshot) => ({
+        id: doc.id,
+        ...doc.data(),
+      }),
+    ) as Interview[];
 
     // Sort by createdAt in JavaScript instead of Firestore
-    interviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    interviews.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
 
     return {
       success: true,
-      interviews
+      interviews,
     };
-
   } catch (error) {
-    console.error('Error fetching user interviews:', error);
+    console.error("Error fetching user interviews:", error);
     return {
       success: false,
-      interviews: []
+      interviews: [],
     };
   }
 }
 
 export async function finalizeInterview(interviewId: string) {
   try {
-    await db.collection('interviews').doc(interviewId).update({
-      finalized: true
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "Not authenticated",
+      };
+    }
+
+    const interviewRef = db.collection("interviews").doc(interviewId);
+    const interviewDoc = await interviewRef.get();
+
+    if (!interviewDoc.exists) {
+      return {
+        success: false,
+        message: "Interview not found",
+      };
+    }
+
+    const interview = interviewDoc.data() as Interview;
+
+    if (interview.userId !== currentUser.uid) {
+      return {
+        success: false,
+        message: "Not authorized to finalize this interview",
+      };
+    }
+
+    await interviewRef.update({
+      finalized: true,
     });
 
     return {
       success: true,
-      message: 'Interview finalized successfully'
+      message: "Interview finalized successfully",
     };
-
   } catch (error) {
-    console.error('Error finalizing interview:', error);
+    console.error("Error finalizing interview:", error);
     return {
       success: false,
-      message: 'Failed to finalize interview'
+      message: "Failed to finalize interview",
     };
   }
 }

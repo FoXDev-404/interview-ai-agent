@@ -1,26 +1,35 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 import {
   buildExecutionFailureResult,
   evaluateCodingSubmissionReal,
   type CodingLanguage,
-} from '@/lib/coding/interviewEngine';
+} from "@/lib/coding/interviewEngine";
+import { requireApiAuth, toApiAuthErrorResponse } from "@/lib/apiAuth";
 
 interface ExecuteBody {
   code?: string;
   language?: CodingLanguage;
   questionId?: string;
-  mode?: 'run' | 'submit';
+  mode?: "run" | "submit";
   customInput?: string;
 }
 
 export async function POST(req: NextRequest) {
   try {
+    await requireApiAuth();
+  } catch (error) {
+    return toApiAuthErrorResponse(error);
+  }
+
+  try {
     const body = (await req.json()) as ExecuteBody;
 
     if (!body.code || !body.language || !body.questionId || !body.mode) {
       return NextResponse.json(
-        { message: 'Missing required fields: code, language, questionId, mode' },
-        { status: 400 }
+        {
+          message: "Missing required fields: code, language, questionId, mode",
+        },
+        { status: 400 },
       );
     }
 
@@ -38,27 +47,30 @@ export async function POST(req: NextRequest) {
       result = await evaluateCodingSubmissionReal(payload);
     } catch (realJudgeError) {
       const fallbackReason =
-        realJudgeError instanceof Error ? realJudgeError.message : 'unknown sandbox error';
+        realJudgeError instanceof Error
+          ? realJudgeError.message
+          : "unknown sandbox error";
       result = buildExecutionFailureResult(payload, fallbackReason);
     }
 
     return NextResponse.json({
       success: true,
       output: result.output,
-      error: result.error ?? '',
+      error: result.error ?? "",
       status: result.status,
       stdout: result.output,
-      stderr: result.error ?? '',
-      compile_output: result.status === 'Runtime Error' ? result.error ?? '' : '',
+      stderr: result.error ?? "",
+      compile_output:
+        result.status === "Runtime Error" ? (result.error ?? "") : "",
       execution_time_ms: result.executionTimeMs,
       memory_mb: result.memoryMB,
       result,
     });
   } catch (error) {
-    console.error('coding execute api error', error);
+    console.error("coding execute api error", error);
     return NextResponse.json(
-      { success: false, message: 'Failed to execute code' },
-      { status: 500 }
+      { success: false, message: "Failed to execute code" },
+      { status: 500 },
     );
   }
 }

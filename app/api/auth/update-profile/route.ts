@@ -1,26 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { auth, db } from '@/firebase/admin';
+import { NextRequest, NextResponse } from "next/server";
+import { auth, db } from "@/firebase/admin";
+import {
+  requireApiAuth,
+  toApiAuthErrorResponse,
+  type ApiAuthContext,
+} from "@/lib/apiAuth";
 
 export async function POST(request: NextRequest) {
+  let authUser: ApiAuthContext;
   try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get('session')?.value;
+    authUser = await requireApiAuth();
+  } catch (error) {
+    return toApiAuthErrorResponse(error);
+  }
 
-    if (!sessionCookie) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    }
-
-    // Verify the session cookie
-    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-    const uid = decodedClaims.uid;
+  try {
+    const uid = authUser.uid;
 
     // Get the request body
     const { displayName, photoURL, headline, bio } = await request.json();
 
     // Update the user's display name in Firebase Auth
     const updateData: { displayName?: string } = {};
-    
+
     if (displayName !== undefined) {
       updateData.displayName = displayName;
     }
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Store profile data (including photoURL) in Firestore
     if (db) {
-      const userRef = db.collection('users').doc(uid);
+      const userRef = db.collection("users").doc(uid);
       const profileData: {
         name?: string;
         displayName?: string;
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
         bio?: string;
         updatedAt: Date;
       } = {
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       if (displayName !== undefined) {
@@ -52,17 +54,21 @@ export async function POST(request: NextRequest) {
 
       if (photoURL !== undefined) {
         // Check if photoURL is null or empty, handle accordingly
-        if (photoURL === null || photoURL === '') {
+        if (photoURL === null || photoURL === "") {
           // User is removing their profile photo
           profileData.photoURL = null;
           profileData.avatar = null;
         } else {
           // Check photoURL size before storing
           const photoSizeInBytes = (photoURL.length * 3) / 4;
-          if (photoSizeInBytes > 500000) { // 500KB limit
+          if (photoSizeInBytes > 500000) {
+            // 500KB limit
             return NextResponse.json(
-              { error: 'Profile image is too large. Please use a smaller image.' },
-              { status: 400 }
+              {
+                error:
+                  "Profile image is too large. Please use a smaller image.",
+              },
+              { status: 400 },
             );
           }
           profileData.photoURL = photoURL;
@@ -81,20 +87,19 @@ export async function POST(request: NextRequest) {
       await userRef.set(profileData, { merge: true });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Profile updated successfully',
+    return NextResponse.json({
+      success: true,
+      message: "Profile updated successfully",
       displayName,
       photoURL,
       headline,
       bio,
     });
-
   } catch (error) {
-    console.error('Error updating profile:', error);
+    console.error("Error updating profile:", error);
     return NextResponse.json(
-      { error: 'Failed to update profile' },
-      { status: 500 }
+      { error: "Failed to update profile" },
+      { status: 500 },
     );
   }
 }

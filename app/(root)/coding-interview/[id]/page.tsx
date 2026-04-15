@@ -1,18 +1,32 @@
-import { notFound } from 'next/navigation';
-import CodingInterviewTopicGate from '@/components/coding/CodingInterviewTopicGate';
-import { getInterview } from '@/lib/actions/interview.action';
-import { requireAuth } from '@/lib/auth';
-import type { CodingLanguage, CodingQuestion } from '@/lib/coding/interviewEngine';
+import { notFound } from "next/navigation";
+import CodingInterviewTopicGate from "@/components/coding/CodingInterviewTopicGate";
+import { getInterview } from "@/lib/actions/interview.action";
+import { requireAuth } from "@/lib/auth";
+import type {
+  CodingLanguage,
+  CodingQuestion,
+} from "@/lib/coding/interviewEngine";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-const ALLOWED_LANGUAGES = new Set(['javascript', 'typescript', 'python', 'java', 'cpp', 'c']);
+const ALLOWED_LANGUAGES = new Set([
+  "javascript",
+  "typescript",
+  "python",
+  "java",
+  "cpp",
+  "c",
+]);
 
-export default async function CodingInterviewPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireAuth();
+export default async function CodingInterviewPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const user = await requireAuth();
 
   const { id } = await params;
-  const response = await getInterview(id);
+  const response = await getInterview(id, user.uid);
 
   if (!response.success || !response.interview) {
     notFound();
@@ -24,14 +38,16 @@ export default async function CodingInterviewPage({ params }: { params: Promise<
     codingQuestions?: CodingQuestion[];
   };
 
-  if (interview.type !== 'Coding') {
+  if (interview.type !== "Coding") {
     notFound();
   }
 
-  const questions = Array.isArray(interview.codingQuestions) ? interview.codingQuestions : [];
-  const language = ALLOWED_LANGUAGES.has(interview.codingLanguage ?? '')
+  const questions = Array.isArray(interview.codingQuestions)
+    ? interview.codingQuestions
+    : [];
+  const language = ALLOWED_LANGUAGES.has(interview.codingLanguage ?? "")
     ? (interview.codingLanguage as CodingLanguage)
-    : 'javascript';
+    : "javascript";
 
   return (
     <CodingInterviewTopicGate

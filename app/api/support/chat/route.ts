@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { NextRequest, NextResponse } from "next/server";
+import { GoogleGenAI } from "@google/genai";
+import { requireApiAuth, toApiAuthErrorResponse } from "@/lib/apiAuth";
 
 type ChatHistoryItem = {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 };
 
@@ -11,17 +12,24 @@ type ChatRequestBody = {
   history?: ChatHistoryItem[];
 };
 
-const HF_MODEL = process.env.HUGGINGFACE_MODEL || 'mistralai/Mistral-7B-Instruct';
+const HF_MODEL =
+  process.env.HUGGINGFACE_MODEL || "mistralai/Mistral-7B-Instruct";
 
 function sanitizeText(input: string, maxLen: number): string {
-  return input.replace(/\s+/g, ' ').trim().slice(0, maxLen);
+  return input.replace(/\s+/g, " ").trim().slice(0, maxLen);
 }
 
-function buildSupportPrompt(message: string, history: ChatHistoryItem[]): string {
+function buildSupportPrompt(
+  message: string,
+  history: ChatHistoryItem[],
+): string {
   const boundedHistory = history.slice(-8);
   const historyText = boundedHistory
-    .map((item) => `${item.role === 'user' ? 'User' : 'Assistant'}: ${sanitizeText(item.content, 700)}`)
-    .join('\n');
+    .map(
+      (item) =>
+        `${item.role === "user" ? "User" : "Assistant"}: ${sanitizeText(item.content, 700)}`,
+    )
+    .join("\n");
 
   return `You are AI MockPrep Support Assistant.
 
@@ -47,7 +55,7 @@ Style rules:
 - Be confident and solution-oriented.
 
 Recent conversation:
-${historyText || 'No prior messages.'}
+${historyText || "No prior messages."}
 
 Latest user message:
 ${sanitizeText(message, 1600)}
@@ -56,13 +64,14 @@ Return only the assistant response text.`;
 }
 
 async function askGemini(prompt: string): Promise<string | null> {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
+  const apiKey =
+    process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
   if (!apiKey) return null;
 
   try {
     const ai = new GoogleGenAI({ apiKey });
     const result = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: {
         temperature: 0.35,
@@ -71,7 +80,7 @@ async function askGemini(prompt: string): Promise<string | null> {
 
     return result.text?.trim() || null;
   } catch (error) {
-    console.error('Gemini support chat failed:', error);
+    console.error("Gemini support chat failed:", error);
     return null;
   }
 }
@@ -84,41 +93,45 @@ async function askHuggingFace(prompt: string): Promise<string | null> {
     const response = await fetch(
       `https://api-inference.huggingface.co/models/${encodeURIComponent(HF_MODEL)}`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           inputs: prompt,
           options: { wait_for_model: true },
           parameters: { max_new_tokens: 400, temperature: 0.35 },
         }),
-      }
+      },
     );
 
     if (!response.ok) {
-      console.warn('HF support chat failed:', response.status, response.statusText);
+      console.warn(
+        "HF support chat failed:",
+        response.status,
+        response.statusText,
+      );
       return null;
     }
 
     const data = await response.json();
 
-    if (Array.isArray(data) && typeof data[0]?.generated_text === 'string') {
+    if (Array.isArray(data) && typeof data[0]?.generated_text === "string") {
       return data[0].generated_text.trim();
     }
 
-    if (typeof data?.generated_text === 'string') {
+    if (typeof data?.generated_text === "string") {
       return data.generated_text.trim();
     }
 
-    if (Array.isArray(data) && typeof data[0]?.text === 'string') {
+    if (Array.isArray(data) && typeof data[0]?.text === "string") {
       return data[0].text.trim();
     }
 
     return null;
   } catch (error) {
-    console.error('HF support chat error:', error);
+    console.error("HF support chat error:", error);
     return null;
   }
 }
@@ -126,53 +139,86 @@ async function askHuggingFace(prompt: string): Promise<string | null> {
 function fallbackResponse(message: string): string {
   const lower = message.toLowerCase();
 
-  if (lower.includes('login') || lower.includes('sign in') || lower.includes('password')) {
-    return 'I can help with sign-in issues. Please try password reset first, then verify your email inbox and spam folder. If it still fails, share your exact error message and browser so I can give targeted troubleshooting steps.';
+  if (
+    lower.includes("login") ||
+    lower.includes("sign in") ||
+    lower.includes("password")
+  ) {
+    return "I can help with sign-in issues. Please try password reset first, then verify your email inbox and spam folder. If it still fails, share your exact error message and browser so I can give targeted troubleshooting steps.";
   }
 
-  if (lower.includes('microphone') || lower.includes('audio') || lower.includes('voice')) {
-    return 'For microphone issues, first allow browser microphone permission, then confirm your correct input device in system sound settings. Refresh the page and retry. If needed, I can walk you through browser-specific fixes next.';
+  if (
+    lower.includes("microphone") ||
+    lower.includes("audio") ||
+    lower.includes("voice")
+  ) {
+    return "For microphone issues, first allow browser microphone permission, then confirm your correct input device in system sound settings. Refresh the page and retry. If needed, I can walk you through browser-specific fixes next.";
   }
 
-  if (lower.includes('resume')) {
-    return 'For resume improvements, open the Resume section, upload your latest resume, and compare suggestions against your target job description. Prioritize measurable achievements and role-specific keywords. I can help you rewrite one section now if you paste it.';
+  if (lower.includes("resume")) {
+    return "For resume improvements, open the Resume section, upload your latest resume, and compare suggestions against your target job description. Prioritize measurable achievements and role-specific keywords. I can help you rewrite one section now if you paste it.";
   }
 
-  return 'I am here to help with AI MockPrep support. Tell me what you are trying to do and what happened, and I will provide step-by-step guidance.';
+  return "I am here to help with AI MockPrep support. Tell me what you are trying to do and what happened, and I will provide step-by-step guidance.";
 }
 
 export async function POST(request: NextRequest) {
   try {
+    await requireApiAuth();
+  } catch (error) {
+    return toApiAuthErrorResponse(error);
+  }
+
+  try {
     const body = (await request.json()) as ChatRequestBody;
-    const message = typeof body.message === 'string' ? sanitizeText(body.message, 2000) : '';
+    const message =
+      typeof body.message === "string" ? sanitizeText(body.message, 2000) : "";
 
     if (!message) {
-      return NextResponse.json({ error: 'Message is required.' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Message is required." },
+        { status: 400 },
+      );
     }
 
     const rawHistory = Array.isArray(body.history) ? body.history : [];
     const history = rawHistory
-      .filter((item) => item && (item.role === 'user' || item.role === 'assistant') && typeof item.content === 'string')
-      .map((item) => ({ role: item.role, content: sanitizeText(item.content, 1200) }));
+      .filter(
+        (item) =>
+          item &&
+          (item.role === "user" || item.role === "assistant") &&
+          typeof item.content === "string",
+      )
+      .map((item) => ({
+        role: item.role,
+        content: sanitizeText(item.content, 1200),
+      }));
 
     const prompt = buildSupportPrompt(message, history);
     const geminiReply = await askGemini(prompt);
 
     if (geminiReply) {
-      return NextResponse.json({ reply: geminiReply, source: 'gemini' });
+      return NextResponse.json({ reply: geminiReply, source: "gemini" });
     }
 
     const hfReply = await askHuggingFace(prompt);
     if (hfReply) {
-      return NextResponse.json({ reply: hfReply, source: 'huggingface' });
+      return NextResponse.json({ reply: hfReply, source: "huggingface" });
     }
 
-    return NextResponse.json({ reply: fallbackResponse(message), source: 'fallback' });
+    return NextResponse.json({
+      reply: fallbackResponse(message),
+      source: "fallback",
+    });
   } catch (error) {
-    console.error('Support chat API error:', error);
+    console.error("Support chat API error:", error);
     return NextResponse.json(
-      { reply: 'I am currently unable to process that request. Please try again in a moment.', source: 'error' },
-      { status: 500 }
+      {
+        reply:
+          "I am currently unable to process that request. Please try again in a moment.",
+        source: "error",
+      },
+      { status: 500 },
     );
   }
 }

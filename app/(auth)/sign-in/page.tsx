@@ -1,19 +1,15 @@
+import AuthForm from "@/components/auth/AuthForm";
+import { getSafeNextPath } from "@/lib/security/redirect";
 
-import { Suspense } from 'react'
-import AuthForm from '@/components/auth/AuthForm'
+const page = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) => {
+  const params = await searchParams;
+  const nextPath = getSafeNextPath(params.next, "/");
 
-function SignInContent() {
-  return <AuthForm type='sign-in' />
-}
+  return <AuthForm type="sign-in" nextPath={nextPath} />;
+};
 
-const page = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SignInContent />
-    </Suspense>
-  )
-}
-
-export default page
-
-
+export default page;
