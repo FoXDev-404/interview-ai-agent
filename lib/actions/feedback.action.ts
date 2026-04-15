@@ -246,6 +246,15 @@ function extractImprovements(
 
 export async function getFeedback(feedbackId: string) {
   try {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "Feedback not found",
+      };
+    }
+
     const doc = await db.collection("feedback").doc(feedbackId).get();
 
     if (!doc.exists) {
@@ -255,9 +264,18 @@ export async function getFeedback(feedbackId: string) {
       };
     }
 
+    const feedback = doc.data() as Omit<Feedback, "id">;
+
+    if (feedback.userId !== currentUser.uid) {
+      return {
+        success: false,
+        message: "Feedback not found",
+      };
+    }
+
     return {
       success: true,
-      feedback: { id: doc.id, ...doc.data() } as Feedback,
+      feedback: { id: doc.id, ...feedback } as Feedback,
     };
   } catch (error) {
     console.error("Error fetching feedback:", error);
@@ -273,26 +291,42 @@ export async function getFeedbackByInterview(
   requestingUserId?: string,
 ) {
   try {
-    if (requestingUserId) {
-      const interviewDoc = await db
-        .collection("interviews")
-        .doc(interviewId)
-        .get();
+    const currentUser = await getCurrentUser();
 
-      if (!interviewDoc.exists) {
-        return {
-          success: false,
-          message: "No feedback found for this interview",
-        };
-      }
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "No feedback found for this interview",
+      };
+    }
 
-      const interview = interviewDoc.data() as Interview;
-      if (interview.userId !== requestingUserId) {
-        return {
-          success: false,
-          message: "No feedback found for this interview",
-        };
-      }
+    const effectiveUserId = requestingUserId || currentUser.uid;
+
+    if (effectiveUserId !== currentUser.uid) {
+      return {
+        success: false,
+        message: "No feedback found for this interview",
+      };
+    }
+
+    const interviewDoc = await db
+      .collection("interviews")
+      .doc(interviewId)
+      .get();
+
+    if (!interviewDoc.exists) {
+      return {
+        success: false,
+        message: "No feedback found for this interview",
+      };
+    }
+
+    const interview = interviewDoc.data() as Interview;
+    if (interview.userId !== effectiveUserId) {
+      return {
+        success: false,
+        message: "No feedback found for this interview",
+      };
     }
 
     const snapshot = await db

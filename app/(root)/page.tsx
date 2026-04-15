@@ -158,7 +158,7 @@ const page = async () => {
   }
 
   if (user) {
-    const userInterviewsResult = await getUserInterviews(user.uid);
+    const userInterviewsResult = await getUserInterviews();
     userInterviews = userInterviewsResult.success
       ? userInterviewsResult.interviews
       : [];

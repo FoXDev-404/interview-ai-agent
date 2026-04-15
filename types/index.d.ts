@@ -1,6 +1,7 @@
 interface Feedback {
   id: string;
   interviewId: string;
+  userId: string;
   totalScore: number;
   categoryScores: Array<{
     name: string;
@@ -164,15 +165,16 @@ interface GetLatestInterviewsParams {
 }
 
 interface SignInParams {
-  email: string;
+  email?: string;
   idToken: string;
 }
 
 interface SignUpParams {
-  uid: string;
-  name: string;
-  email: string;
-  password?: string; // Make password optional for verified email sign-up
+  idToken: string;
+  name?: string;
+  email?: string;
+  uid?: string;
+  password?: string;
 }
 
 type FormType = "sign-in" | "sign-up";

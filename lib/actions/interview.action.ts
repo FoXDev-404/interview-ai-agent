@@ -123,6 +123,24 @@ export async function getInterview(
   requestingUserId?: string,
 ) {
   try {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "Interview not found",
+      };
+    }
+
+    const effectiveUserId = requestingUserId || currentUser.uid;
+
+    if (effectiveUserId !== currentUser.uid) {
+      return {
+        success: false,
+        message: "Interview not found",
+      };
+    }
+
     const doc = await db.collection("interviews").doc(interviewId).get();
 
     if (!doc.exists) {
@@ -134,7 +152,7 @@ export async function getInterview(
 
     const data = doc.data()!;
 
-    if (requestingUserId && data.userId !== requestingUserId) {
+    if (data.userId !== effectiveUserId) {
       return {
         success: false,
         message: "Interview not found",
@@ -212,11 +230,29 @@ export async function setCodingInterviewTopic(
   }
 }
 
-export async function getUserInterviews(userId: string) {
+export async function getUserInterviews(requestingUserId?: string) {
   try {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        success: false,
+        interviews: [],
+      };
+    }
+
+    const effectiveUserId = requestingUserId || currentUser.uid;
+
+    if (effectiveUserId !== currentUser.uid) {
+      return {
+        success: false,
+        interviews: [],
+      };
+    }
+
     const snapshot = await db
       .collection("interviews")
-      .where("userId", "==", userId)
+      .where("userId", "==", effectiveUserId)
       .get();
 
     const interviews = snapshot.docs.map(

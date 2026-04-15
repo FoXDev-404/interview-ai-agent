@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { signIn, signUp } from "@/lib/actions/auth.action";
+import { signIn } from "@/lib/actions/auth.action";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -33,26 +33,9 @@ export default function GoogleLoginButton({ onSuccess }: Props) {
 
       const idToken = await user.getIdToken();
 
-      const signInResult = await signIn({ email: user.email, idToken });
+      const signInResult = await signIn({ idToken });
 
-      if (!signInResult.success && signInResult.message.includes("User does not exist")) {
-        const signUpResult = await signUp({
-          uid: user.uid,
-          name: user.displayName || "User",
-          email: user.email,
-        });
-
-        if (!signUpResult.success) {
-          toast.error(signUpResult.message);
-          return;
-        }
-
-        const finalSignIn = await signIn({ email: user.email, idToken });
-        if (!finalSignIn.success) {
-          toast.error(finalSignIn.message);
-          return;
-        }
-      } else if (!signInResult.success) {
+      if (!signInResult.success) {
         toast.error(signInResult.message);
         return;
       }
@@ -81,7 +64,13 @@ export default function GoogleLoginButton({ onSuccess }: Props) {
       suppressHydrationWarning
       className="auth-google-btn"
     >
-      <Image src="/google.png" alt="Google" width={20} height={20} className="rounded-sm bg-white p-[2px]" />
+      <Image
+        src="/google.png"
+        alt="Google"
+        width={20}
+        height={20}
+        className="rounded-sm bg-white p-[2px]"
+      />
       <span>{loading ? "Signing in..." : "Continue with Google"}</span>
     </button>
   );

@@ -9,7 +9,7 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { signIn, signUp } from "@/lib/actions/auth.action";
+import { signIn } from "@/lib/actions/auth.action";
 import FormField from "@/components/FormField";
 import { getSafeNextPath } from "@/lib/security/redirect";
 
@@ -45,16 +45,11 @@ export default function SignInForm({
       }
 
       const token = await cred.user.getIdToken();
-      const res = await signIn({ email: values.email, idToken: token });
+      const res = await signIn({ idToken: token });
 
       if (!res.success) {
-        const name =
-          localStorage.getItem(`pendingUser_${cred.user.uid}`) ||
-          cred.user.displayName ||
-          "User";
-
-        await signUp({ uid: cred.user.uid, name, email: values.email });
-        await signIn({ email: values.email, idToken: token });
+        toast.error(res.message || "Sign in failed");
+        return;
       }
 
       toast.success("Signed in successfully!");
