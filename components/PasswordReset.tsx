@@ -54,14 +54,14 @@ const PasswordReset = ({ onBack }: PasswordResetProps) => {
 
   if (sent) {
     return (
-      <div className="bg-gradient-to-r from-green-600/20 to-blue-600/20 rounded-xl p-6 border border-green-500/20">
+      <div className="bg-green-500/10 rounded-xl p-6 border border-green-500/20">
         <div className="flex items-center gap-3 mb-4">
           <Mail className="w-6 h-6 text-green-400" />
-          <h3 className="text-lg font-semibold text-white">Reset Email Sent</h3>
+          <h3 className="text-lg font-semibold text-foreground">Reset Email Sent</h3>
         </div>
         
-        <p className="text-gray-300 mb-4">
-          We&apos;ve sent a password reset link to <span className="font-medium text-green-300">{email}</span>. 
+        <p className="text-foreground/70 mb-4">
+          We&apos;ve sent a password reset link to <span className="font-medium text-green-400">{email}</span>. 
           Please check your inbox and follow the instructions to reset your password.
         </p>
         
@@ -82,7 +82,7 @@ const PasswordReset = ({ onBack }: PasswordResetProps) => {
           </Link>
         </div>
         
-        <p className="text-sm text-gray-400 mt-4">
+        <p className="text-sm text-foreground/50 mt-4">
           Didn&apos;t receive the email? Check your spam folder or try again.
         </p>
       </div>
@@ -90,13 +90,13 @@ const PasswordReset = ({ onBack }: PasswordResetProps) => {
   }
 
   return (
-    <div className="bg-gradient-to-r from-orange-600/20 to-red-600/20 rounded-xl p-6 border border-orange-500/20">
+    <div className="bg-orange-500/10 rounded-xl p-6 border border-orange-500/20">
       <div className="flex items-center gap-3 mb-4">
         <Mail className="w-6 h-6 text-orange-400" />
-        <h3 className="text-lg font-semibold text-white">Reset Your Password</h3>
+        <h3 className="text-lg font-semibold text-foreground">Reset Your Password</h3>
       </div>
       
-        <p className="text-gray-300 mb-4">
+        <p className="text-foreground/70 mb-4">
           Enter your email address and we&apos;ll send you a link to reset your password.
         </p>      <form onSubmit={handlePasswordReset} className="space-y-4">
         <Input
@@ -104,7 +104,6 @@ const PasswordReset = ({ onBack }: PasswordResetProps) => {
           placeholder="Enter your email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
           required
         />
         

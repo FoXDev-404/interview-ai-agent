@@ -14,7 +14,7 @@ export default function SupportLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-900 to-black">
+    <div className="min-h-screen flex flex-col bg-background">
       <ConditionalNavigation />
       <ConditionalRootContainer>
         <main className="flex-1 -mt-6">

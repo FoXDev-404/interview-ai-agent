@@ -317,11 +317,11 @@ export default function ProfilePage() {
     <>
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-8">
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-r from-blue-600/15 via-indigo-600/10 to-cyan-600/10 p-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <div className="rounded-2xl border border-border/50 bg-blue-500/10 p-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Profile
           </h1>
-          <p className="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg text-foreground/70 leading-relaxed max-w-2xl mx-auto">
             Manage your account information and preferences
           </p>
         </div>
@@ -332,8 +332,8 @@ export default function ProfilePage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Profile Info */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-gray-800/50 rounded-2xl p-8">
-              <h2 className="text-2xl font-bold text-white mb-6">
+            <div className="bg-card rounded-2xl p-8 border border-border/50">
+              <h2 className="text-2xl font-bold text-foreground mb-6">
                 Personal Information
               </h2>
 
@@ -341,26 +341,26 @@ export default function ProfilePage() {
                 {/* Name Fields */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground/80 mb-2">
                       First Name
                     </label>
                     <input
                       type="text"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                       placeholder="Enter your first name"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground/80 mb-2">
                       Last Name
                     </label>
                     <input
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                       placeholder="Enter your last name"
                     />
                   </div>
@@ -368,18 +368,18 @@ export default function ProfilePage() {
 
                 {/* Email (Read-only) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-foreground/80 mb-2">
                     Professional Headline
                   </label>
                   <input
                     type="text"
                     value={headline}
                     onChange={(e) => setHeadline(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                     placeholder="e.g. Frontend Engineer | React | Next.js"
                     maxLength={120}
                   />
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-foreground/50 mt-1">
                     Shown as a quick summary on your profile.
                   </p>
                 </div>
@@ -388,7 +388,7 @@ export default function ProfilePage() {
                 <div>
                   <label
                     htmlFor="profile-email"
-                    className="block text-sm font-medium text-gray-300 mb-2"
+                    className="block text-sm font-medium text-foreground/80 mb-2"
                   >
                     <Mail className="w-4 h-4 inline mr-2" />
                     Email Address
@@ -398,23 +398,23 @@ export default function ProfilePage() {
                     type="email"
                     value={currentUser?.email || ""}
                     disabled
-                    className="w-full px-4 py-3 bg-gray-700/30 border border-gray-600 rounded-lg text-gray-400 cursor-not-allowed"
+                    className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg text-foreground/50 cursor-not-allowed"
                   />
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-foreground/50 mt-1">
                     Email cannot be changed
                   </p>
                 </div>
 
                 {/* Bio */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-foreground/80 mb-2">
                     Bio
                   </label>
                   <textarea
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     rows={4}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
                     placeholder="Tell us about yourself..."
                   />
                 </div>
@@ -436,15 +436,15 @@ export default function ProfilePage() {
 
           {/* Profile Picture Section */}
           <div className="flex flex-col gap-6">
-            <div className="bg-gray-800/50 rounded-2xl p-8 flex-1">
-              <h3 className="text-xl font-bold text-white mb-6">
+            <div className="bg-card rounded-2xl p-8 flex-1 border border-border/50">
+              <h3 className="text-xl font-bold text-foreground mb-6">
                 Profile Picture
               </h3>
 
               <div className="flex flex-col items-center space-y-4">
                 {/* Profile Image Display */}
                 <div className="relative">
-                  <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center">
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-muted flex items-center justify-center">
                     {profileImage ? (
                       <img
                         src={profileImage}
@@ -452,7 +452,7 @@ export default function ProfilePage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <User className="w-16 h-16 text-gray-400" />
+                      <User className="w-16 h-16 text-foreground/40" />
                     )}
                   </div>
 
@@ -483,14 +483,14 @@ export default function ProfilePage() {
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <Upload className="w-4 h-4" />
                     Upload Photo
                   </button>
                 </div>
 
-                <p className="text-xs text-gray-400 text-center">
+                <p className="text-xs text-foreground/50 text-center">
                   Supported formats: JPG, PNG, GIF
                   <br />
                   Max size: 5MB
@@ -499,17 +499,17 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Security */}
-            <div className="bg-gray-800/50 rounded-2xl p-8 flex-1">
-              <h3 className="text-xl font-bold text-white mb-6">
+            <div className="bg-card rounded-2xl p-8 flex-1 border border-border/50">
+              <h3 className="text-xl font-bold text-foreground mb-6">
                 <Shield className="w-5 h-5 inline mr-2" />
                 Account Security
               </h3>
 
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-3 border-b border-gray-700/70">
+                <div className="flex justify-between items-center py-3 border-b border-border/50">
                   <div>
-                    <p className="text-white font-medium">Password</p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-foreground font-medium">Password</p>
+                    <p className="text-sm text-foreground/50">
                       Last updated 30 days ago
                     </p>
                   </div>
@@ -521,7 +521,7 @@ export default function ProfilePage() {
                   </button>
                 </div>
 
-                <p className="text-xs text-gray-400 leading-relaxed">
+                <p className="text-xs text-foreground/50 leading-relaxed">
                   Keep your account secure by using a strong password and
                   updating it regularly.
                 </p>
@@ -533,17 +533,17 @@ export default function ProfilePage() {
 
       {/* Password Change Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card rounded-2xl p-8 max-w-md w-full mx-4 border border-border">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Lock className="w-5 h-5" />
                 Change Password
               </h3>
               <button
                 type="button"
                 onClick={closePasswordModal}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-foreground/50 hover:text-foreground transition-colors"
                 aria-label="Close password dialog"
                 title="Close"
               >
@@ -554,7 +554,7 @@ export default function ProfilePage() {
             <div className="space-y-4">
               {/* Current Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground/80 mb-2">
                   Current Password
                 </label>
                 <div className="relative">
@@ -562,13 +562,13 @@ export default function ProfilePage() {
                     type={showCurrentPassword ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent pr-12"
                     placeholder="Enter current password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/50 hover:text-foreground"
                     aria-label={
                       showCurrentPassword
                         ? "Hide current password"
@@ -591,7 +591,7 @@ export default function ProfilePage() {
 
               {/* New Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground/80 mb-2">
                   New Password
                 </label>
                 <div className="relative">
@@ -599,13 +599,13 @@ export default function ProfilePage() {
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent pr-12"
                     placeholder="Enter new password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/50 hover:text-foreground"
                     aria-label={
                       showNewPassword
                         ? "Hide new password"
@@ -628,7 +628,7 @@ export default function ProfilePage() {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground/80 mb-2">
                   Confirm New Password
                 </label>
                 <div className="relative">
@@ -636,13 +636,13 @@ export default function ProfilePage() {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent pr-12"
                     placeholder="Confirm new password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/50 hover:text-foreground"
                     aria-label={
                       showConfirmPassword
                         ? "Hide confirm password"
@@ -663,7 +663,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-foreground/50">
                 Password must be at least 6 characters long. You will be
                 automatically signed out after changing your password.
               </p>
@@ -672,7 +672,7 @@ export default function ProfilePage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={closePasswordModal}
-                className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                className="flex-1 px-4 py-3 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
               >
                 Cancel
               </button>

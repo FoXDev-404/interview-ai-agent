@@ -3,7 +3,7 @@ export default function AuthHeader({ type }: { type?: string }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-2xl font-bold tracking-tight text-white">
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">
         {isSignIn ? "Welcome back" : "Create your account"}
       </h2>
       <p className="text-sm text-light-400">

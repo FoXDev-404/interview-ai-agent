@@ -17,6 +17,7 @@ import {
   Code2,
   FileText,
 } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -115,7 +116,7 @@ export default function Navigation() {
   }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -128,7 +129,7 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
-              className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors"
             >
               <Home className="w-4 h-4" />
               Home
@@ -137,7 +138,7 @@ export default function Navigation() {
               <button
                 type="button"
                 onClick={toggleResume}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${isResumeOpen ? "text-white bg-gray-800 border border-gray-700" : "text-gray-300 hover:text-white hover:bg-gray-800/70 border border-transparent"}`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${isResumeOpen ? "text-foreground bg-accent border border-border" : "text-foreground/70 hover:text-foreground hover:bg-accent/70 border border-transparent"}`}
               >
                 <FileText className="w-4 h-4" />
                 Resume
@@ -147,21 +148,21 @@ export default function Navigation() {
               </button>
 
               {isResumeOpen && (
-                <div className="absolute left-0 mt-2 w-56 bg-gray-900/95 backdrop-blur-xl rounded-xl shadow-2xl border border-indigo-400/20 z-50 p-2">
+                <div className="absolute left-0 mt-2 w-56 bg-background/95 backdrop-blur-xl rounded-xl shadow-2xl border border-indigo-400/20 z-50 p-2">
                   <Link
                     href="/resume"
-                    className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-indigo-500/10 hover:text-white transition-colors border border-transparent hover:border-indigo-400/25"
+                    className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-foreground/70 hover:bg-indigo-500/10 hover:text-foreground transition-colors border border-transparent hover:border-indigo-400/25"
                     onClick={() => setIsResumeOpen(false)}
                   >
-                    <Search className="w-4 h-4 text-gray-400 group-hover:text-primary-100" />
+                    <Search className="w-4 h-4 text-foreground/50 group-hover:text-primary-100" />
                     <span className="text-sm font-medium">Resume Analyzer</span>
                   </Link>
                   <Link
                     href="/resume-builder"
-                    className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-indigo-500/10 hover:text-white transition-colors border border-transparent hover:border-indigo-400/25"
+                    className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-foreground/70 hover:bg-indigo-500/10 hover:text-foreground transition-colors border border-transparent hover:border-indigo-400/25"
                     onClick={() => setIsResumeOpen(false)}
                   >
-                    <PenTool className="w-4 h-4 text-gray-400 group-hover:text-primary-100" />
+                    <PenTool className="w-4 h-4 text-foreground/50 group-hover:text-primary-100" />
                     <span className="text-sm font-medium">Resume Builder</span>
                   </Link>
                 </div>
@@ -169,20 +170,23 @@ export default function Navigation() {
             </div>
             <Link
               href="/speech-analytics"
-              className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors"
             >
               <Mic className="w-4 h-4" />
               Speech Coach
             </Link>
 
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* User Profile */}
             {isLoading ? (
-              <div className="w-8 h-8 bg-gray-700 rounded-full animate-pulse"></div>
+              <div className="w-8 h-8 bg-muted rounded-full animate-pulse"></div>
             ) : currentUser ? (
               <div className="relative profile-dropdown">
                 <button
                   onClick={toggleProfile}
-                  className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-800"
+                  className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors p-2 rounded-lg hover:bg-accent"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-sm overflow-hidden">
                     {currentUser.photoURL ? (
@@ -203,9 +207,9 @@ export default function Navigation() {
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50">
+                  <div className="absolute right-0 mt-2 w-64 bg-card rounded-lg shadow-xl border border-border z-50">
                     {/* Profile Header */}
-                    <div className="p-4 border-b border-gray-700">
+                    <div className="p-4 border-b border-border">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-lg overflow-hidden">
                           {currentUser.photoURL ? (
@@ -219,7 +223,7 @@ export default function Navigation() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-white font-medium truncate">
+                          <div className="text-foreground font-medium truncate">
                             {currentUser.name || "User"}
                           </div>
                         </div>
@@ -230,7 +234,7 @@ export default function Navigation() {
                     <div className="py-2">
                       <Link
                         href="/profile"
-                        className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                        className="flex items-center gap-3 px-4 py-2 text-foreground/70 hover:bg-accent hover:text-foreground transition-colors"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         <User className="w-4 h-4" />
@@ -238,19 +242,19 @@ export default function Navigation() {
                       </Link>
                       <Link
                         href="/settings"
-                        className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                        className="flex items-center gap-3 px-4 py-2 text-foreground/70 hover:bg-accent hover:text-foreground transition-colors"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         <Settings className="w-4 h-4" />
                         <span>Settings</span>
                       </Link>
-                      <hr className="my-2 border-gray-700" />
+                      <hr className="my-2 border-border" />
                       <button
                         onClick={() => {
                           handleLogout();
                           setIsProfileOpen(false);
                         }}
-                        className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2 text-foreground/70 hover:bg-accent hover:text-foreground transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Sign Out</span>
@@ -272,7 +276,8 @@ export default function Navigation() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
             {currentUser && (
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
                 {currentUser.name?.charAt(0)?.toUpperCase() ||
@@ -283,7 +288,7 @@ export default function Navigation() {
             <button
               type="button"
               onClick={toggleMenu}
-              className="text-gray-300 hover:text-white focus:outline-none focus:text-white"
+              className="text-foreground/70 hover:text-foreground focus:outline-none"
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               title={isMenuOpen ? "Close menu" : "Open menu"}
             >
@@ -299,10 +304,10 @@ export default function Navigation() {
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-800/95 backdrop-blur-sm rounded-lg mt-2">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-card/95 backdrop-blur-sm rounded-lg mt-2 border border-border">
               <Link
                 href="/"
-                className="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors"
+                className="flex items-center gap-2 text-foreground/70 hover:text-foreground px-3 py-2 rounded-md transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Home className="w-4 h-4" />
@@ -310,7 +315,7 @@ export default function Navigation() {
               </Link>
               <button
                 type="button"
-                className={`flex items-center justify-between gap-2 w-full text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors ${isMobileResumeOpen ? "bg-gray-700/50 text-white" : ""}`}
+                className={`flex items-center justify-between gap-2 w-full text-foreground/70 hover:text-foreground px-3 py-2 rounded-md transition-colors ${isMobileResumeOpen ? "bg-accent text-foreground" : ""}`}
                 onClick={() => {
                   setIsMobileResumeOpen((prev) => !prev);
                 }}
@@ -324,10 +329,10 @@ export default function Navigation() {
                 />
               </button>
               {isMobileResumeOpen && (
-                <div className="ml-5 mr-2 mt-1 space-y-1 rounded-lg border border-gray-700/70 bg-gray-900/55 p-2">
+                <div className="ml-5 mr-2 mt-1 space-y-1 rounded-lg border border-border/70 bg-background/55 p-2">
                   <Link
                     href="/resume"
-                    className="group flex items-center gap-2 text-gray-300 hover:text-white px-2.5 py-2 rounded-md transition-colors hover:bg-indigo-500/10"
+                    className="group flex items-center gap-2 text-foreground/70 hover:text-foreground px-2.5 py-2 rounded-md transition-colors hover:bg-indigo-500/10"
                     onClick={() => {
                       setIsMenuOpen(false);
                       setIsMobileResumeOpen(false);
@@ -338,7 +343,7 @@ export default function Navigation() {
                   </Link>
                   <Link
                     href="/resume-builder"
-                    className="group flex items-center gap-2 text-gray-300 hover:text-white px-2.5 py-2 rounded-md transition-colors hover:bg-indigo-500/10"
+                    className="group flex items-center gap-2 text-foreground/70 hover:text-foreground px-2.5 py-2 rounded-md transition-colors hover:bg-indigo-500/10"
                     onClick={() => {
                       setIsMenuOpen(false);
                       setIsMobileResumeOpen(false);
@@ -351,7 +356,7 @@ export default function Navigation() {
               )}
               <Link
                 href="/speech-analytics"
-                className="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors"
+                className="flex items-center gap-2 text-foreground/70 hover:text-foreground px-3 py-2 rounded-md transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Mic className="w-4 h-4" />
@@ -359,7 +364,7 @@ export default function Navigation() {
               </Link>
               <Link
                 href="/coding-interview"
-                className="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors"
+                className="flex items-center gap-2 text-foreground/70 hover:text-foreground px-3 py-2 rounded-md transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Code2 className="w-4 h-4" />
@@ -368,7 +373,7 @@ export default function Navigation() {
 
               {currentUser ? (
                 <>
-                  <div className="px-3 py-3 text-sm border-t border-gray-700 mt-2 bg-gray-700/50 rounded-md mx-2">
+                  <div className="px-3 py-3 text-sm border-t border-border mt-2 bg-accent/50 rounded-md mx-2">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium overflow-hidden">
                         {currentUser.photoURL ? (
@@ -384,7 +389,7 @@ export default function Navigation() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-white font-medium truncate">
+                        <div className="text-foreground font-medium truncate">
                           {currentUser.name || "User"}
                         </div>
                       </div>
@@ -392,7 +397,7 @@ export default function Navigation() {
                   </div>
                   <Link
                     href="/profile"
-                    className="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors"
+                    className="flex items-center gap-2 text-foreground/70 hover:text-foreground px-3 py-2 rounded-md transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <User className="w-4 h-4" />
@@ -400,7 +405,7 @@ export default function Navigation() {
                   </Link>
                   <Link
                     href="/settings"
-                    className="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors"
+                    className="flex items-center gap-2 text-foreground/70 hover:text-foreground px-3 py-2 rounded-md transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Settings className="w-4 h-4" />
@@ -411,7 +416,7 @@ export default function Navigation() {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors w-full"
+                    className="flex items-center gap-2 text-foreground/70 hover:text-foreground px-3 py-2 rounded-md transition-colors w-full"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out

@@ -33,14 +33,14 @@ export default async function LeaderboardPage() {
 
   return (
     <div className="space-y-8">
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#161728] via-[#1d1f35] to-[#111320] px-6 py-10 md:px-10 md:py-12">
+      <section className="relative overflow-hidden rounded-3xl border border-border/50 bg-card px-6 py-10 md:px-10 md:py-12">
         <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-primary-200/15 blur-3xl" />
         <div className="absolute -right-20 top-10 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
 
         <div className="relative z-10">
           <Link
             href="/"
-            className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-blue-300 transition-colors hover:text-blue-200"
+            className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Home
@@ -51,10 +51,10 @@ export default async function LeaderboardPage() {
             Real-Time Rankings
           </div>
 
-          <h1 className="mt-4 text-4xl font-extrabold leading-tight text-white md:text-5xl">
+          <h1 className="mt-4 text-4xl font-extrabold leading-tight text-foreground md:text-5xl">
             Leaderboard
           </h1>
-          <p className="mt-3 max-w-3xl text-gray-300">
+          <p className="mt-3 max-w-3xl text-foreground/70">
             Rankings are based on a balanced score: average interview score plus
             consistency bonus for completed interviews.
           </p>
@@ -62,23 +62,23 @@ export default async function LeaderboardPage() {
       </section>
 
       {currentUser && leaderboard.currentUser && (
-        <section className="rounded-2xl border border-blue-400/20 bg-gradient-to-r from-blue-900/25 via-indigo-900/20 to-purple-900/20 p-5">
-          <p className="text-xs uppercase tracking-wider text-blue-200">
+        <section className="rounded-2xl border border-blue-400/20 bg-blue-500/10 p-5">
+          <p className="text-xs uppercase tracking-wider text-blue-400">
             Your Standing
           </p>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-white">
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-foreground">
             <span className="rounded-full border border-blue-300/35 bg-blue-500/15 px-3 py-1 text-sm font-semibold">
               Rank #{leaderboard.currentUser.rank}
             </span>
-            <span className="text-sm text-blue-100">
+            <span className="text-sm text-foreground/70">
               Leaderboard Score:{" "}
-              <span className="font-bold text-white">
+              <span className="font-bold text-foreground">
                 {leaderboard.currentUser.leaderboardScore.toFixed(2)}
               </span>
             </span>
-            <span className="text-sm text-blue-100">
+            <span className="text-sm text-foreground/70">
               Interviews:{" "}
-              <span className="font-bold text-white">
+              <span className="font-bold text-foreground">
                 {leaderboard.currentUser.interviewsCompleted}
               </span>
             </span>
@@ -86,21 +86,21 @@ export default async function LeaderboardPage() {
         </section>
       )}
 
-      <section className="rounded-2xl border border-white/10 bg-gray-900/55 p-4 md:p-6">
+      <section className="rounded-2xl border border-border/50 bg-card/50 p-4 md:p-6">
         {topUsers.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-gray-800/45 p-8 text-center">
-            <h2 className="text-xl font-semibold text-white">
+          <div className="rounded-xl border border-border bg-muted/30 p-8 text-center">
+            <h2 className="text-xl font-semibold text-foreground">
               No rankings yet
             </h2>
-            <p className="mt-2 text-sm text-gray-300">
+            <p className="mt-2 text-sm text-foreground/70">
               Complete interviews to appear on the leaderboard.
             </p>
           </div>
         ) : (
           <>
-            <div className="hidden overflow-hidden rounded-xl border border-white/10 md:block">
+            <div className="hidden overflow-hidden rounded-xl border border-border md:block">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-800/70 text-xs uppercase tracking-wide text-gray-300">
+                <thead className="bg-muted/50 text-xs uppercase tracking-wide text-foreground/70">
                   <tr>
                     <th className="px-5 py-4">Rank</th>
                     <th className="px-5 py-4">User</th>
@@ -116,9 +116,9 @@ export default async function LeaderboardPage() {
                     return (
                       <tr
                         key={entry.id}
-                        className={`border-t border-white/10 transition-colors ${isCurrentUser ? "bg-blue-500/10" : "hover:bg-white/5"}`}
+                        className={`border-t border-border transition-colors ${isCurrentUser ? "bg-blue-500/10" : "hover:bg-muted/30"}`}
                       >
-                        <td className="px-5 py-4 font-bold text-white">
+                        <td className="px-5 py-4 font-bold text-foreground">
                           <span className="inline-flex items-center gap-2">
                             #{entry.rank}
                             {entry.rank <= 3 && (
@@ -137,29 +137,29 @@ export default async function LeaderboardPage() {
                                 className="h-9 w-9 rounded-full object-cover"
                               />
                             ) : (
-                              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-700 text-xs font-bold text-white">
+                              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-bold text-foreground">
                                 {getInitials(entry.name)}
                               </div>
                             )}
                             <div>
-                              <p className="font-semibold text-white">
+                              <p className="font-semibold text-foreground">
                                 {entry.name}
                               </p>
                               {isCurrentUser && (
-                                <span className="inline-flex rounded-full border border-blue-300/40 bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold text-blue-200">
+                                <span className="inline-flex rounded-full border border-blue-300/40 bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold text-blue-400">
                                   You
                                 </span>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="px-5 py-4 text-gray-200">
+                        <td className="px-5 py-4 text-foreground/80">
                           {entry.averageScore.toFixed(2)}
                         </td>
-                        <td className="px-5 py-4 text-gray-200">
+                        <td className="px-5 py-4 text-foreground/80">
                           {entry.interviewsCompleted}
                         </td>
-                        <td className="px-5 py-4 text-lg font-bold text-white">
+                        <td className="px-5 py-4 text-lg font-bold text-foreground">
                           {entry.leaderboardScore.toFixed(2)}
                         </td>
                       </tr>
@@ -176,10 +176,10 @@ export default async function LeaderboardPage() {
                 return (
                   <article
                     key={entry.id}
-                    className={`rounded-xl border p-4 ${isCurrentUser ? "border-blue-400/40 bg-blue-900/20" : "border-white/10 bg-gray-800/45"}`}
+                    className={`rounded-xl border p-4 ${isCurrentUser ? "border-blue-400/40 bg-blue-500/10" : "border-border bg-muted/30"}`}
                   >
                     <div className="mb-3 flex items-center justify-between">
-                      <span className="text-sm font-bold text-white">
+                      <span className="text-sm font-bold text-foreground">
                         #{entry.rank}
                       </span>
                       {entry.rank <= 3 && (
@@ -196,35 +196,35 @@ export default async function LeaderboardPage() {
                           className="h-10 w-10 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-700 text-xs font-bold text-white">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xs font-bold text-foreground">
                           {getInitials(entry.name)}
                         </div>
                       )}
                       <div>
-                        <p className="font-semibold text-white">{entry.name}</p>
+                        <p className="font-semibold text-foreground">{entry.name}</p>
                         {isCurrentUser && (
-                          <p className="text-xs font-semibold text-blue-200">
+                          <p className="text-xs font-semibold text-blue-400">
                             You
                           </p>
                         )}
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                      <div className="rounded-lg bg-black/20 p-2">
-                        <p className="text-gray-400">Avg</p>
-                        <p className="font-semibold text-white">
+                      <div className="rounded-lg bg-muted/50 p-2">
+                        <p className="text-foreground/60">Avg</p>
+                        <p className="font-semibold text-foreground">
                           {entry.averageScore.toFixed(2)}
                         </p>
                       </div>
-                      <div className="rounded-lg bg-black/20 p-2">
-                        <p className="text-gray-400">Done</p>
-                        <p className="font-semibold text-white">
+                      <div className="rounded-lg bg-muted/50 p-2">
+                        <p className="text-foreground/60">Done</p>
+                        <p className="font-semibold text-foreground">
                           {entry.interviewsCompleted}
                         </p>
                       </div>
-                      <div className="rounded-lg bg-black/20 p-2">
-                        <p className="text-gray-400">Score</p>
-                        <p className="font-semibold text-white">
+                      <div className="rounded-lg bg-muted/50 p-2">
+                        <p className="text-foreground/60">Score</p>
+                        <p className="font-semibold text-foreground">
                           {entry.leaderboardScore.toFixed(2)}
                         </p>
                       </div>

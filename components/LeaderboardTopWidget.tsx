@@ -26,13 +26,13 @@ const LeaderboardTopWidget = ({ users }: LeaderboardTopWidgetProps) => {
   const topUsers = users.slice(0, 3);
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#151629] via-[#101326] to-[#0c1020] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
+    <div className="rounded-3xl border border-border/50 bg-card p-6 shadow-lg">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
           <p className="section-label">Community</p>
-          <h3 className="mt-1 text-2xl font-extrabold text-white">Top Performers</h3>
+          <h3 className="mt-1 text-2xl font-extrabold text-foreground">Top Performers</h3>
         </div>
-        <Trophy className="h-8 w-8 text-yellow-300" />
+        <Trophy className="h-8 w-8 text-yellow-400" />
       </div>
 
       {topUsers.length > 0 ? (
@@ -68,7 +68,7 @@ const LeaderboardTopWidget = ({ users }: LeaderboardTopWidgetProps) => {
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-light-400">
+        <div className="rounded-2xl border border-border bg-muted/20 p-5 text-sm text-foreground/60">
           No completed interviews yet. Be the first to claim the top rank.
         </div>
       )}
