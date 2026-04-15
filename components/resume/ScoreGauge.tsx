@@ -28,7 +28,7 @@ const ScoreGauge: React.FC<ScoreGaugeProps> = ({ score }) => {
   const data = [{ name: "Score", value: score, fill: getColor(score) }];
 
   return (
-    <div className="relative w-full min-w-0 h-56 flex flex-col items-center justify-center rounded-2xl bg-dark-100/70 px-2 border border-primary-200/15">
+    <div className="relative w-full min-w-0 h-56 flex flex-col items-center justify-center rounded-2xl bg-card px-2 border border-primary-200/15">
       <ResponsiveContainer
         width="100%"
         height="100%"
@@ -53,7 +53,7 @@ const ScoreGauge: React.FC<ScoreGaugeProps> = ({ score }) => {
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1 mt-4 text-center">
-        <span className="text-5xl font-bold text-white block">{score}</span>
+        <span className="text-5xl font-bold text-foreground block">{score}</span>
         <span className="text-xs text-primary-200 uppercase tracking-[0.2em] font-semibold">
           Match Score
         </span>

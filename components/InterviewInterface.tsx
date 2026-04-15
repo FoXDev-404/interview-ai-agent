@@ -267,7 +267,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
             </div>
 
             <div className="grid grid-cols-4 gap-2 text-center">
-              <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2">
+              <div className="rounded-2xl border border-border/50 bg-muted/20 px-3 py-2">
                 <p className="text-[9px] uppercase tracking-[0.12em] text-light-400">
                   Stage
                 </p>
@@ -275,7 +275,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
                   {interview.type}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2">
+              <div className="rounded-2xl border border-border/50 bg-muted/20 px-3 py-2">
                 <p className="text-[9px] uppercase tracking-[0.12em] text-light-400">
                   Level
                 </p>
@@ -283,7 +283,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
                   {interview.level}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2">
+              <div className="rounded-2xl border border-border/50 bg-muted/20 px-3 py-2">
                 <p className="text-[9px] uppercase tracking-[0.12em] text-light-400">
                   Answered
                 </p>
@@ -291,7 +291,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
                   {answeredCount}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2">
+              <div className="rounded-2xl border border-border/50 bg-muted/20 px-3 py-2">
                 <p className="text-[9px] uppercase tracking-[0.12em] text-light-400">
                   Progress
                 </p>
@@ -343,7 +343,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
                 </span>
               </div>
 
-              <p className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-4 text-[15px] leading-relaxed text-light-100 md:text-[16px]">
+              <p className="mt-3 rounded-2xl border border-border/50 bg-muted/20 p-4 text-[15px] leading-relaxed text-foreground/80 md:text-[16px]">
                 {currentQuestion}
               </p>
             </article>
@@ -369,13 +369,13 @@ const InterviewInterface = ({ interview, userId }: Props) => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1 text-[9px] text-light-400">
-                  <span className="rounded-full border border-white/10 bg-black/20 px-1.5 py-0.5">
+                  <span className="rounded-full border border-border/50 bg-muted/20 px-1.5 py-0.5">
                     Words {responseWordCount}
                   </span>
-                  <span className="rounded-full border border-white/10 bg-black/20 px-1.5 py-0.5">
+                  <span className="rounded-full border border-border/50 bg-muted/20 px-1.5 py-0.5">
                     Avg {avgWordsPerAnswer}
                   </span>
-                  <span className="rounded-full border border-white/10 bg-black/20 px-1.5 py-0.5">
+                  <span className="rounded-full border border-border/50 bg-muted/20 px-1.5 py-0.5">
                     Left {remainingCount}
                   </span>
                 </div>
@@ -522,7 +522,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
               </div>
 
               <div className="mt-2 grid grid-cols-3 gap-1.5 text-[10px] text-light-400">
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-2.5 text-center">
+                <div className="rounded-2xl border border-border/50 bg-muted/20 p-2.5 text-center">
                   <p className="uppercase tracking-[0.12em] text-light-400">
                     Words
                   </p>
@@ -530,7 +530,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
                     {responseWordCount}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-2.5 text-center">
+                <div className="rounded-2xl border border-border/50 bg-muted/20 p-2.5 text-center">
                   <p className="uppercase tracking-[0.12em] text-light-400">
                     Avg
                   </p>
@@ -538,7 +538,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
                     {avgWordsPerAnswer}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-2.5 text-center">
+                <div className="rounded-2xl border border-border/50 bg-muted/20 p-2.5 text-center">
                   <p className="uppercase tracking-[0.12em] text-light-400">
                     Left
                   </p>
@@ -548,7 +548,7 @@ const InterviewInterface = ({ interview, userId }: Props) => {
                 </div>
               </div>
 
-              <div className="mt-2 flex-1 rounded-2xl border border-white/10 bg-black/20 p-2.5">
+              <div className="mt-2 flex-1 rounded-2xl border border-border/50 bg-muted/20 p-2.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-200">
                   Live Readiness
                 </p>

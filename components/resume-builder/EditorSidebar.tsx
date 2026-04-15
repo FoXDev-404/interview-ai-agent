@@ -114,7 +114,7 @@ function EditorSidebar({
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                 activeSection === section
                   ? "bg-primary-200/20 text-primary-200"
-                  : "text-light-400 hover:text-white hover:bg-gray-800"
+                  : "text-foreground/60 hover:text-foreground hover:bg-muted/30"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />

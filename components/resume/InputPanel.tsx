@@ -70,15 +70,15 @@ const InputPanel: React.FC<InputPanelProps> = ({
   const displayError = error ?? analysisError;
 
   return (
-    <section className="w-full max-w-5xl mx-auto rounded-2xl border border-white/10 bg-[linear-gradient(168deg,rgba(24,26,44,0.88)_0%,rgba(10,11,20,0.95)_100%)] p-5 md:p-6 shadow-2xl">
+    <section className="w-full max-w-5xl mx-auto rounded-2xl border border-border/50 bg-card p-5 md:p-6 shadow-2xl">
       <div className="flex gap-3 mb-5">
         <button
           onClick={() => setActiveTab("upload")}
           className={clsx(
             "px-3 py-2 text-sm font-medium rounded-lg border transition-colors",
             activeTab === "upload"
-              ? "text-cyan-200 border-cyan-300/40 bg-cyan-300/10"
-              : "text-light-300 border-white/15 bg-white/5 hover:text-white",
+              ? "text-cyan-600 dark:text-cyan-200 border-cyan-300/40 bg-cyan-300/10"
+              : "text-foreground/70 border-border/30 bg-muted/20 hover:text-foreground",
           )}
         >
           Upload Resume
@@ -88,8 +88,8 @@ const InputPanel: React.FC<InputPanelProps> = ({
           className={clsx(
             "px-3 py-2 text-sm font-medium rounded-lg border transition-colors",
             activeTab === "paste"
-              ? "text-cyan-200 border-cyan-300/40 bg-cyan-300/10"
-              : "text-light-300 border-white/15 bg-white/5 hover:text-white",
+              ? "text-cyan-600 dark:text-cyan-200 border-cyan-300/40 bg-cyan-300/10"
+              : "text-foreground/70 border-border/30 bg-muted/20 hover:text-foreground",
           )}
         >
           Paste Text
@@ -104,7 +104,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
           {activeTab === "upload" ? (
             <div
-              className="border-2 border-dashed border-white/20 rounded-xl p-5 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-white/5 transition-colors h-72"
+              className="border-2 border-dashed border-border/40 rounded-xl p-5 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-muted/20 transition-colors h-72"
               onClick={() => fileInputRef.current?.click()}
             >
               <input
@@ -120,7 +120,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
                   <div className="w-11 h-11 bg-emerald-300/15 rounded-full flex items-center justify-center mb-2 text-emerald-200">
                     <FileText size={24} />
                   </div>
-                  <p className="font-medium text-white mb-1 text-sm max-w-[260px] truncate">
+                  <p className="font-medium text-foreground mb-1 text-sm max-w-[260px] truncate">
                     {fileName}
                   </p>
                   <p className="text-xs text-emerald-200">Ready for analysis</p>
@@ -140,7 +140,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
                   <div className="w-11 h-11 bg-cyan-300/15 rounded-full flex items-center justify-center mb-2 text-cyan-200">
                     <Upload size={24} />
                   </div>
-                  <p className="font-medium text-white mb-1 text-sm">
+                  <p className="font-medium text-foreground mb-1 text-sm">
                     Click to upload
                   </p>
                   <p className="text-xs text-light-400">
@@ -151,7 +151,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
             </div>
           ) : (
             <textarea
-              className="w-full h-72 p-3 rounded-xl border border-white/20 bg-white/[0.03] text-light-100 focus:ring-2 focus:ring-cyan-300/30 focus:border-cyan-300/40 resize-none text-sm"
+              className="w-full h-72 p-3 rounded-xl border border-border/50 bg-input text-foreground focus:ring-2 focus:ring-primary-200/30 focus:border-primary-200/40 resize-none text-sm"
               placeholder="Paste your resume content here..."
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
@@ -163,14 +163,14 @@ const InputPanel: React.FC<InputPanelProps> = ({
           <label className="block text-sm font-semibold mb-2 text-light-200">
             Job Description
           </label>
-          <div className="flex flex-col border border-white/20 rounded-xl overflow-hidden bg-white/[0.03] focus-within:ring-2 focus-within:ring-cyan-300/30 focus-within:border-cyan-300/40 h-full">
+          <div className="flex flex-col border border-border/50 rounded-xl overflow-hidden bg-input focus-within:ring-2 focus-within:ring-primary-200/30 focus-within:border-primary-200/40 h-full">
             <textarea
-              className="w-full flex-[0.4] p-3 bg-transparent resize-none text-sm outline-none border-none text-light-100"
+              className="w-full flex-[0.4] p-3 bg-transparent resize-none text-sm outline-none border-none text-foreground"
               placeholder="Paste the job description here..."
               value={jdText}
               onChange={(e) => setJdText(e.target.value)}
             />
-            <div className="border-t border-white/10 p-3 flex-[0.6] flex items-center justify-center overflow-hidden">
+            <div className="border-t border-border/30 p-3 flex-[0.6] flex items-center justify-center overflow-hidden">
               <div className="grid grid-cols-3 gap-2 w-full">
                 {ROLE_SUGGESTIONS.map((role) => (
                   <button
@@ -191,7 +191,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
         <div
           role="alert"
           aria-live="polite"
-          className="mt-4 rounded-lg border border-rose-300/30 bg-rose-300/10 p-3 text-sm text-rose-100"
+          className="mt-4 rounded-lg border border-rose-300/30 bg-rose-300/10 p-3 text-sm text-rose-600 dark:text-rose-100"
         >
           <div className="flex items-center gap-2 font-semibold">
             <AlertCircle size={16} />

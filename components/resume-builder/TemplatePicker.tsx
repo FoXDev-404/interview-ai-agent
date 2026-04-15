@@ -158,7 +158,7 @@ export default function TemplatePicker({
       />
 
       {/* Modal */}
-      <div className="relative w-[90vw] max-w-6xl h-[85vh] bg-dark-200 rounded-2xl border border-gray-700 shadow-2xl flex flex-col">
+      <div className="relative w-[90vw] max-w-6xl h-[85vh] bg-card rounded-2xl border border-border shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-700">
           <div>

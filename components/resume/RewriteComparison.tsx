@@ -16,7 +16,7 @@ const RewriteComparison: React.FC<RewriteComparisonProps> = ({ rewrites }) => {
       </div>
 
       {rewrites.length === 0 && (
-        <div className="rounded-2xl border border-primary-200/20 bg-dark-100/70 p-6 text-sm text-light-100">
+        <div className="rounded-2xl border border-primary-200/20 bg-card p-6 text-sm text-foreground/80">
           No rewrite recommendations were generated for this analysis.
         </div>
       )}
@@ -24,7 +24,7 @@ const RewriteComparison: React.FC<RewriteComparisonProps> = ({ rewrites }) => {
       {rewrites.map((item, idx) => (
         <div key={idx} className="grid md:grid-cols-2 gap-4 md:gap-8 p-6 dark-gradient rounded-2xl border border-primary-200/20 shadow-sm relative overflow-hidden">
 
-          <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-dark-100 rounded-full items-center justify-center border border-primary-200/25 z-10 shadow-sm">
+          <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-card rounded-full items-center justify-center border border-primary-200/25 z-10 shadow-sm">
             <ArrowRight size={14} className="text-primary-200" />
           </div>
 

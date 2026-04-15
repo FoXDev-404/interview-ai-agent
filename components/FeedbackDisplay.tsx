@@ -136,13 +136,13 @@ const FeedbackDisplay = ({ interview, feedback }: Props) => {
               {interview.type} • {interview.level} level • {interview.questions.length} questions • {dayjs(feedback.createdAt).format("MMM DD, YYYY")}
             </p>
 
-            <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="mt-5 rounded-2xl border border-border/50 bg-muted/20 p-4">
               <p className="text-[11px] uppercase tracking-wider text-light-400 mb-2">Technologies Evaluated</p>
               <DisplayTechIcons techStack={interview.techstack} />
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-black/25 p-6 flex flex-col justify-between">
+          <div className="rounded-2xl border border-border/50 bg-muted/20 p-6 flex flex-col justify-between">
             <div className="flex items-center justify-between gap-4">
               <p className="text-xs uppercase tracking-wider text-light-300/80">Final Score</p>
               <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-white/80">{scoreBand}</span>

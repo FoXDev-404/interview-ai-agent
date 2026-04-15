@@ -113,7 +113,7 @@ export default function SpeechAnalyzer() {
                   </p>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {FEATURE_PILLARS.map(({ icon: Icon, label }) => (
-                      <span key={label} className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-light-300">
+                      <span key={label} className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-xs text-foreground/70">
                         <Icon className="w-3 h-3" />
                         {label}
                       </span>
@@ -143,7 +143,7 @@ export default function SpeechAnalyzer() {
                     className={`px-4 py-1.5 text-xs font-semibold rounded-full border transition-all duration-200 whitespace-nowrap ${
                       category === cat
                         ? 'bg-primary-200/20 border-primary-200/40 text-primary-200'
-                        : 'border-white/10 bg-white/5 text-light-400 hover:text-white hover:border-white/20 hover:bg-white/10'
+                        : 'border-border/50 bg-muted/20 text-foreground/60 hover:text-foreground hover:border-border hover:bg-muted/30'
                     }`}
                   >
                     {CATEGORY_LABELS[cat]}
@@ -165,7 +165,7 @@ export default function SpeechAnalyzer() {
                   </div>
                   <button
                     onClick={() => setCurrentQuestion(getRandomQuestion(currentQuestion, category))}
-                    className="shrink-0 p-2 rounded-xl border border-white/10 bg-white/5 text-light-400 hover:text-primary-200 hover:border-primary-200/30 hover:bg-primary-200/10 transition-all"
+                    className="shrink-0 p-2 rounded-xl border border-border/50 bg-muted/20 text-foreground/60 hover:text-primary-200 hover:border-primary-200/30 hover:bg-primary-200/10 transition-all"
                     title="Get another question"
                   >
                     <Shuffle className="w-4 h-4" />
@@ -257,7 +257,7 @@ export default function SpeechAnalyzer() {
       {view === 'dashboard' && result && (
         <div className="animate-in fade-in duration-700">
           {/* Dashboard header bar */}
-          <div className="border-b border-white/6 bg-dark-100/80 backdrop-blur-sm">
+          <div className="border-b border-border/30 bg-background/80 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
               <div className="flex items-center justify-between">
                 <button

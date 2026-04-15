@@ -22,7 +22,7 @@ const ImpactPanel: React.FC<ImpactPanelProps> = ({ data }) => {
 
       <div className="space-y-4">
         {data.weak_bullets.map((bullet, idx) => (
-          <div key={idx} className="p-4 bg-dark-100/70 rounded-xl border border-primary-200/20">
+          <div key={idx} className="p-4 bg-card rounded-xl border border-primary-200/20">
             <div className="flex items-start gap-3">
               <AlertCircle className="text-destructive-100 shrink-0 mt-0.5" size={18} />
               <div>

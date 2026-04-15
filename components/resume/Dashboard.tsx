@@ -23,7 +23,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
     data.final_score >= 80
       ? 'text-primary-200 bg-primary-200/15 border-primary-200/40'
       : data.final_score >= 60
-        ? 'text-light-100 bg-white/5 border-white/15'
+        ? 'text-light-100 bg-muted/5 border-border/15'
         : 'text-destructive-100 bg-destructive-100/10 border-destructive-100/40';
 
   return (
@@ -40,7 +40,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <button
               onClick={onReset}
-              className="inline-flex items-center gap-2 rounded-full border border-primary-200/40 bg-white/10 px-4 py-2 text-sm font-semibold text-light-100 transition hover:bg-white/15"
+              className="inline-flex items-center gap-2 rounded-full border border-primary-200/40 bg-foreground/5 px-4 py-2 text-sm font-semibold text-foreground/80 transition hover:bg-foreground/8"
             >
               <ArrowLeft size={16} />
               Analyze Another Resume
@@ -53,7 +53,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Resume Analysis Report</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">Resume Analysis Report</h2>
             <p className="max-w-4xl text-sm text-light-100 leading-relaxed">
               Your resume has been benchmarked against role intent, keywords, impact language, and ATS format quality.
               Use the sections below to prioritize the edits with highest score lift.
@@ -61,28 +61,28 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-primary-200/25 bg-dark-100/70 p-4">
+            <div className="rounded-2xl border border-primary-200/25 bg-card p-4">
               <div className="mb-1 flex items-center gap-2 text-light-100">
                 <Sparkles size={15} />
                 <span className="text-xs font-semibold uppercase tracking-wide">Current Score</span>
               </div>
-              <p className="text-2xl font-bold text-white">{data.final_score}/100</p>
+              <p className="text-2xl font-bold text-foreground">{data.final_score}/100</p>
             </div>
 
-            <div className="rounded-2xl border border-primary-200/25 bg-dark-100/70 p-4">
+            <div className="rounded-2xl border border-primary-200/25 bg-card p-4">
               <div className="mb-1 flex items-center gap-2 text-light-100">
                 <CheckCircle2 size={15} />
                 <span className="text-xs font-semibold uppercase tracking-wide">Keywords Matched</span>
               </div>
-              <p className="text-2xl font-bold text-white">{data.keyword_analysis.matched.length}</p>
+              <p className="text-2xl font-bold text-foreground">{data.keyword_analysis.matched.length}</p>
             </div>
 
-            <div className="rounded-2xl border border-primary-200/25 bg-dark-100/70 p-4">
+            <div className="rounded-2xl border border-primary-200/25 bg-card p-4">
               <div className="mb-1 flex items-center gap-2 text-light-100">
                 <Briefcase size={15} />
                 <span className="text-xs font-semibold uppercase tracking-wide">Projected Score</span>
               </div>
-              <p className="text-2xl font-bold text-white">{data.projected_score}/100</p>
+              <p className="text-2xl font-bold text-foreground">{data.projected_score}/100</p>
             </div>
           </div>
         </div>

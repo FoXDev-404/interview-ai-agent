@@ -38,7 +38,7 @@ const InterviewQuestions = ({ interview }: Props) => {
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
               <span className="text-[11px] font-medium text-primary-200/80 tracking-wide">Interview Ready</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground">
               {interview.role} <span className="hero-gradient-text">Interview</span>
             </h1>
             <p className="text-light-400 mt-1.5 text-sm">
@@ -59,15 +59,15 @@ const InterviewQuestions = ({ interview }: Props) => {
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="interview-stat-card">
-            <p className="text-2xl font-extrabold text-white">{interview.questions.length}</p>
+            <p className="text-2xl font-extrabold text-foreground">{interview.questions.length}</p>
             <p className="text-[11px] text-light-400 mt-1">Questions</p>
           </div>
           <div className="interview-stat-card">
-            <p className="text-2xl font-extrabold text-white">{interview.level}</p>
+            <p className="text-2xl font-extrabold text-foreground">{interview.level}</p>
             <p className="text-[11px] text-light-400 mt-1">Level</p>
           </div>
           <div className="interview-stat-card">
-            <p className="text-2xl font-extrabold text-white">{interview.type}</p>
+            <p className="text-2xl font-extrabold text-foreground">{interview.type}</p>
             <p className="text-[11px] text-light-400 mt-1">Type</p>
           </div>
         </div>
@@ -86,12 +86,12 @@ const InterviewQuestions = ({ interview }: Props) => {
               <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </div>
-          <h2 className="text-base font-semibold text-white">Before You Begin</h2>
+          <h2 className="text-base font-semibold text-foreground">Before You Begin</h2>
         </div>
         <div className="space-y-3.5 pl-12">
           <div className="flex items-start gap-3">
             <span className="interview-dot mt-1.5"></span>
-            <span className="text-sm text-light-100/80">This interview contains <span className="text-white font-semibold">{interview.questions.length} questions</span></span>
+            <span className="text-sm text-light-100/80">This interview contains <span className="text-foreground font-semibold">{interview.questions.length} questions</span></span>
           </div>
           <div className="flex items-start gap-3">
             <span className="interview-dot mt-1.5"></span>
@@ -103,7 +103,7 @@ const InterviewQuestions = ({ interview }: Props) => {
           </div>
           <div className="flex items-start gap-3">
             <span className="interview-dot mt-1.5"></span>
-            <span className="text-sm text-light-100/80">Use <span className="text-white font-semibold">voice or text</span> to respond</span>
+            <span className="text-sm text-light-100/80">Use <span className="text-foreground font-semibold">voice or text</span> to respond</span>
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@ const InterviewQuestions = ({ interview }: Props) => {
       {/* Questions Preview */}
       <div className="interview-glass p-7 md:p-9 mb-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-white">Questions Preview</h2>
+          <h2 className="text-lg font-bold text-foreground">Questions Preview</h2>
           <span className="interview-badge">{interview.questions.length} total</span>
         </div>
         <div className="space-y-3">

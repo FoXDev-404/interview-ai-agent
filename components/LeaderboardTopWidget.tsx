@@ -52,18 +52,18 @@ const LeaderboardTopWidget = ({ users }: LeaderboardTopWidgetProps) => {
                   <img
                     src={user.avatar}
                     alt={user.name}
-                    className="h-9 w-9 rounded-full border border-white/20 object-cover"
+                    className="h-9 w-9 rounded-full border border-border/50 object-cover"
                   />
                 ) : (
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-xs font-bold text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-muted/30 text-xs font-bold text-foreground">
                     {getInitials(user.name)}
                   </div>
                 )}
-                <p className="truncate text-sm font-semibold text-white">{user.name}</p>
+                <p className="truncate text-sm font-semibold text-foreground">{user.name}</p>
               </div>
 
-              <p className="text-xl font-extrabold text-white">{user.leaderboardScore.toFixed(2)}</p>
-              <p className="text-xs text-white/75">Leaderboard Score</p>
+              <p className="text-xl font-extrabold text-foreground">{user.leaderboardScore.toFixed(2)}</p>
+              <p className="text-xs text-foreground/75">Leaderboard Score</p>
             </div>
           ))}
         </div>

@@ -74,7 +74,7 @@ function ScoreRing({ score }: { score: number }) {
     <div className="flex flex-col items-center gap-2">
       <div className="relative inline-flex items-center justify-center">
         <svg width="148" height="148" viewBox="0 0 148 148" className="-rotate-90">
-          <circle cx="74" cy="74" r="54" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="12" />
+          <circle cx="74" cy="74" r="54" fill="none" stroke="currentColor" strokeOpacity="0.08" strokeWidth="12" />
           <circle
             cx="74"
             cy="74"
@@ -89,7 +89,7 @@ function ScoreRing({ score }: { score: number }) {
           />
         </svg>
         <div className="absolute flex flex-col items-center">
-          <span className="text-4xl font-bold text-white">{score}</span>
+          <span className="text-4xl font-bold text-foreground">{score}</span>
           <span className="text-xs text-light-400">/ 100</span>
         </div>
       </div>
@@ -127,9 +127,9 @@ function SkillBar({
           {icon}
           {label}
         </div>
-        <span className="font-semibold text-white">{clampedScore}%</span>
+        <span className="font-semibold text-foreground">{clampedScore}%</span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-foreground/10">
         <div
           className={`h-2 rounded-full ${colorClass} transition-all duration-700`}
           style={{ width: `${clampedScore}%` }}
@@ -153,11 +153,11 @@ function StatCard({
   accent?: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/8 bg-white/5 p-4">
+    <div className="rounded-xl border border-border/50 bg-muted/20 p-4">
       <div className={`mb-2 flex h-8 w-8 items-center justify-center rounded-lg ${accent ?? 'bg-primary-200/15'}`}>
         {icon}
       </div>
-      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-2xl font-bold text-foreground">{value}</p>
       <p className="text-xs text-light-400">{label}</p>
       {sub && <p className="mt-0.5 text-[11px] text-light-400/70">{sub}</p>}
     </div>
@@ -411,7 +411,7 @@ export default function CodingFeedbackDashboard({
   return (
     <div className="min-h-screen w-full">
       {/* ---- Navbar ---- */}
-      <div className="sticky top-0 z-10 border-b border-white/8 bg-dark-100/90 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
+      <div className="sticky top-0 z-10 border-b border-border/50 bg-background/90 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo.svg" alt="logo" width={26} height={22} />
@@ -420,7 +420,7 @@ export default function CodingFeedbackDashboard({
           <div className="flex items-center gap-3">
             <Link
               href={`/coding-interview/${interviewId}`}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-light-300 transition hover:bg-white/5"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border/50 px-3 py-1.5 text-xs text-foreground/70 transition hover:bg-muted/20"
             >
               Review Solutions
             </Link>
@@ -447,21 +447,21 @@ export default function CodingFeedbackDashboard({
                 <Medal className="h-5 w-5 text-amber-400" />
                 <span className="text-sm font-semibold text-amber-400">Interview Complete</span>
               </div>
-              <h1 className="text-3xl font-bold text-white">{role}</h1>
+              <h1 className="text-3xl font-bold text-foreground">{role}</h1>
               <p className="mt-1 text-sm text-light-400">
                 {level} level · {totalQuestions} questions · Coding round
               </p>
 
               <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-3">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+                <div className="rounded-xl border border-border/50 bg-muted/20 p-3 text-center">
                   <p className="text-xl font-bold text-emerald-400">{solvedCount}</p>
                   <p className="text-[11px] text-light-400">Solved</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+                <div className="rounded-xl border border-border/50 bg-muted/20 p-3 text-center">
                   <p className="text-xl font-bold text-amber-400">{attemptedCount}</p>
                   <p className="text-[11px] text-light-400">Attempted</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+                <div className="rounded-xl border border-border/50 bg-muted/20 p-3 text-center">
                   <p className="text-xl font-bold text-blue-400">{formatTime(timerSecondsElapsed)}</p>
                   <p className="text-[11px] text-light-400">Time Used</p>
                 </div>
@@ -474,12 +474,12 @@ export default function CodingFeedbackDashboard({
         <div className="interview-glass p-6">
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-primary-200" />
-            <h2 className="text-lg font-semibold text-white">Question Performance</h2>
+            <h2 className="text-lg font-semibold text-foreground">Question Performance</h2>
           </div>
-          <div className="overflow-x-auto rounded-xl border border-white/8">
+          <div className="overflow-x-auto rounded-xl border border-border/50">
             <table className="w-full min-w-[540px] text-sm">
               <thead>
-                <tr className="border-b border-white/8 bg-white/5">
+                <tr className="border-b border-border/50 bg-muted/20">
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-light-400">#</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-light-400">Question</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-light-400">Difficulty</th>
@@ -489,7 +489,7 @@ export default function CodingFeedbackDashboard({
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-light-400">Runtime</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/8">
+              <tbody className="divide-y divide-border/30">
                 {questions.map((q, idx) => {
                   const best = bestSubmissions[q.id];
                   const status = questionSummaries[q.id];
@@ -498,11 +498,11 @@ export default function CodingFeedbackDashboard({
                   const isAttempted = status?.attempted;
 
                   return (
-                    <tr key={q.id} className="transition hover:bg-white/3">
+                    <tr key={q.id} className="transition hover:bg-muted/10">
                       <td className="px-4 py-3 text-xs text-light-400">{idx + 1}</td>
                       <td className="px-4 py-3">
                         <div>
-                          <p className="font-medium text-white">{q.title}</p>
+                          <p className="font-medium text-foreground">{q.title}</p>
                           <p className="text-[11px] text-light-400">{q.tags.slice(0, 2).join(', ')}</p>
                         </div>
                       </td>
@@ -582,7 +582,7 @@ export default function CodingFeedbackDashboard({
         <div className="interview-glass p-6">
           <div className="mb-5 flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary-200" />
-            <h2 className="text-lg font-semibold text-white">AI Performance Analysis</h2>
+            <h2 className="text-lg font-semibold text-foreground">AI Performance Analysis</h2>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/8 p-4">
@@ -616,7 +616,7 @@ export default function CodingFeedbackDashboard({
           <div className="interview-glass p-6">
             <div className="mb-5 flex items-center gap-2">
               <Brain className="h-5 w-5 text-primary-200" />
-              <h2 className="text-lg font-semibold text-white">Skill Breakdown</h2>
+              <h2 className="text-lg font-semibold text-foreground">Skill Breakdown</h2>
             </div>
             <div className="space-y-4">
               <SkillBar
@@ -653,7 +653,7 @@ export default function CodingFeedbackDashboard({
             <div className="interview-glass p-6">
               <div className="mb-4 flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary-200" />
-                <h2 className="text-base font-semibold text-white">Difficulty Breakdown</h2>
+                <h2 className="text-base font-semibold text-foreground">Difficulty Breakdown</h2>
               </div>
               <div className="space-y-3">
                 {difficultyOrder.map((diff) => {
@@ -668,7 +668,7 @@ export default function CodingFeedbackDashboard({
                           {group.solved}/{group.total} solved ({pct}%)
                         </span>
                       </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-foreground/10">
                         <div
                           className={`h-2 rounded-full ${difficultyBg[diff]} transition-all duration-700`}
                           style={{ width: `${pct}%` }}
@@ -684,25 +684,25 @@ export default function CodingFeedbackDashboard({
             <div className="interview-glass p-6">
               <div className="mb-4 flex items-center gap-2">
                 <Clock3 className="h-5 w-5 text-primary-200" />
-                <h2 className="text-base font-semibold text-white">Time Management</h2>
+                <h2 className="text-base font-semibold text-foreground">Time Management</h2>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
-                  <p className="text-lg font-bold text-white">{formatTime(timerSecondsElapsed)}</p>
+                <div className="rounded-xl border border-border/50 bg-muted/20 p-3 text-center">
+                  <p className="text-lg font-bold text-foreground">{formatTime(timerSecondsElapsed)}</p>
                   <p className="text-[11px] text-light-400">Total time used</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
-                  <p className="text-lg font-bold text-white">
+                <div className="rounded-xl border border-border/50 bg-muted/20 p-3 text-center">
+                  <p className="text-lg font-bold text-foreground">
                     {attemptedCount > 0 ? formatTime(avgTimePerAttempted) : '—'}
                   </p>
                   <p className="text-[11px] text-light-400">Avg per question</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
-                  <p className="text-lg font-bold text-white">{formatTime(75 * 60)}</p>
+                <div className="rounded-xl border border-border/50 bg-muted/20 p-3 text-center">
+                  <p className="text-lg font-bold text-foreground">{formatTime(75 * 60)}</p>
                   <p className="text-[11px] text-light-400">Total allotted</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
-                  <p className="text-lg font-bold text-white">
+                <div className="rounded-xl border border-border/50 bg-muted/20 p-3 text-center">
+                  <p className="text-lg font-bold text-foreground">
                     {Math.round((timerSecondsElapsed / (75 * 60)) * 100)}%
                   </p>
                   <p className="text-[11px] text-light-400">Time used</p>
@@ -717,7 +717,7 @@ export default function CodingFeedbackDashboard({
           <div className="interview-glass p-6">
             <div className="mb-4 flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary-200" />
-              <h2 className="text-lg font-semibold text-white">Recommended Practice Topics</h2>
+              <h2 className="text-lg font-semibold text-foreground">Recommended Practice Topics</h2>
             </div>
             <p className="mb-4 text-sm text-light-400">
               Based on unsolved questions, focus your practice on these areas:
@@ -737,7 +737,7 @@ export default function CodingFeedbackDashboard({
 
         {/* ---- Action buttons ---- */}
         <div className="interview-glass p-6">
-          <h2 className="mb-4 text-lg font-semibold text-white">What&apos;s Next?</h2>
+          <h2 className="mb-4 text-lg font-semibold text-foreground">What&apos;s Next?</h2>
           <div className="flex flex-wrap gap-3">
             <Link
               href={`/coding-interview/${interviewId}`}
@@ -748,7 +748,7 @@ export default function CodingFeedbackDashboard({
             </Link>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-light-300 transition hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-xl border border-border/50 bg-muted/20 px-5 py-2.5 text-sm font-semibold text-foreground/70 transition hover:bg-muted/30"
             >
               <Home className="h-4 w-4" />
               Back to Dashboard

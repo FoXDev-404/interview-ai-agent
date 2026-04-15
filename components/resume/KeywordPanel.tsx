@@ -106,7 +106,7 @@ const KeywordPanel: React.FC<KeywordPanelProps> = ({ data }) => {
         )}
       </div>
 
-      <div className="mt-5 rounded-2xl border border-primary-200/20 bg-dark-100/70 p-4">
+      <div className="mt-5 rounded-2xl border border-primary-200/20 bg-card p-4">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-sm font-semibold text-light-100 capitalize">{activeTab} Coverage</p>
           <p className="text-sm font-bold text-foreground">{activeCoverage}%</p>
