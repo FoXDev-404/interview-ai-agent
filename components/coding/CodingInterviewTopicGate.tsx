@@ -13,7 +13,7 @@ import {
   getCodingTopicsWithCounts,
   type CodingLanguage,
   type CodingQuestion,
-} from '@/lib/codingInterview';
+} from '@/lib/coding/interviewEngine';
 
 interface CodingInterviewTopicGateProps {
   interviewId: string;

@@ -1,8 +1,8 @@
 'use server';
 
 import { db } from "@/firebase/admin";
-import { generateQuestions } from "@/lib/serverQuestions";
-import { generateCodingQuestionSet, type CodingLanguage } from "@/lib/codingInterview";
+import { generateQuestions } from "@/lib/interview/questionGenerator";
+import { generateCodingQuestionSet, type CodingLanguage } from "@/lib/coding/interviewEngine";
 
 export async function createInterview(params: {
   userId: string;

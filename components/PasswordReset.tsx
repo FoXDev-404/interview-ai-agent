@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '@/firebase/client'
-import { emailVerificationConfig } from '@/lib/emailConfig'
+import { emailVerificationConfig } from '@/lib/email/config'
 import { toast } from 'sonner'
 import { Button } from './ui/button'
 import { Mail, ArrowLeft } from 'lucide-react'

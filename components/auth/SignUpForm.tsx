@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import FormField from "@/components/FormField";
-import { emailVerificationConfig, fallbackEmailVerificationConfig } from "@/lib/emailConfig";
+import { emailVerificationConfig, fallbackEmailVerificationConfig } from "@/lib/email/config";
 
 const schema = z.object({
   name: z.string().min(3),

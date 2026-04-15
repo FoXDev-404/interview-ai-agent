@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from "@/firebase/admin";
-import { generateFeedbackWithGemini } from "@/lib/gemini";
+import { generateFeedbackWithGemini } from "@/lib/ai/interviewFeedback";
 import { updateUserLeaderboardAfterInterview } from "@/lib/actions/leaderboard.action";
 import { syncUserLeaderboardStats } from "@/lib/actions/leaderboard.action";
 

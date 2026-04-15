@@ -22,7 +22,7 @@ import {
     ChevronRight,
     AlertTriangle,
 } from 'lucide-react';
-import type { CodingLanguage, CodingQuestion } from '@/lib/codingInterview';
+import type { CodingLanguage, CodingQuestion } from '@/lib/coding/interviewEngine';
 
 type SubmissionStatus =
   | 'Accepted'

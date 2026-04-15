@@ -3,7 +3,7 @@ import {
   buildExecutionFailureResult,
   evaluateCodingSubmissionReal,
   type CodingLanguage,
-} from '@/lib/codingInterview';
+} from '@/lib/coding/interviewEngine';
 
 interface ExecuteBody {
   code?: string;

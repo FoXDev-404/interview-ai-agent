@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { requireAuth } from '@/lib/auth';
 import { getInterview } from '@/lib/actions/interview.action';
 import CodingFeedbackDashboard from '@/components/coding/CodingFeedbackDashboard';
-import { filterCodingQuestionsByTopic, type CodingQuestion } from '@/lib/codingInterview';
+import { filterCodingQuestionsByTopic, type CodingQuestion } from '@/lib/coding/interviewEngine';
 
 export const dynamic = 'force-dynamic';
 

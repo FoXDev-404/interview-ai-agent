@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import emailService from '@/lib/emailService';
+import emailService from '@/lib/email/service';
 
 export async function POST(request: NextRequest) {
   console.log('🚀 Contact API called - POST method');

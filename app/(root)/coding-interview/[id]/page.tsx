@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import CodingInterviewTopicGate from '@/components/coding/CodingInterviewTopicGate';
 import { getInterview } from '@/lib/actions/interview.action';
 import { requireAuth } from '@/lib/auth';
-import type { CodingLanguage, CodingQuestion } from '@/lib/codingInterview';
+import type { CodingLanguage, CodingQuestion } from '@/lib/coding/interviewEngine';
 
 export const dynamic = 'force-dynamic';
 

@@ -6,7 +6,7 @@ import {
   createCodingInterview,
   createInterview,
 } from "@/lib/actions/interview.action";
-import type { CodingLanguage } from "@/lib/codingInterview";
+import type { CodingLanguage } from "@/lib/coding/interviewEngine";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 

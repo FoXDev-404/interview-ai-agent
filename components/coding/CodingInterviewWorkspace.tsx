@@ -25,7 +25,7 @@ import {
   type CodingLanguage,
   type CodingQuestion,
   isDesignTestCase,
-} from "@/lib/codingInterview";
+} from "@/lib/coding/interviewEngine";
 
 type LeftTab = "description" | "hints" | "editorial";
 type BottomTab = "tests" | "console" | "history";
