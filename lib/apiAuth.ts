@@ -1,7 +1,9 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { auth } from "@/firebase/admin";
+import { recordFailedAuthAttempt } from "@/lib/security/computeProtection";
 
 export interface ApiAuthContext {
   uid: string;
@@ -22,15 +24,29 @@ export class ApiAuthError extends Error {
   }
 }
 
-export async function requireApiAuth(): Promise<ApiAuthContext> {
+export async function requireApiAuth(options?: {
+  request?: NextRequest;
+  routeId?: string;
+}): Promise<ApiAuthContext> {
+  const routeId = options?.routeId || "api.unknown";
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("session")?.value;
 
   if (!sessionCookie) {
+    recordFailedAuthAttempt({
+      request: options?.request,
+      routeId,
+      reason: "missing_session",
+    });
     throw new ApiAuthError("Not authenticated", 401);
   }
 
   if (!auth) {
+    recordFailedAuthAttempt({
+      request: options?.request,
+      routeId,
+      reason: "auth_service_unavailable",
+    });
     throw new ApiAuthError("Authentication service is unavailable", 503);
   }
 
@@ -42,6 +58,11 @@ export async function requireApiAuth(): Promise<ApiAuthContext> {
       decodedClaims,
     };
   } catch (error) {
+    recordFailedAuthAttempt({
+      request: options?.request,
+      routeId,
+      reason: "invalid_session",
+    });
     throw new ApiAuthError("Not authenticated", 401, { cause: error });
   }
 }

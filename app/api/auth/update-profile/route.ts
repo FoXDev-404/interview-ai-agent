@@ -1,15 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, db } from "@/firebase/admin";
+import { z } from "zod";
 import {
   requireApiAuth,
   toApiAuthErrorResponse,
   type ApiAuthContext,
 } from "@/lib/apiAuth";
 
+const updateProfileSchema = z
+  .object({
+    displayName: z.string().trim().min(1).max(80).optional(),
+    photoURL: z.union([z.string().max(700000), z.null()]).optional(),
+    headline: z.string().trim().max(120).optional(),
+    bio: z.string().trim().max(600).optional(),
+  })
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "At least one field is required",
+  });
+
 export async function POST(request: NextRequest) {
   let authUser: ApiAuthContext;
   try {
-    authUser = await requireApiAuth();
+    authUser = await requireApiAuth({
+      request,
+      routeId: "auth.update-profile",
+    });
   } catch (error) {
     return toApiAuthErrorResponse(error);
   }
@@ -17,8 +33,16 @@ export async function POST(request: NextRequest) {
   try {
     const uid = authUser.uid;
 
-    // Get the request body
-    const { displayName, photoURL, headline, bio } = await request.json();
+    const parsedBody = updateProfileSchema.safeParse(await request.json());
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { error: "Invalid request payload" },
+        { status: 400 },
+      );
+    }
+
+    const { displayName, photoURL, headline, bio } = parsedBody.data;
 
     // Update the user's display name in Firebase Auth
     const updateData: { displayName?: string } = {};
@@ -53,14 +77,17 @@ export async function POST(request: NextRequest) {
       }
 
       if (photoURL !== undefined) {
+        const normalizedPhoto =
+          typeof photoURL === "string" ? photoURL.trim() : photoURL;
+
         // Check if photoURL is null or empty, handle accordingly
-        if (photoURL === null || photoURL === "") {
+        if (normalizedPhoto === null || normalizedPhoto === "") {
           // User is removing their profile photo
           profileData.photoURL = null;
           profileData.avatar = null;
         } else {
           // Check photoURL size before storing
-          const photoSizeInBytes = (photoURL.length * 3) / 4;
+          const photoSizeInBytes = (normalizedPhoto.length * 3) / 4;
           if (photoSizeInBytes > 500000) {
             // 500KB limit
             return NextResponse.json(
@@ -71,8 +98,8 @@ export async function POST(request: NextRequest) {
               { status: 400 },
             );
           }
-          profileData.photoURL = photoURL;
-          profileData.avatar = photoURL;
+          profileData.photoURL = normalizedPhoto;
+          profileData.avatar = normalizedPhoto;
         }
       }
 

@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { AssemblyAI } from "assemblyai";
 import { generateCoachingFeedback } from "@/lib/speech/coachingFeedback";
 import { requireApiAuth, toApiAuthErrorResponse } from "@/lib/apiAuth";
+import {
+  enforceComputePayloadLimit,
+  enforceComputeRateLimit,
+  getComputePolicy,
+  isOperationTimeoutError,
+  withOperationTimeout,
+  type ComputeRouteId,
+} from "@/lib/security/computeProtection";
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+const ROUTE_ID: ComputeRouteId = "speech.analyze";
 
 // ---------------------------------------------------------------------------
 // Filler word configuration (separated for precise detection)
@@ -123,10 +132,27 @@ const WPM_WINDOW_SIZE_SEC = 15;
  * timestamps, computes advanced speech metrics, and returns AI coaching feedback.
  */
 export async function POST(request: NextRequest) {
+  const payloadLimitResponse = enforceComputePayloadLimit(request, ROUTE_ID);
+  if (payloadLimitResponse) {
+    return payloadLimitResponse;
+  }
+
+  const policy = getComputePolicy(ROUTE_ID);
+
+  let authContext: Awaited<ReturnType<typeof requireApiAuth>>;
   try {
-    await requireApiAuth();
+    authContext = await requireApiAuth({ request, routeId: ROUTE_ID });
   } catch (error) {
     return toApiAuthErrorResponse(error);
+  }
+
+  const rateLimitResponse = await enforceComputeRateLimit(
+    request,
+    ROUTE_ID,
+    authContext.uid,
+  );
+  if (rateLimitResponse) {
+    return rateLimitResponse;
   }
 
   try {
@@ -168,11 +194,8 @@ export async function POST(request: NextRequest) {
     const assemblyApiKey = process.env.ASSEMBLYAI_API_KEY;
     if (!assemblyApiKey) {
       return NextResponse.json(
-        {
-          error:
-            "AssemblyAI API key not configured. Set ASSEMBLYAI_API_KEY in environment variables.",
-        },
-        { status: 500 },
+        { error: "Speech analysis service is temporarily unavailable" },
+        { status: 503 },
       );
     }
 
@@ -180,15 +203,20 @@ export async function POST(request: NextRequest) {
 
     // 4. Upload and transcribe with word-level timestamps
     const audioBuffer = Buffer.from(await audioFile.arrayBuffer());
-    const transcript = await client.transcripts.transcribe({
-      audio: audioBuffer,
-      speech_models: ["universal-3-pro", "universal-2"],
-    });
+    const transcript = await withOperationTimeout(
+      () =>
+        client.transcripts.transcribe({
+          audio: audioBuffer,
+          speech_models: ["universal-3-pro", "universal-2"],
+        }),
+      policy.timeoutMs,
+      `${ROUTE_ID}.transcribe`,
+    );
 
     if (transcript.status === "error") {
       return NextResponse.json(
-        { error: transcript.error || "Transcription failed" },
-        { status: 500 },
+        { error: "Unable to transcribe audio at the moment" },
+        { status: 502 },
       );
     }
 
@@ -398,11 +426,16 @@ export async function POST(request: NextRequest) {
         : 0;
 
     // 11. Generate AI coaching feedback
-    const coaching = await generateCoachingFeedback(
-      transcriptText,
-      metrics,
-      question,
-      fillerFrequency,
+    const coaching = await withOperationTimeout(
+      () =>
+        generateCoachingFeedback(
+          transcriptText,
+          metrics,
+          question,
+          fillerFrequency,
+        ),
+      policy.timeoutMs,
+      `${ROUTE_ID}.coaching`,
     );
 
     // 12. Return merged response
@@ -421,9 +454,20 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error: unknown) {
+    if (isOperationTimeoutError(error)) {
+      console.warn("speech_analysis_timeout", {
+        timeoutMs: error.timeoutMs,
+      });
+      return NextResponse.json(
+        { error: "Speech analysis timed out. Please try again." },
+        { status: 504 },
+      );
+    }
+
     console.error("Speech analysis error:", error);
-    const message =
-      error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unable to analyze speech right now" },
+      { status: 500 },
+    );
   }
 }

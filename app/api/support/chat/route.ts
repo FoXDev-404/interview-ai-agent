@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { requireApiAuth, toApiAuthErrorResponse } from "@/lib/apiAuth";
+import { z } from "zod";
+import {
+  enforceComputePayloadLimit,
+  enforceComputeRateLimit,
+  getComputePolicy,
+  isOperationTimeoutError,
+  withOperationTimeout,
+  type ComputeRouteId,
+} from "@/lib/security/computeProtection";
 
 type ChatHistoryItem = {
   role: "user" | "assistant";
@@ -12,8 +21,27 @@ type ChatRequestBody = {
   history?: ChatHistoryItem[];
 };
 
+const chatRequestSchema = z
+  .object({
+    message: z.string().trim().min(1).max(2000),
+    history: z
+      .array(
+        z
+          .object({
+            role: z.enum(["user", "assistant"]),
+            content: z.string().trim().min(1).max(1200),
+          })
+          .strict(),
+      )
+      .max(20)
+      .optional(),
+  })
+  .strict();
+
 const HF_MODEL =
   process.env.HUGGINGFACE_MODEL || "mistralai/Mistral-7B-Instruct";
+
+const ROUTE_ID: ComputeRouteId = "support.chat";
 
 function sanitizeText(input: string, maxLen: number): string {
   return input.replace(/\s+/g, " ").trim().slice(0, maxLen);
@@ -163,45 +191,94 @@ function fallbackResponse(message: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const payloadLimitResponse = enforceComputePayloadLimit(request, ROUTE_ID);
+  if (payloadLimitResponse) {
+    return payloadLimitResponse;
+  }
+
+  const policy = getComputePolicy(ROUTE_ID);
+
+  let authContext: Awaited<ReturnType<typeof requireApiAuth>>;
   try {
-    await requireApiAuth();
+    authContext = await requireApiAuth({ request, routeId: ROUTE_ID });
   } catch (error) {
     return toApiAuthErrorResponse(error);
   }
 
+  const rateLimitResponse = await enforceComputeRateLimit(
+    request,
+    ROUTE_ID,
+    authContext.uid,
+  );
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   try {
     const body = (await request.json()) as ChatRequestBody;
-    const message =
-      typeof body.message === "string" ? sanitizeText(body.message, 2000) : "";
+    const parsedBody = chatRequestSchema.safeParse(body);
 
-    if (!message) {
+    if (!parsedBody.success) {
       return NextResponse.json(
-        { error: "Message is required." },
+        { error: "Invalid request payload" },
         { status: 400 },
       );
     }
 
-    const rawHistory = Array.isArray(body.history) ? body.history : [];
-    const history = rawHistory
-      .filter(
-        (item) =>
-          item &&
-          (item.role === "user" || item.role === "assistant") &&
-          typeof item.content === "string",
-      )
-      .map((item) => ({
-        role: item.role,
-        content: sanitizeText(item.content, 1200),
-      }));
+    const message = sanitizeText(parsedBody.data.message, 2000);
+
+    const rawHistory = parsedBody.data.history || [];
+    const history = rawHistory.map((item) => ({
+      role: item.role,
+      content: sanitizeText(item.content, 1200),
+    }));
 
     const prompt = buildSupportPrompt(message, history);
-    const geminiReply = await askGemini(prompt);
+
+    let geminiReply: string | null = null;
+    try {
+      geminiReply = await withOperationTimeout(
+        () => askGemini(prompt),
+        policy.timeoutMs,
+        `${ROUTE_ID}.gemini`,
+      );
+    } catch (error) {
+      if (isOperationTimeoutError(error)) {
+        console.warn("support_chat_provider_timeout", {
+          provider: "gemini",
+          timeoutMs: policy.timeoutMs,
+        });
+      } else {
+        console.error("support_chat_provider_failure", {
+          provider: "gemini",
+        });
+      }
+    }
 
     if (geminiReply) {
       return NextResponse.json({ reply: geminiReply, source: "gemini" });
     }
 
-    const hfReply = await askHuggingFace(prompt);
+    let hfReply: string | null = null;
+    try {
+      hfReply = await withOperationTimeout(
+        () => askHuggingFace(prompt),
+        policy.timeoutMs,
+        `${ROUTE_ID}.huggingface`,
+      );
+    } catch (error) {
+      if (isOperationTimeoutError(error)) {
+        console.warn("support_chat_provider_timeout", {
+          provider: "huggingface",
+          timeoutMs: policy.timeoutMs,
+        });
+      } else {
+        console.error("support_chat_provider_failure", {
+          provider: "huggingface",
+        });
+      }
+    }
+
     if (hfReply) {
       return NextResponse.json({ reply: hfReply, source: "huggingface" });
     }

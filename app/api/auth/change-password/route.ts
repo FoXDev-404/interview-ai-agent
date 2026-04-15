@@ -1,16 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { auth as clientAuth } from "@/firebase/client";
+import { z } from "zod";
 import {
   requireApiAuth,
   toApiAuthErrorResponse,
   type ApiAuthContext,
 } from "@/lib/apiAuth";
 
+const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1).max(128),
+    newPassword: z.string().min(8).max(128),
+  })
+  .strict();
+
 export async function POST(request: NextRequest) {
   let authUser: ApiAuthContext;
   try {
-    authUser = await requireApiAuth();
+    authUser = await requireApiAuth({
+      request,
+      routeId: "auth.change-password",
+    });
   } catch (error) {
     return toApiAuthErrorResponse(error);
   }
@@ -25,22 +36,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the request body
-    const { currentPassword, newPassword } = await request.json();
+    const parsedBody = changePasswordSchema.safeParse(await request.json());
 
-    if (!currentPassword || !newPassword) {
+    if (!parsedBody.success) {
       return NextResponse.json(
-        { error: "Current password and new password are required" },
+        { error: "Invalid request payload" },
         { status: 400 },
       );
     }
 
-    if (newPassword.length < 6) {
-      return NextResponse.json(
-        { error: "New password must be at least 6 characters long" },
-        { status: 400 },
-      );
-    }
+    const { currentPassword, newPassword } = parsedBody.data;
 
     try {
       // First, verify the current password by signing in
@@ -60,7 +65,12 @@ export async function POST(request: NextRequest) {
         message: "Password changed successfully",
       });
     } catch (authError: unknown) {
-      console.error("Authentication error:", authError);
+      console.error("change_password_authentication_failed", {
+        code:
+          authError && typeof authError === "object" && "code" in authError
+            ? (authError as { code?: string }).code || "unknown"
+            : "unknown",
+      });
 
       // Handle specific Firebase auth errors
       const error = authError as { code?: string };
@@ -70,7 +80,7 @@ export async function POST(request: NextRequest) {
       ) {
         return NextResponse.json(
           { error: "Current password is incorrect" },
-          { status: 400 },
+          { status: 401 },
         );
       } else if (error.code === "auth/weak-password") {
         return NextResponse.json(
@@ -83,13 +93,13 @@ export async function POST(request: NextRequest) {
             error:
               "Please sign out and sign back in before changing your password",
           },
-          { status: 400 },
+          { status: 401 },
         );
       }
 
       return NextResponse.json(
         { error: "Failed to verify current password" },
-        { status: 400 },
+        { status: 401 },
       );
     }
   } catch (error) {

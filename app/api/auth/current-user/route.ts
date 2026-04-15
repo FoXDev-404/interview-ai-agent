@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import {
   ApiAuthError,
@@ -6,9 +7,9 @@ import {
   toApiAuthErrorResponse,
 } from "@/lib/apiAuth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    await requireApiAuth();
+    await requireApiAuth({ request, routeId: "auth.current-user" });
     const user = await getCurrentUser();
 
     if (!user) {

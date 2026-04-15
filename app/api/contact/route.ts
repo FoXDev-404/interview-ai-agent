@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import emailService from "@/lib/email/service";
 import {
   requireApiAuth,
@@ -6,18 +7,49 @@ import {
   type ApiAuthContext,
 } from "@/lib/apiAuth";
 
-export async function POST(request: NextRequest) {
-  console.log("🚀 Contact API called - POST method");
+const contactSchema = z
+  .object({
+    firstName: z.string().trim().min(1).max(80),
+    lastName: z.string().trim().min(1).max(80),
+    email: z.string().trim().email().max(254),
+    mobileNumber: z.string().trim().max(25).optional().nullable(),
+    subject: z.string().trim().min(3).max(160),
+    message: z.string().trim().min(1).max(5000),
+    newsletter: z.boolean().optional(),
+  })
+  .strict();
 
+function escapeHtml(input: string) {
+  return input
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+export async function POST(request: NextRequest) {
   let currentUser: ApiAuthContext;
   try {
-    currentUser = await requireApiAuth();
+    currentUser = await requireApiAuth({
+      request,
+      routeId: "contact.submit",
+    });
   } catch (error) {
     return toApiAuthErrorResponse(error);
   }
 
   try {
-    const body = await request.json();
+    const rawBody = await request.json();
+    const parsed = contactSchema.safeParse(rawBody);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request payload" },
+        { status: 400 },
+      );
+    }
+
     const {
       firstName,
       lastName,
@@ -26,59 +58,43 @@ export async function POST(request: NextRequest) {
       subject,
       message,
       newsletter,
-    } = body;
+    } = parsed.data;
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const userEmail = currentUser.email?.trim().toLowerCase();
 
     // Validate that the email matches the authenticated user's email
-    if (!currentUser.email || email !== currentUser.email) {
-      console.log(
-        "❌ Email mismatch - Form:",
-        email,
-        "User:",
-        currentUser.email,
-      );
+    if (!userEmail || normalizedEmail !== userEmail) {
+      console.warn("contact_submission_rejected_email_mismatch", {
+        uid: currentUser.uid,
+        hasAuthEmail: Boolean(userEmail),
+      });
       return NextResponse.json(
         { error: "Email must match your registered account email" },
         { status: 403 },
       );
     }
 
-    // Validate required fields
-    if (!firstName || !lastName || !email || !subject || !message) {
-      console.log("❌ Missing required fields");
-      return NextResponse.json(
-        { error: "All required fields must be filled" },
-        { status: 400 },
-      );
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      console.log("❌ Invalid email format");
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 },
-      );
-    }
-
-    // Log submission details
-    console.log("📝 Contact form submission:", {
-      name: `${firstName} ${lastName}`,
-      email,
-      mobileNumber,
-      subject,
+    console.info("contact_submission_received", {
+      uid: currentUser.uid,
+      subjectLength: subject.length,
       messageLength: message.length,
-      newsletter,
-      timestamp: new Date().toISOString(),
+      newsletterOptIn: Boolean(newsletter),
     });
 
-    // Send email using enhanced email service with automatic fallback
     try {
-      console.log("📧 Sending email using enhanced email service...");
+      const safeFirstName = escapeHtml(firstName);
+      const safeLastName = escapeHtml(lastName);
+      const safeEmail = escapeHtml(normalizedEmail);
+      const safeMobile = escapeHtml(mobileNumber || "Not provided");
+      const safeSubject = escapeHtml(subject);
+      const safeMessage = escapeHtml(message);
+      const safeUserId = escapeHtml(currentUser.uid);
+      const safeNewsletter = newsletter ? "Yes" : "No";
 
       const emailResult = await emailService.sendEmail({
         to: "localghost678@gmail.com", // Send to business support email
-        subject: `[AI MockPrep Contact] ${subject}`,
+        subject: `[AI MockPrep Contact] ${safeSubject}`,
         from: "Aimockprep@resend.dev", // Use Resend's default verified domain
         fromName: "AI MockPrep Contact",
         html: `
@@ -96,25 +112,25 @@ export async function POST(request: NextRequest) {
             
             <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <h3 style="color: #4F46E5; margin-top: 0;">Contact Information</h3>
-              <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-              <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-              <p><strong>Mobile:</strong> ${mobileNumber || "Not provided"}</p>
-              <p><strong>Subject:</strong> ${subject}</p>
-              <p><strong>Newsletter:</strong> ${newsletter ? "Yes" : "No"}</p>
-              <p><strong>User ID:</strong> ${currentUser.uid}</p>
+              <p><strong>Name:</strong> ${safeFirstName} ${safeLastName}</p>
+              <p><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
+              <p><strong>Mobile:</strong> ${safeMobile}</p>
+              <p><strong>Subject:</strong> ${safeSubject}</p>
+              <p><strong>Newsletter:</strong> ${safeNewsletter}</p>
+              <p><strong>User ID:</strong> ${safeUserId}</p>
               <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
             </div>
             
             <div style="background: #fff; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
               <h3 style="color: #333; margin-top: 0;">Message</h3>
-              <p style="line-height: 1.6; color: #555; white-space: pre-wrap;">${message}</p>
+              <p style="line-height: 1.6; color: #555; white-space: pre-wrap;">${safeMessage}</p>
             </div>
             
             <div style="margin-top: 20px; padding: 15px; background: #f0f4ff; border-radius: 8px;">
               <p style="margin: 0; font-size: 12px; color: #666;">
                 📧 This message was sent from the AI MockPrep contact form by a verified user.<br>
-                Reply directly to this email to respond to ${firstName}.<br>
-                🔒 User authentication verified: ${currentUser.email}
+                Reply directly to this email to respond to ${safeFirstName}.<br>
+                🔒 User authentication verified: ${safeEmail}
               </p>
             </div>
           </div>
@@ -127,10 +143,10 @@ This message was sent by an authenticated user with verified email address.
 
 CONTACT INFORMATION
 Name: ${firstName} ${lastName}
-Email: ${email}
+Email: ${normalizedEmail}
 Mobile: ${mobileNumber || "Not provided"}
 Subject: ${subject}
-Newsletter: ${newsletter ? "Yes" : "No"}
+Newsletter: ${safeNewsletter}
 User ID: ${currentUser.uid}
 Time: ${new Date().toLocaleString()}
 
@@ -139,40 +155,28 @@ ${message}
 
 📧 This message was sent from the AI MockPrep contact form by a verified user.
 Reply directly to this email to respond to ${firstName}.
-🔒 User authentication verified: ${currentUser.email}
+🔒 User authentication verified: ${normalizedEmail}
         `,
       });
 
       if (emailResult.success) {
-        console.log(`✅ Email sent successfully via ${emailResult.provider}:`, {
-          messageId: emailResult.messageId,
-          to: "localghost678@gmail.com", // Business support email
-          subject: `[AI MockPrep Contact] ${subject}`,
+        console.info("contact_submission_sent", {
+          uid: currentUser.uid,
+          provider: emailResult.provider,
+          hasMessageId: Boolean(emailResult.messageId),
         });
 
         return NextResponse.json({
           success: true,
-          message: `Message sent successfully via ${emailResult.provider}!`,
+          message: "Message sent successfully.",
           timestamp: new Date().toISOString(),
-          messageId: emailResult.messageId,
-          provider: emailResult.provider,
           emailSent: true,
         });
       } else {
-        console.error("❌ All email services failed:", emailResult.error);
-
-        // Log the message for manual review even if email fails
-        console.log("📝 CONTACT MESSAGE LOGGED (Email failed):", {
-          name: `${firstName} ${lastName}`,
-          email: email,
-          subject: subject,
-          mobileNumber: mobileNumber,
-          message: message,
-          newsletter: newsletter,
+        console.warn("contact_submission_send_failed", {
           userId: currentUser.uid,
-          timestamp: new Date().toISOString(),
           provider: emailResult.provider,
-          error: emailResult.error,
+          hasProviderError: Boolean(emailResult.error),
         });
 
         return NextResponse.json({
@@ -186,27 +190,28 @@ Reply directly to this email to respond to ${firstName}.
         });
       }
     } catch (emailError) {
-      console.error("❌ Email service error:", emailError);
+      console.error("contact_submission_exception", {
+        uid: currentUser.uid,
+        errorType:
+          emailError instanceof Error ? emailError.name : "unknown_error",
+      });
 
       return NextResponse.json(
         {
           success: false,
-          message: "Email service temporarily unavailable",
-          error:
-            emailError instanceof Error
-              ? emailError.message
-              : "Unknown email error",
+          message: "Unable to send message right now. Please try again later.",
           emailSent: false,
-          fallbackMessage:
-            "Your message has been logged. We will respond manually if needed.",
         },
         { status: 500 },
       );
     }
   } catch (error) {
-    console.error("Contact form error:", error);
+    console.error("contact_request_processing_failed", {
+      uid: currentUser.uid,
+      errorType: error instanceof Error ? error.name : "unknown_error",
+    });
     return NextResponse.json(
-      { error: "Failed to send message. Please try again later." },
+      { error: "Unable to process contact request" },
       { status: 500 },
     );
   }

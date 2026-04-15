@@ -5,6 +5,15 @@ import {
   type CodingLanguage,
 } from "@/lib/coding/interviewEngine";
 import { requireApiAuth, toApiAuthErrorResponse } from "@/lib/apiAuth";
+import { z } from "zod";
+import {
+  enforceComputePayloadLimit,
+  enforceComputeRateLimit,
+  getComputePolicy,
+  isOperationTimeoutError,
+  withOperationTimeout,
+  type ComputeRouteId,
+} from "@/lib/security/computeProtection";
 
 interface ExecuteBody {
   code?: string;
@@ -14,42 +23,82 @@ interface ExecuteBody {
   customInput?: string;
 }
 
+const executeBodySchema = z
+  .object({
+    code: z.string().trim().min(1).max(20000),
+    language: z.enum([
+      "javascript",
+      "typescript",
+      "python",
+      "java",
+      "cpp",
+      "c",
+    ]),
+    questionId: z.string().trim().min(1).max(120),
+    mode: z.enum(["run", "submit"]),
+    customInput: z.string().max(5000).optional(),
+  })
+  .strict();
+
+const ROUTE_ID: ComputeRouteId = "coding.execute";
+
 export async function POST(req: NextRequest) {
+  const payloadLimitResponse = enforceComputePayloadLimit(req, ROUTE_ID);
+  if (payloadLimitResponse) {
+    return payloadLimitResponse;
+  }
+
+  const policy = getComputePolicy(ROUTE_ID);
+
+  let authContext: Awaited<ReturnType<typeof requireApiAuth>>;
   try {
-    await requireApiAuth();
+    authContext = await requireApiAuth({ request: req, routeId: ROUTE_ID });
   } catch (error) {
     return toApiAuthErrorResponse(error);
   }
 
+  const rateLimitResponse = await enforceComputeRateLimit(
+    req,
+    ROUTE_ID,
+    authContext.uid,
+  );
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   try {
     const body = (await req.json()) as ExecuteBody;
+    const parsedBody = executeBodySchema.safeParse(body);
 
-    if (!body.code || !body.language || !body.questionId || !body.mode) {
+    if (!parsedBody.success) {
       return NextResponse.json(
-        {
-          message: "Missing required fields: code, language, questionId, mode",
-        },
+        { message: "Invalid request payload" },
         { status: 400 },
       );
     }
 
+    const sanitizedBody = parsedBody.data;
+
     const payload = {
-      code: body.code,
-      language: body.language,
-      questionId: body.questionId,
-      mode: body.mode,
-      customInput: body.customInput,
+      code: sanitizedBody.code,
+      language: sanitizedBody.language,
+      questionId: sanitizedBody.questionId,
+      mode: sanitizedBody.mode,
+      customInput: sanitizedBody.customInput,
     } as const;
 
     let result;
 
     try {
-      result = await evaluateCodingSubmissionReal(payload);
-    } catch (realJudgeError) {
-      const fallbackReason =
-        realJudgeError instanceof Error
-          ? realJudgeError.message
-          : "unknown sandbox error";
+      result = await withOperationTimeout(
+        () => evaluateCodingSubmissionReal(payload),
+        policy.timeoutMs,
+        ROUTE_ID,
+      );
+    } catch (error) {
+      const fallbackReason = isOperationTimeoutError(error)
+        ? "execution timed out"
+        : "execution service unavailable";
       result = buildExecutionFailureResult(payload, fallbackReason);
     }
 

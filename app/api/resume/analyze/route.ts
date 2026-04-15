@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { requireApiAuth, toApiAuthErrorResponse } from "@/lib/apiAuth";
+import { z } from "zod";
+import {
+  enforceComputePayloadLimit,
+  enforceComputeRateLimit,
+  getComputePolicy,
+  isOperationTimeoutError,
+  withOperationTimeout,
+  type ComputeRouteId,
+} from "@/lib/security/computeProtection";
 
 const HF_MODEL =
   process.env.HUGGINGFACE_MODEL || "mistralai/Mistral-7B-Instruct";
+
+const ROUTE_ID: ComputeRouteId = "resume.analyze";
 
 const GEMINI_MODEL_CANDIDATES = [
   process.env.GEMINI_MODEL,
@@ -217,6 +228,13 @@ type GeminiAttemptResult = {
   retryAfterSeconds?: number;
   diagnostic?: string;
 };
+
+const resumeAnalyzeSchema = z
+  .object({
+    resumeText: z.string().trim().min(1).max(20000),
+    jobDescription: z.string().trim().min(1).max(10000),
+  })
+  .strict();
 
 function clampScore(value: number): number {
   if (!Number.isFinite(value)) return 0;
@@ -990,28 +1008,41 @@ async function askHuggingFaceForAnalysis(
 }
 
 export async function POST(request: NextRequest) {
+  const payloadLimitResponse = enforceComputePayloadLimit(request, ROUTE_ID);
+  if (payloadLimitResponse) {
+    return payloadLimitResponse;
+  }
+
+  const policy = getComputePolicy(ROUTE_ID);
+
+  let authContext: Awaited<ReturnType<typeof requireApiAuth>>;
   try {
-    await requireApiAuth();
+    authContext = await requireApiAuth({ request, routeId: ROUTE_ID });
   } catch (error) {
     return toApiAuthErrorResponse(error);
   }
 
-  try {
-    const { resumeText, jobDescription } = await request.json();
+  const rateLimitResponse = await enforceComputeRateLimit(
+    request,
+    ROUTE_ID,
+    authContext.uid,
+  );
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
 
-    // 1. Validation
-    if (!resumeText || !resumeText.trim()) {
+  try {
+    const rawBody = await request.json();
+    const parsedBody = resumeAnalyzeSchema.safeParse(rawBody);
+
+    if (!parsedBody.success) {
       return NextResponse.json(
-        { error: "Resume content is required" },
+        { error: "Invalid request payload" },
         { status: 400 },
       );
     }
-    if (!jobDescription || !jobDescription.trim()) {
-      return NextResponse.json(
-        { error: "Job description is required" },
-        { status: 400 },
-      );
-    }
+
+    const { resumeText, jobDescription } = parsedBody.data;
 
     // 3. Prompt Engineering
     const systemInstruction = `
@@ -1070,9 +1101,27 @@ export async function POST(request: NextRequest) {
     let source: "gemini" | "huggingface" | "heuristic" = "heuristic";
     let retryAfterSeconds: number | undefined;
     let modelUsed: string | undefined;
-    let fallbackReason: string | undefined;
 
-    const geminiResult = await askGeminiForAnalysis(prompt, systemInstruction);
+    let geminiResult: GeminiAttemptResult = { analysis: null };
+    try {
+      geminiResult = await withOperationTimeout(
+        () => askGeminiForAnalysis(prompt, systemInstruction),
+        policy.timeoutMs,
+        `${ROUTE_ID}.gemini`,
+      );
+    } catch (error) {
+      if (isOperationTimeoutError(error)) {
+        console.warn("resume_analysis_provider_timeout", {
+          provider: "gemini",
+          timeoutMs: policy.timeoutMs,
+        });
+      } else {
+        console.error("resume_analysis_provider_failure", {
+          provider: "gemini",
+        });
+      }
+    }
+
     if (geminiResult.analysis) {
       rawAnalysis = geminiResult.analysis;
       source = "gemini";
@@ -1085,12 +1134,30 @@ export async function POST(request: NextRequest) {
       }
     } else {
       retryAfterSeconds = geminiResult.retryAfterSeconds;
-      fallbackReason = geminiResult.diagnostic;
     }
 
     // 5. Try Hugging Face if Gemini is unavailable or exhausted.
     if (!rawAnalysis) {
-      const hfAnalysis = await askHuggingFaceForAnalysis(prompt);
+      let hfAnalysis: PlainObject | null = null;
+      try {
+        hfAnalysis = await withOperationTimeout(
+          () => askHuggingFaceForAnalysis(prompt),
+          policy.timeoutMs,
+          `${ROUTE_ID}.huggingface`,
+        );
+      } catch (error) {
+        if (isOperationTimeoutError(error)) {
+          console.warn("resume_analysis_provider_timeout", {
+            provider: "huggingface",
+            timeoutMs: policy.timeoutMs,
+          });
+        } else {
+          console.error("resume_analysis_provider_failure", {
+            provider: "huggingface",
+          });
+        }
+      }
+
       if (hfAnalysis) {
         rawAnalysis = hfAnalysis;
         source = "huggingface";
@@ -1108,8 +1175,7 @@ export async function POST(request: NextRequest) {
     if (requireRealAi && source === "heuristic") {
       return NextResponse.json(
         {
-          error:
-            "AI providers are unavailable. Configure GEMINI_API_KEY (and optional GEMINI_API_KEY_2..5 or HUGGINGFACE_API_KEY) in Vercel Environment Variables, then redeploy.",
+          error: "Resume analysis service is temporarily unavailable",
         },
         { status: 503 },
       );
@@ -1122,7 +1188,6 @@ export async function POST(request: NextRequest) {
       source,
       ...(retryAfterSeconds ? { retryAfterSeconds } : {}),
       ...(modelUsed ? { modelUsed } : {}),
-      ...(fallbackReason && source === "heuristic" ? { fallbackReason } : {}),
     };
 
     const payload = payloadBase;
