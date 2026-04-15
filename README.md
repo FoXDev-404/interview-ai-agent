@@ -2,8 +2,6 @@
 
 An AI-powered interview preparation platform that integrates speech analysis, behavioural scoring, NLP-driven content evaluation, and ATS-compliant resume optimization. Built with Next.js 15, Firebase, and multiple AI backends, AI MockPrep bridges the gap between employer-facing AI recruitment tools and job-seeker readiness.
 
-
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -28,17 +26,18 @@ AI MockPrep addresses this by providing a unified system that no existing tool o
 
 ### How It Compares
 
-| Tool | Strength | Gap |
-|------|----------|-----|
-| Google Interview Warmup | Strong NLP questions | No behavioural scoring |
-| Huru AI | Body language scoring | No ATS resume support |
-| Final Round AI | Avatar interaction | Limited domain depth |
-| Pramp | Peer interviews | Not AI-driven |
-| **AI MockPrep** | **All of the above, unified** | — |
+| Tool                    | Strength                      | Gap                    |
+| ----------------------- | ----------------------------- | ---------------------- |
+| Google Interview Warmup | Strong NLP questions          | No behavioural scoring |
+| Huru AI                 | Body language scoring         | No ATS resume support  |
+| Final Round AI          | Avatar interaction            | Limited domain depth   |
+| Pramp                   | Peer interviews               | Not AI-driven          |
+| **AI MockPrep**         | **All of the above, unified** | —                      |
 
 ## Features
 
 ### Interview Simulation
+
 - Dynamic interview creation based on role, experience level (Junior / Mid / Senior), and tech stack
 - 8 AI-generated or curated questions per session tailored to the selected domain
 - Voice-based interviews via VAPI AI or text-based input mode
@@ -47,6 +46,7 @@ AI MockPrep addresses this by providing a unified system that no existing tool o
 - FAANG-specific quick-start templates (Google, Amazon, Meta, Apple, Netflix, Microsoft)
 
 ### AI-Powered Feedback
+
 - Per-question scoring (0-10) with comparison to ideal answers
 - Comprehensive final assessment with an overall score (0-100)
 - Performance classification: Excellent, Good, Average, Needs Improvement, Poor
@@ -55,6 +55,7 @@ AI MockPrep addresses this by providing a unified system that no existing tool o
 - Strengths, weaknesses, and actionable improvement suggestions per response
 
 ### Resume Optimization (ATS Analysis)
+
 - Upload PDF or DOCX resumes (up to 25MB)
 - Match resume against a target job description
 - Keyword analysis: matched, missing, and partial keyword identification
@@ -64,6 +65,7 @@ AI MockPrep addresses this by providing a unified system that no existing tool o
 - Composite ATS score using a weighted formula (keyword 30%, semantic 25%, impact 15%, skills 10%, experience 10%, format 10%)
 
 ### Speech Analytics
+
 - Words-per-minute (WPM) measurement
 - Filler word detection and frequency tracking (um, uh, like, basically, etc.)
 - Hesitation pause identification (gaps > 1.5 seconds)
@@ -71,11 +73,13 @@ AI MockPrep addresses this by providing a unified system that no existing tool o
 - AI coaching with a clarity score (0-100) and 3 actionable improvement steps
 
 ### Dashboard & History
+
 - Track all past interviews with role, tech stack, and date
 - View and revisit previous feedback
 - User profile and settings management
 
 ### Authentication
+
 - Firebase authentication with email/password
 - Google OAuth support
 - Email verification flow
@@ -107,36 +111,40 @@ Frontend UI (Next.js 15 / React 19)
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS v4 |
-| Backend | Next.js Server Actions, Next.js API Routes |
-| Database | Firebase Firestore |
-| Authentication | Firebase Auth, Google OAuth |
-| AI - Questions | Hugging Face Inference API (Mistral-7B-Instruct) |
-| AI - Feedback | Google Generative AI (Gemini 1.5-Flash) |
-| AI - Resume | Google Generative AI (Gemini 3-Flash) |
-| Voice AI | VAPI AI |
-| Speech-to-Text | AssemblyAI (universal-3-pro model) |
-| File Parsing | pdfjs-dist (PDF), mammoth (DOCX) |
-| UI Components | Radix UI, Lucide React, Framer Motion |
-| Charts | Recharts |
-| Forms | React Hook Form, Zod |
-| Email | Nodemailer, Resend |
-| Notifications | Sonner |
+| Layer          | Technology                                        |
+| -------------- | ------------------------------------------------- |
+| Frontend       | Next.js 15, React 19, TypeScript, Tailwind CSS v4 |
+| Backend        | Next.js Server Actions, Next.js API Routes        |
+| Database       | Firebase Firestore                                |
+| Authentication | Firebase Auth, Google OAuth                       |
+| AI - Questions | Hugging Face Inference API (Mistral-7B-Instruct)  |
+| AI - Feedback  | Google Generative AI (Gemini 1.5-Flash)           |
+| AI - Resume    | Google Generative AI (Gemini 3-Flash)             |
+| Voice AI       | VAPI AI                                           |
+| Speech-to-Text | AssemblyAI (universal-3-pro model)                |
+| File Parsing   | pdfjs-dist (PDF), mammoth (DOCX)                  |
+| UI Components  | Radix UI, Lucide React, Framer Motion             |
+| Charts         | Recharts                                          |
+| Forms          | React Hook Form, Zod                              |
+| Email          | Nodemailer, Resend                                |
+| Notifications  | Sonner                                            |
 
 ## AI & ML Integrations
 
 ### Question Generation
+
 Uses Hugging Face's Mistral-7B-Instruct model to generate role-specific, level-appropriate interview questions. Falls back to a curated CSV question bank when the API is unavailable.
 
 ### Real-Time Answer Analysis
+
 Google Gemini 1.5-Flash evaluates each candidate response on a 0-10 scale with strict evaluation rules, producing feedback, correct answer templates, strengths, weaknesses, and improvement suggestions. A final analysis aggregates all responses into an overall assessment with a hiring recommendation.
 
 ### Speech Analytics Pipeline
+
 AssemblyAI transcribes audio with word-level timestamps. The system computes WPM, filler word frequency, and hesitation pauses. Google Gemini then generates coaching feedback with a clarity score and actionable improvement steps.
 
 ### Resume Analysis Engine
+
 Google Gemini 3-Flash performs deep resume-to-job-description matching. It evaluates keyword coverage, semantic alignment, bullet point impact, skills fit, experience relevance, and format compliance, producing a composite ATS score.
 
 ## Scoring Model
@@ -144,20 +152,25 @@ Google Gemini 3-Flash performs deep resume-to-job-description matching. It evalu
 The scoring module adapts evaluation weights based on interview type:
 
 **Coding / DSA:**
+
 - Problem Understanding 25% | Logic 30% | Correctness 30% | Efficiency 15%
 
 **Technical Round:**
+
 - Technical Accuracy 40% | Communication 35% | Problem-Solving 20% | Confidence 5%
 
 **Behavioural Interview:**
+
 - Communication 35% | STAR Structure 40% | Tone & Professionalism 25%
 
 **Aptitude Test:**
+
 - Accuracy 50% | Reasoning 30% | Speed 20%
 
 ## Installation & Setup
 
 ### Prerequisites
+
 - Node.js 18+
 - npm
 - A Firebase project
@@ -179,7 +192,6 @@ The scoring module adapts evaluation weights based on interview type:
    ```
 
 3. **Set up Firebase**
-
    - Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
    - Enable Firestore Database
    - Enable Authentication (Email/Password and Google sign-in providers)
@@ -211,6 +223,17 @@ The scoring module adapts evaluation weights based on interview type:
 
    # Email (optional)
    RESEND_API_KEY="your-resend-key"
+
+   # Distributed rate limiting (optional, recommended for production)
+   UPSTASH_REDIS_REST_URL="https://<your-upstash-endpoint>.upstash.io"
+   UPSTASH_REDIS_REST_TOKEN="your-upstash-token"
+
+   # Security telemetry sinks (optional)
+   SECURITY_METRICS_ENABLE_DATADOG="false"
+   DD_API_KEY="your-datadog-api-key"
+   DD_SITE="datadoghq.com"
+   DD_SERVICE="interview-ai-agent"
+   DD_ENV="production"
    ```
 
 5. **Run the development server**
@@ -270,31 +293,31 @@ types/                   # TypeScript interfaces (Interview, Feedback, User, Res
 constants/               # Tech stack mappings and configuration
 ```
 
-
 ### Performance Comparison
 
-| Metric | AI MockPrep (Group A) | Traditional (Group B) |
-|--------|----------------------|----------------------|
-| Communication Clarity | +34% | +12% |
-| Technical Accuracy | +26% | +9% |
-| Behavioural Confidence | +31% | +10% |
-| Filler Word Reduction | 41% lower | 14% lower |
+| Metric                 | AI MockPrep (Group A) | Traditional (Group B) |
+| ---------------------- | --------------------- | --------------------- |
+| Communication Clarity  | +34%                  | +12%                  |
+| Technical Accuracy     | +26%                  | +9%                   |
+| Behavioural Confidence | +31%                  | +10%                  |
+| Filler Word Reduction  | 41% lower             | 14% lower             |
 
 ### Model Performance
 
-| Evaluation Metric | Score |
-|-------------------|-------|
-| Semantic Matching Accuracy | 86% |
-| Speech-to-Text Reliability | 91% |
-| Filler Word Detection | 94% |
-| Sentiment Recognition | 81% |
+| Evaluation Metric          | Score |
+| -------------------------- | ----- |
+| Semantic Matching Accuracy | 86%   |
+| Speech-to-Text Reliability | 91%   |
+| Filler Word Detection      | 94%   |
+| Sentiment Recognition      | 81%   |
 
 ### Quantitative Results
+
 - Overall scoring accuracy: 88%
 - Resume ATS improvement: 53% to 74%
 - 70% of AI MockPrep users reached the recruiter callback stage vs. 30% in the control group
 
-Full details are available in the published paper: *IJERT Vol. 15, Issue 01, January 2026 (IJERTV15IS010560)*.
+Full details are available in the published paper: _IJERT Vol. 15, Issue 01, January 2026 (IJERTV15IS010560)_.
 
 ## Deployment
 
