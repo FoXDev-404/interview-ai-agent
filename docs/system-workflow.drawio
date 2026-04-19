@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  System Workflow Diagram — interview-ai-agent
+  Open with https://app.diagrams.net (draw.io) or the VS Code draw.io extension.
+  Four swimlane groups reflect the four major platform workflows:
+    1. Onboarding Process        (blue)
+    2. Interview Simulation      (orange)
+    3. Resume Builder            (green)
+    4. Feedback & Analytics      (purple)
+-->
+<mxGraphModel
+  dx="1422" dy="762"
+  grid="0" gridSize="10" guides="1"
+  tooltips="1" connect="1" arrows="1" fold="1"
+  page="1" pageScale="1"
+  pageWidth="1654" pageHeight="1169"
+  math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ================================================================
+         TITLE
+         ================================================================ -->
+    <mxCell id="title"
+      value="&lt;b style=&quot;font-size:16px;&quot;&gt;interview-ai-agent — Complete System Workflow&lt;/b&gt;"
+      style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="0" width="540" height="32" as="geometry" />
+    </mxCell>
+
+    <!-- ================================================================
+         GROUP 1 — ONBOARDING PROCESS  (blue)
+         Items: starter + 4 boxes   width = 840
+         ================================================================ -->
+    <mxCell id="c1"
+      value="&lt;b&gt;⚙  ONBOARDING PROCESS&lt;/b&gt;"
+      style="swimlane;startSize=28;fillColor=#dae8fc;strokeColor=#6c8ebf;
+             fontStyle=1;fontSize=10;align=left;spacingLeft=8;
+             rounded=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="44" width="840" height="155" as="geometry" />
+    </mxCell>
+
+    <!-- starter oval -->
+    <mxCell id="c1s"
+      value="User Onboarding"
+      style="ellipse;whiteSpace=wrap;html=1;
+             fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;
+             fontSize=10;fontStyle=1;"
+      vertex="1" parent="c1">
+      <mxGeometry x="15" y="55" width="110" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c1b1"
+      value="Register or Login&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;Firebase Auth / Google OAuth&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#6c8ebf;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c1">
+      <mxGeometry x="155" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c1b2"
+      value="Email Verification&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;Firebase email link&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#6c8ebf;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c1">
+      <mxGeometry x="335" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c1b3"
+      value="Profile Setup&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;syncUserProfile → Firestore&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#6c8ebf;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c1">
+      <mxGeometry x="515" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c1b4"
+      value="Dashboard Access&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;session cookie → proxy.ts&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#6c8ebf;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c1">
+      <mxGeometry x="665" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- edges -->
+    <mxCell id="c1e1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c1s"  target="c1b1" parent="c1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c1e2" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c1b1" target="c1b2" parent="c1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c1e3" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c1b2" target="c1b3" parent="c1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c1e4" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c1b3" target="c1b4" parent="c1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+
+    <!-- ================================================================
+         GROUP 2 — INTERVIEW SIMULATION  (orange)
+         Items: starter + 6 boxes   width = 1180
+         ================================================================ -->
+    <mxCell id="c2"
+      value="&lt;b&gt;🎤  INTERVIEW SIMULATION&lt;/b&gt;"
+      style="swimlane;startSize=28;fillColor=#ffe6cc;strokeColor=#d79b00;
+             fontStyle=1;fontSize=10;align=left;spacingLeft=8;
+             rounded=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="238" width="1180" height="155" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c2s"
+      value="AI Interview Simulation"
+      style="ellipse;whiteSpace=wrap;html=1;
+             fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;
+             fontSize=10;fontStyle=1;"
+      vertex="1" parent="c2">
+      <mxGeometry x="15" y="55" width="110" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c2b1"
+      value="Create Interview Config&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;InterviewForm.tsx&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#d79b00;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c2">
+      <mxGeometry x="155" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c2b2"
+      value="Generate Role-Specific Questions&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;CSV bank → AI fallback&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#d79b00;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c2">
+      <mxGeometry x="335" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c2b3"
+      value="AI Interview Session&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;TTS + Voice Recognition&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#d79b00;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c2">
+      <mxGeometry x="515" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c2b4"
+      value="Real-Time Answer Analysis&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;Google Gemini per answer&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#d79b00;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c2">
+      <mxGeometry x="695" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c2b5"
+      value="Speech Coach &amp; Sentiment&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;lib/speech/coach.ts&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#d79b00;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c2">
+      <mxGeometry x="875" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c2b6"
+      value="Feedback Generation &amp; Storage&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;createFeedback → Firestore&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#d79b00;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c2">
+      <mxGeometry x="1005" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- edges -->
+    <mxCell id="c2e1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c2s"  target="c2b1" parent="c2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c2e2" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c2b1" target="c2b2" parent="c2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c2e3" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c2b2" target="c2b3" parent="c2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c2e4" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c2b3" target="c2b4" parent="c2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c2e5" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c2b4" target="c2b5" parent="c2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c2e6" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c2b5" target="c2b6" parent="c2"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- coding interview sub-note -->
+    <mxCell id="c2note"
+      value="&lt;i&gt;Coding path: Monaco Editor → /api/coding/execute → Judge0 sandbox → AI evaluation&lt;/i&gt;"
+      style="text;html=1;align=left;verticalAlign=middle;resizable=0;
+             fontSize=9;fontColor=#888888;italic=1;"
+      vertex="1" parent="c2">
+      <mxGeometry x="155" y="120" width="1000" height="20" as="geometry" />
+    </mxCell>
+
+
+    <!-- ================================================================
+         GROUP 3 — RESUME BUILDER  (green)
+         Items: starter + 5 boxes   width = 1010
+         ================================================================ -->
+    <mxCell id="c3"
+      value="&lt;b&gt;📄  RESUME BUILDER&lt;/b&gt;"
+      style="swimlane;startSize=28;fillColor=#d5e8d4;strokeColor=#82b366;
+             fontStyle=1;fontSize=10;align=left;spacingLeft=8;
+             rounded=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="432" width="1010" height="155" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c3s"
+      value="Resume Builder"
+      style="ellipse;whiteSpace=wrap;html=1;
+             fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;
+             fontSize=10;fontStyle=1;"
+      vertex="1" parent="c3">
+      <mxGeometry x="15" y="55" width="110" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c3b1"
+      value="Select Template&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;48 designs (modern/ATS/exec…)&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#82b366;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c3">
+      <mxGeometry x="155" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c3b2"
+      value="Edit Resume Content&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;Live preview editor&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#82b366;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c3">
+      <mxGeometry x="335" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c3b3"
+      value="AI Resume Analysis&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;/api/resume/analyze → Gemini&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#82b366;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c3">
+      <mxGeometry x="515" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c3b4"
+      value="ATS Score &amp; Suggestions&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;Keyword &amp; compliance check&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#82b366;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c3">
+      <mxGeometry x="695" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c3b5"
+      value="PDF Export&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;lib/resume-builder/pdf-export.ts&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#82b366;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c3">
+      <mxGeometry x="835" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- edges -->
+    <mxCell id="c3e1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c3s"  target="c3b1" parent="c3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c3e2" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c3b1" target="c3b2" parent="c3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c3e3" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c3b2" target="c3b3" parent="c3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c3e4" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c3b3" target="c3b4" parent="c3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c3e5" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c3b4" target="c3b5" parent="c3"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+
+    <!-- ================================================================
+         GROUP 4 — FEEDBACK AND ANALYTICS PROCESS  (purple)
+         Items: starter + 4 boxes   width = 840
+         ================================================================ -->
+    <mxCell id="c4"
+      value="&lt;b&gt;📊  FEEDBACK AND ANALYTICS PROCESS&lt;/b&gt;"
+      style="swimlane;startSize=28;fillColor=#e1d5e7;strokeColor=#9673a6;
+             fontStyle=1;fontSize=10;align=left;spacingLeft=8;
+             rounded=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="626" width="860" height="155" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c4s"
+      value="Feedback &amp; Analytics"
+      style="ellipse;whiteSpace=wrap;html=1;
+             fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;
+             fontSize=10;fontStyle=1;"
+      vertex="1" parent="c4">
+      <mxGeometry x="15" y="55" width="110" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c4b1"
+      value="Generate AI Feedback Report&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;FeedbackDisplay.tsx&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#9673a6;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c4">
+      <mxGeometry x="155" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c4b2"
+      value="Speech Analytics Dashboard&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;AssemblyAI + filler analysis&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#9673a6;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c4">
+      <mxGeometry x="335" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c4b3"
+      value="Leaderboard &amp; Ranking&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;leaderboard.action.ts&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#9673a6;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c4">
+      <mxGeometry x="515" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="c4b4"
+      value="Track Progress Over Time&lt;br/&gt;&lt;font color=&quot;#888888&quot; style=&quot;font-size:8px;&quot;&gt;Profile + interview history&lt;/font&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;
+             fillColor=#ffffff;strokeColor=#9673a6;
+             fontSize=10;arcSize=15;"
+      vertex="1" parent="c4">
+      <mxGeometry x="695" y="55" width="150" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- edges -->
+    <mxCell id="c4e1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c4s"  target="c4b1" parent="c4"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c4e2" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c4b1" target="c4b2" parent="c4"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c4e3" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c4b2" target="c4b3" parent="c4"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="c4e4" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="c4b3" target="c4b4" parent="c4"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+
+    <!-- ================================================================
+         CROSS-GROUP CONNECTORS  (dashed, outside containers)
+         ================================================================ -->
+    <!-- Onboarding → Interview Simulation -->
+    <mxCell id="xg12"
+      value=""
+      style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;dashPattern=6 4;
+             strokeColor=#999999;exitX=1;exitY=0.5;exitDx=0;exitDy=0;
+             entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+      edge="1" source="c1b4" target="c2b1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="920" y="148" />
+          <mxPoint x="920" y="199" />
+          <mxPoint x="220" y="199" />
+          <mxPoint x="220" y="320" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Interview Simulation → Feedback & Analytics -->
+    <mxCell id="xg24"
+      value=""
+      style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;dashPattern=6 4;
+             strokeColor=#999999;exitX=1;exitY=0.5;exitDx=0;exitDy=0;
+             entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+      edge="1" source="c2b6" target="c4b1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1230" y="315" />
+          <mxPoint x="1230" y="400" />
+          <mxPoint x="240" y="400" />
+          <mxPoint x="240" y="695" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Resume Builder → Feedback & Analytics -->
+    <mxCell id="xg34"
+      value=""
+      style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;dashPattern=6 4;
+             strokeColor=#999999;exitX=1;exitY=0.5;exitDx=0;exitDy=0;
+             entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+      edge="1" source="c3b5" target="c4b1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1060" y="510" />
+          <mxPoint x="1060" y="590" />
+          <mxPoint x="240" y="590" />
+          <mxPoint x="240" y="695" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+
+    <!-- ================================================================
+         LEGEND
+         ================================================================ -->
+    <mxCell id="legend"
+      value="Legend"
+      style="swimlane;startSize=22;fillColor=#f8f8f8;strokeColor=#cccccc;
+             fontStyle=1;fontSize=10;align=left;spacingLeft=6;rounded=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="1300" y="44" width="260" height="200" as="geometry" />
+    </mxCell>
+
+    <mxCell id="leg1" value="Onboarding Process" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="legend">
+      <mxGeometry x="10" y="32" width="155" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="leg2" value="Interview Simulation" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=9;" vertex="1" parent="legend">
+      <mxGeometry x="10" y="68" width="155" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="leg3" value="Resume Builder" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;" vertex="1" parent="legend">
+      <mxGeometry x="10" y="104" width="155" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="leg4" value="Feedback &amp; Analytics" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="legend">
+      <mxGeometry x="10" y="140" width="155" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="leg5" value="Cross-flow handoff" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=6 4;strokeColor=#999999;fontSize=9;" edge="1" parent="legend">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="10"  y="180" as="sourcePoint" />
+        <mxPoint x="165" y="180" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+  </root>
+</mxGraphModel>
