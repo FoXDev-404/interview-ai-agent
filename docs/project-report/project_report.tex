@@ -77,11 +77,32 @@
 \makenomenclature
 
 % ── Header/Footer ─────────────────────────────────────────
+% Default style for main-body pages (arabic numbering)
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[R]{\leftmark}
-\fancyfoot[C]{\thepage}
-\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\textit{AI MockPrep}}   % Left header: project short title
+\fancyhead[R]{\small\nouppercase{\leftmark}} % Right header: current chapter name
+\fancyfoot[C]{\thepage}                      % Centre footer: page number
+\renewcommand{\headrulewidth}{0.4pt}         % Rule below header
+\renewcommand{\footrulewidth}{0.4pt}         % Rule above footer
+
+% Plain style – used automatically on the first page of every \chapter
+% Shows page number at bottom centre; no header or header rule
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[C]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0.4pt}%
+}
+
+% Frontmatter style – roman-numbered preliminary pages
+% Shows page number at bottom centre; no header
+\fancypagestyle{frontmatter}{%
+  \fancyhf{}%
+  \fancyfoot[C]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0.4pt}%
+}
 
 % ── Chapter Title Formatting ──────────────────────────────
 \titleformat{\chapter}[display]
@@ -104,6 +125,7 @@
 % ────────────────────────────────────────────────────────────
 \pagenumbering{roman}
 \setcounter{page}{0}
+\pagestyle{frontmatter}
 
 % ── Cover Page ─────────────────────────────────────────────
 \begin{titlepage}
@@ -180,7 +202,6 @@ Noida -- 201301\\[12pt]
 
 % ── Declaration ────────────────────────────────────────────
 \newpage
-\thispagestyle{empty}
 \begin{center}
 {\Large\bfseries DECLARATION}
 \end{center}
@@ -201,7 +222,6 @@ The matter presented in this project report, in full or part, has not been submi
 
 % ── Certificate ────────────────────────────────────────────
 \newpage
-\thispagestyle{empty}
 \begin{center}
 {\Large\bfseries CERTIFICATE}
 \end{center}
@@ -226,7 +246,6 @@ Designation & Designation \\
 
 % ── Acknowledgements ──────────────────────────────────────
 \newpage
-\thispagestyle{empty}
 \begin{center}
 {\Large\bfseries ACKNOWLEDGEMENTS}
 \end{center}
@@ -254,7 +273,6 @@ Finally, we express our deep appreciation to our families and friends for their 
 
 % ── Abstract ──────────────────────────────────────────────
 \newpage
-\thispagestyle{empty}
 \begin{center}
 {\Large\bfseries ABSTRACT}
 \end{center}
@@ -346,6 +364,7 @@ WPM   & Words Per Minute \\
 \newpage
 \pagenumbering{arabic}
 \setcounter{page}{1}
+\pagestyle{fancy}
 
 \chapter{Introduction}
 \label{ch:introduction}
