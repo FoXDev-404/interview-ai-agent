@@ -15,10 +15,10 @@
 \usepackage{geometry}
 \geometry{
   a4paper,
-  left   = 4cm,
-  right  = 2.5cm,
-  top    = 2.5cm,
-  bottom = 2.5cm
+  top    = 1in,
+  bottom = 1in,
+  left   = 1.25in,
+  right  = 1.25in
 }
 
 % ── Graphics, Tables, Floats ──────────────────────────────
@@ -487,71 +487,426 @@ AI MockPrep finds applications across diverse sectors:
 \section{Report Organisation}
 \label{sec:organisation}
 
-This report is organised into six chapters:
+This report is organised into seven chapters:
 
 \begin{itemize}
-  \item \textbf{Chapter~\ref{ch:introduction}} introduces the background, motivation, problem statement, objectives, and scope.
-  \item \textbf{Chapter~\ref{ch:literature}} presents a comprehensive literature survey of related work, existing systems, and identified research gaps.
-  \item \textbf{Chapter~\ref{ch:design}} details the system architecture, module design, data models, and design patterns.
-  \item \textbf{Chapter~\ref{ch:implementation}} describes the implementation methodology, module-wise development, algorithms, and technology integration.
-  \item \textbf{Chapter~\ref{ch:results}} presents testing methodology, performance metrics, result analysis, and comparative evaluation.
-  \item \textbf{Chapter~\ref{ch:conclusion}} summarizes achievements, contributions, limitations, and future enhancement roadmap.
+  \item \textbf{Chapter~\ref{ch:introduction}} introduces the background, motivation, literature review, problem definition, project overview, proposed modules, and hardware and software requirements.
+  \item \textbf{Chapter~\ref{ch:system_analysis}} presents the system analysis and specification: functional model, data model (Firestore schema and ER diagram), process flow (DFD Levels 0--2), behavioral model, and feasibility analysis.
+  \item \textbf{Chapter~\ref{ch:module_impl}} details the high-level design of all six core modules: Authentication, Interview Engine, Coding Engine, Speech Coach, Resume Analyzer, and Feedback System.
+  \item \textbf{Chapter~\ref{ch:impl_detail}} covers the detailed, code-level implementation methodology: Agile sprint process, module-wise code walkthroughs, scoring formulas, and API integration patterns.
+  \item \textbf{Chapter~\ref{ch:task_analysis}} presents the task decomposition (WBS), project schedule (Gantt chart), and key milestones.
+  \item \textbf{Chapter~\ref{ch:testing}} covers testing methodology, test cases, user acceptance testing, performance benchmarks, and comparative evaluation.
+  \item \textbf{Chapter~\ref{ch:project_mgmt}} summarizes project management: risk register, mitigation strategies, learning outcomes, results achieved, and concluding remarks with future scope.
 \end{itemize}
+
+
+\section{Literature Review}
+\label{sec:ch1_litreview}
+
+A survey of prominent AI-driven career preparation platforms reveals the state of the art and identifies the key research gaps that AI MockPrep addresses.
+
+\subsection{Existing Platforms}
+\textbf{Final Round AI}~\cite{ref_finalroundai} provides avatar-based interview simulation using GPT models but lacks domain-specific technical customisation, ATS resume analysis, and coding assessment. \textbf{Google Interview Warmup}~\cite{ref_google_warmup} offers NLP-based response analysis across predefined career tracks with no personalisation or quantitative rubric. \textbf{Huru AI}~\cite{ref_huru} introduces video-based non-verbal analysis but omits speech analytics and resume optimisation. \textbf{Pramp}~\cite{ref_pramp} enables peer-to-peer mock sessions with no AI evaluation and inconsistent quality. \textbf{Teal AI}~\cite{ref_teal} focuses on resume building and job tracking without interview simulation or speech coaching.
+
+\subsection{Identified Research Gaps}
+\begin{enumerate}
+  \item No existing platform unifies interview simulation, rubric-based real-time evaluation, speech analytics, ATS resume analysis, and live coding assessment in a single system.
+  \item Interview-type-aware evaluation weighting (STAR structure for behavioural; correctness for coding) is absent in all reviewed platforms.
+  \item Quantitative speech metrics (WPM, filler frequency, pacing consistency, hesitation detection) are not provided by any mainstream interview preparation tool.
+  \item No composite ATS scoring model mirroring actual vendor strategies is available in an open, integrated platform.
+\end{enumerate}
+
+
+\section{Project Overview}
+\label{sec:project_overview}
+
+\textbf{AI MockPrep} is a unified, cloud-deployed, full-stack web application that integrates every facet of interview and career preparation under one platform. Users interact with the system through a responsive Next.js 15 frontend; all server-side business logic is encapsulated in Next.js Server Actions and API Routes; AI evaluation and generation are delegated to best-in-class cloud APIs; and all data is persisted in Firebase Firestore with Firebase Authentication securing every route.
+
+The platform delivers six distinct functional workflows:
+\begin{enumerate}
+  \item \textbf{AI Interview Simulation} -- adaptive, role-specific mock interviews with real-time rubric-based evaluation.
+  \item \textbf{Speech Analytics} -- quantitative analysis of WPM, filler words, pacing, and confidence.
+  \item \textbf{Resume Analysis} -- ATS compliance scoring with AI-generated improvement suggestions and bullet-point rewrites.
+  \item \textbf{Resume Builder} -- template-driven resume creation with 48 design variants and cloud persistence.
+  \item \textbf{Coding Interview} -- multi-language in-browser coding environment with automated test-case execution.
+  \item \textbf{Leaderboard \& Progress Tracking} -- competitive ranking and longitudinal performance monitoring.
+\end{enumerate}
+
+The system is deployed on Vercel and accessible at \url{https://ai-mockprep.vercel.app}.
+
+
+\section{Proposed Modules}
+\label{sec:proposed_modules}
+
+The system is decomposed into six primary modules:
+
+\begin{table}[H]
+\centering
+\caption{Proposed System Modules}
+\label{tab:modules}
+\begin{tabular}{|p{3.5cm}|p{5cm}|p{5cm}|}
+\hline
+\textbf{Module} & \textbf{Functionality} & \textbf{Key Technologies} \\
+\hline
+Authentication & User registration, login, session management, email verification & Firebase Auth, Next.js Middleware \\
+\hline
+Interview Engine & Adaptive question generation, voice/text delivery, real-time answer evaluation & Hugging Face Mistral-7B, Google Gemini 1.5-Flash, VAPI AI \\
+\hline
+Coding Engine & In-browser code editor, multi-language execution, test-case validation, AI code review & Monaco Editor, Judge0, Google Gemini \\
+\hline
+Speech Coach & Audio transcription, WPM computation, filler detection, hesitation analysis, coaching feedback & AssemblyAI, Web Speech API, Google Gemini \\
+\hline
+Resume Analyzer & PDF/DOCX parsing, ATS composite scoring, keyword analysis, AI bullet-point rewrites & pdfjs-dist, mammoth, Google Gemini 3-Flash \\
+\hline
+Feedback System & Comprehensive interview feedback, leaderboard, progress tracking & Google Gemini, Firebase Firestore \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\section{Hardware and Software Requirements}
+\label{sec:hw_sw_requirements}
+
+\subsection{Hardware Requirements}
+
+\begin{table}[H]
+\centering
+\caption{Minimum and Recommended Hardware Requirements}
+\label{tab:hardware}
+\begin{tabular}{|p{3.5cm}|p{5cm}|p{5cm}|}
+\hline
+\textbf{Component} & \textbf{Minimum} & \textbf{Recommended} \\
+\hline
+Processor & Intel Core i3 / AMD Ryzen 3 (2 GHz) & Intel Core i5 / AMD Ryzen 5 (3 GHz+) \\
+\hline
+RAM & 4 GB & 8 GB or above \\
+\hline
+Storage & 1 GB free (browser + cache) & SSD with 5 GB free \\
+\hline
+Display & 1024 $\times$ 768 resolution & 1920 $\times$ 1080 (Full HD) \\
+\hline
+Microphone & Any built-in or USB microphone & Noise-cancelling USB microphone \\
+\hline
+Internet & 2 Mbps (for AI API calls) & 10 Mbps+ broadband \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Software Requirements}
+
+\begin{table}[H]
+\centering
+\caption{Software Requirements}
+\label{tab:software}
+\begin{tabular}{|p{4cm}|p{5cm}|p{4.5cm}|}
+\hline
+\textbf{Component} & \textbf{Tool / Version} & \textbf{Purpose} \\
+\hline
+Runtime & Node.js 20.x LTS & Server-side execution \\
+\hline
+Framework & Next.js 15.1.4 & Full-stack web framework \\
+\hline
+UI Library & React 19.0 & Component-based UI rendering \\
+\hline
+Database & Firebase Firestore & NoSQL cloud data persistence \\
+\hline
+Authentication & Firebase Auth 10.x & User identity management \\
+\hline
+AI --- Question Gen. & Hugging Face Inference API & Mistral-7B-Instruct \\
+\hline
+AI --- Evaluation & Google Generative AI SDK & Gemini 1.5-Flash \\
+\hline
+AI --- Speech & AssemblyAI API & Audio transcription \& analytics \\
+\hline
+AI --- Voice & VAPI AI & Voice interview delivery \\
+\hline
+Code Editor & Monaco Editor & In-browser IDE \\
+\hline
+Deployment & Vercel & Serverless hosting \\
+\hline
+Package Manager & npm 10.x & Dependency management \\
+\hline
+Version Control & Git / GitHub & Source code management \\
+\hline
+\end{tabular}
+\end{table}
 
 
 % ────────────────────────────────────────────────────────────
 %                       CHAPTER 2
 % ────────────────────────────────────────────────────────────
-\chapter{Literature Review}
-\label{ch:literature}
+\chapter{System Analysis and Specification}
+\label{ch:system_analysis}
 
-\section{Introduction to Literature Survey}
+\section{Introduction to System Analysis}
 
-The literature review examines five key domains relevant to AI MockPrep: (i)~AI-powered interview platforms, (ii)~Natural Language Processing for assessment, (iii)~speech analytics in professional communication, (iv)~resume optimisation and ATS technology, and (v)~real-time feedback systems. This survey identifies the individual strengths and collective limitations of existing approaches, establishing the research gap that AI MockPrep addresses.
+This chapter presents the complete analysis and specification of AI MockPrep. It covers the functional model, data model (including the entity-relationship schema), process flow model (DFD Levels 0, 1, and 2), behavioral model, and feasibility analysis. The analysis is informed by the requirements identified in Chapter~\ref{ch:introduction} and the research gaps exposed by the literature survey.
 
-\section{AI-Powered Interview Platforms}
+\section{Functional Model}
+\label{sec:functional_model}
 
-\subsection{Final Round AI}
-Final Round AI~\cite{ref_finalroundai} offers an avatar-based interview simulation with real-time conversational AI. The platform employs GPT-based models for dynamic question generation and provides feedback on communication style. However, Final Round AI focuses predominantly on behavioural interviews without technical customisation for specific technology stacks. The platform lacks resume analysis, speech analytics, and coding assessment capabilities, limiting its utility for comprehensive interview preparation.
+The functional model describes the behavioural requirements of AI MockPrep from the user's perspective. The system provides the following primary functions:
 
-\subsection{Google Interview Warmup}
-Google Interview Warmup~\cite{ref_google_warmup} provides a minimalist interview practice tool with AI-evaluated responses. Users select from predefined career tracks (Data Analytics, UX Design, IT Support) and answer domain-specific questions. The system analyses responses for talking points, most-used words, and job-related terms. However, the platform offers only basic analysis without personalisation, adaptive difficulty, or quantitative scoring. There is no support for voice-based interviews, resume analysis, or coding assessment.
+\begin{enumerate}
+  \item \textbf{User Management:} Registration, authentication, profile management, email verification, and session handling.
+  \item \textbf{Interview Management:} Create, configure, start, pause, and complete interview sessions of four types (Technical, Behavioural, Mixed, Coding/DSA).
+  \item \textbf{Question Generation:} Generate role-specific and level-appropriate questions using Hugging Face Mistral-7B with a CSV-based fallback.
+  \item \textbf{Answer Evaluation:} Evaluate each candidate response in real time using Google Gemini with a four-dimensional rubric.
+  \item \textbf{Speech Analysis:} Transcribe audio, compute WPM, detect filler words, identify hesitation pauses, and generate speech coaching feedback.
+  \item \textbf{Resume Analysis:} Parse uploaded PDF/DOCX resumes, score ATS compliance, identify keyword gaps, and generate AI-written rewrites.
+  \item \textbf{Resume Building:} Create, edit, preview, and export resumes using a template-driven builder with 48 design variants.
+  \item \textbf{Coding Assessment:} Present algorithmic problems, execute submitted code, validate against test cases, and provide AI code feedback.
+  \item \textbf{Feedback and Progress:} Generate comprehensive post-interview feedback reports and maintain longitudinal performance history.
+  \item \textbf{Leaderboard:} Maintain a competitive ranking of users by composite score across all interview sessions.
+\end{enumerate}
 
-\subsection{Huru AI}
-Huru AI~\cite{ref_huru} provides body language assessment through video analysis, evaluating eye contact, posture, and facial expressions during mock interviews. The platform offers valuable non-verbal feedback that most competitors lack. However, Huru AI does not integrate resume optimisation, speech analytics with quantitative metrics, or coding interview capabilities. The feedback is qualitative rather than rubric-based, limiting objective performance tracking.
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{3cm}
+\textbf{[INSERT: Use Case Diagram]}\\
+\textit{Actors: User, Recruiter (external) --- Use Cases: Register, Login, Create Interview, Generate Questions, Evaluate Answer, Analyse Speech, Analyse Resume, Build Resume, Code Interview, View Feedback, View Leaderboard}
+\vspace{3cm}}}
+\caption{Use Case Diagram -- AI MockPrep}
+\label{fig:use_case}
+\end{figure}
 
-\subsection{Pramp}
-Pramp~\cite{ref_pramp} facilitates peer-to-peer mock interviews, matching candidates with other job seekers for mutual practice sessions. While this approach provides valuable interpersonal dynamics, it is fundamentally non-AI-driven, relies on the subjective assessment of untrained peers, and cannot guarantee availability, consistency, or domain expertise. The platform lacks resume analysis, speech analytics, and adaptive question generation.
 
-\subsection{Teal AI}
-Teal AI~\cite{ref_teal} focuses on resume building and job tracking with AI-assisted content suggestions. The platform offers ATS-friendly templates and keyword optimisation. However, Teal AI lacks immersive interview simulation environments, emotional/sentiment feedback, and speech analytics capabilities, functioning primarily as a career management tool rather than a comprehensive preparation platform.
+\section{Data Model}
+\label{sec:data_model}
 
-\section{NLP in Interview Assessment}
+\subsection{Firestore Collection Schema}
 
-\subsection{Transformer-Based Models for Question Generation}
-Lee~\cite{ref_lee2024} demonstrated that transformer-based models, particularly those fine-tuned on domain-specific corpora, can generate contextually appropriate interview questions with 89\% relevance ratings from human evaluators. The study employed Mistral-7B-Instruct with role-specific prompt engineering, achieving superior question diversity compared to template-based approaches.
+AI MockPrep uses Firebase Firestore with three primary collections:
 
-\subsection{Sentiment Analysis in Professional Communication}
-Kumar et al.~\cite{ref_kumar2024} developed a real-time sentiment analysis framework for evaluating interview responses. Their approach achieved 86\% accuracy in classifying candidate confidence levels using a combination of linguistic features (hedging patterns, assertive language) and prosodic cues (pitch variation, speech rate). The framework, however, required dedicated training on interview-specific datasets, limiting its generalisability.
+\begin{table}[H]
+\centering
+\caption{Firestore \texttt{users} Collection Schema}
+\label{tab:schema_users}
+\begin{tabular}{|p{3.5cm}|p{2.5cm}|p{7cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+\hline
+uid & String & Firebase Authentication UID (document ID) \\
+\hline
+name & String & User's full name \\
+\hline
+email & String & Email address \\
+\hline
+photoURL & String & Profile picture URL \\
+\hline
+createdAt & Timestamp & Account creation timestamp \\
+\hline
+emailVerified & Boolean & Email verification status \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsection{Conversational AI and Dynamic Questioning}
-Zhang and Rodriguez~\cite{ref_zhang2023} explored transformer-based models for context-aware conversational understanding in interview settings. Their approach maintained coherent multi-turn conversations, dynamically adapting questions based on candidate responses. The research highlighted the importance of maintaining question context across a session, though scalable deployment remained a challenge.
+\begin{table}[H]
+\centering
+\caption{Firestore \texttt{interviews} Collection Schema}
+\label{tab:schema_interviews}
+\begin{tabular}{|p{3.5cm}|p{2.5cm}|p{7cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+\hline
+id & String & Auto-generated document ID \\
+\hline
+userId & String & Reference to users.uid \\
+\hline
+role & String & Target job role \\
+\hline
+type & String & Interview type (Technical / Behavioural / Mixed / Coding) \\
+\hline
+level & String & Experience level (Junior / Mid / Senior) \\
+\hline
+techstack & Array$<$String$>$ & Selected technology stack \\
+\hline
+questions & Array$<$String$>$ & Generated question set \\
+\hline
+finalized & Boolean & Whether the interview has been completed \\
+\hline
+createdAt & Timestamp & Session creation timestamp \\
+\hline
+\end{tabular}
+\end{table}
 
-\section{Speech Analytics}
+\begin{table}[H]
+\centering
+\caption{Firestore \texttt{feedback} Collection Schema}
+\label{tab:schema_feedback}
+\begin{tabular}{|p{3.5cm}|p{2.5cm}|p{7cm}|}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+\hline
+id & String & Auto-generated document ID \\
+\hline
+interviewId & String & Reference to interviews.id \\
+\hline
+userId & String & Reference to users.uid \\
+\hline
+totalScore & Number & Composite interview score (0--100) \\
+\hline
+categoryScores & Object & Per-dimension scores (Technical, Clarity, Problem-Solving, Depth) \\
+\hline
+strengths & Array$<$String$>$ & Identified strengths \\
+\hline
+areasForImprovement & Array$<$String$>$ & Improvement areas \\
+\hline
+finalAssessment & String & Overall assessment narrative \\
+\hline
+createdAt & Timestamp & Feedback generation timestamp \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsection{Real-Time Speech Processing}
-Chen~\cite{ref_chen2024} demonstrated that machine learning models can achieve 91\% accuracy in real-time speech-to-text transcription when combined with word-level timestamp alignment. The study used AssemblyAI's universal model for transcription and developed custom algorithms for computing WPM segments, filler word detection, and hesitation pause identification.
+\subsection{Entity-Relationship Diagram}
 
-\subsection{Filler Word Detection}
-Research by Martinez and Brown~\cite{ref_martinez2024} established that automated filler word detection with frequency tracking provides actionable feedback that reduces filler usage by an average of 41\% over six practice sessions. Their system detected common fillers (um, uh, like, basically, actually, literally) and phrasal fillers (you know, kind of, sort of, I mean) with 94\% precision.
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{4cm}
+\textbf{[INSERT: ER Diagram]}\\
+\textit{Entities: User (uid, name, email) --- Interview (id, userId, role, type, level) --- Feedback (id, interviewId, userId, totalScore) --- Resume (id, userId, template, content) --- SpeechReport (id, userId, wpm, fillerCount, clarityScore)}\\
+\textit{Relationships: User \textbf{creates} many Interviews; Interview \textbf{has} one Feedback; User \textbf{owns} many Resumes; User \textbf{generates} many SpeechReports}
+\vspace{4cm}}}
+\caption{Entity-Relationship Diagram -- AI MockPrep Data Model}
+\label{fig:er_diagram}
+\end{figure}
 
-\section{Resume Optimisation and ATS Technology}
 
-\subsection{Keyword-Based ATS Filtering}
-Rodriguez and Kim~\cite{ref_rodriguez2024} analysed the algorithmic filtering strategies employed by major ATS vendors (Taleo, Greenhouse, Lever, Workday). Their study found that keyword matching accounts for approximately 30\% of the filtering decision, semantic alignment contributes 25\%, and format compliance accounts for 10\%. This empirical distribution informed the composite scoring weights adopted in AI MockPrep.
+\section{Process Flow Model (DFD)}
+\label{sec:dfd}
 
-\subsection{AI-Generated Bullet Point Rewrites}
-Recent work by Smith and Johnson~\cite{ref_smith2024} demonstrated that AI-generated resume bullet point rewrites, incorporating action verbs, quantifiable metrics, and impact-oriented language, improve recruiter response rates by 38\%. Their approach used large language models to transform weak, passive bullet points into strong, metrics-driven statements.
+\subsection{DFD Level 0 -- Context Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{3.5cm}
+\textbf{[INSERT: DFD Level 0]}\\
+\textit{External Entities: Candidate, Admin, AI Services (HF, Gemini, AssemblyAI, VAPI)\\
+Central Process: AI MockPrep System\\
+Flows: Candidate $\rightarrow$ Login / Interview Config / Resume / Audio; System $\rightarrow$ Feedback / Scores; AI Services $\leftrightarrow$ System (questions, evaluation, transcription)}
+\vspace{3.5cm}}}
+\caption{DFD Level 0 -- Context Diagram}
+\label{fig:dfd0}
+\end{figure}
+
+\subsection{DFD Level 1 -- System Decomposition}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{4cm}
+\textbf{[INSERT: DFD Level 1]}\\
+\textit{Processes: 1.0 Authentication, 2.0 Interview Management, 3.0 Question Generation, 4.0 Answer Evaluation, 5.0 Speech Analysis, 6.0 Resume Analysis, 7.0 Feedback Generation\\
+Data Stores: D1 Users, D2 Interviews, D3 Feedback, D4 Resumes\\
+All processes read/write to corresponding data stores; processes 3.0 and 4.0 interface with external AI APIs}
+\vspace{4cm}}}
+\caption{DFD Level 1 -- System Decomposition}
+\label{fig:dfd1}
+\end{figure}
+
+\subsection{DFD Level 2 -- Interview Simulation Sub-Process}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{4cm}
+\textbf{[INSERT: DFD Level 2 -- Process 2.0 Interview Management]}\\
+\textit{Sub-processes: 2.1 Create Interview, 2.2 Fetch Questions, 2.3 Conduct Session, 2.4 Capture Answers, 2.5 Evaluate Answers, 2.6 Finalise \& Store Feedback\\
+Data flows: Config $\rightarrow$ 2.1 $\rightarrow$ D2; D2 $\rightarrow$ 2.2 $\rightarrow$ HF API $\rightarrow$ questions; Answers $\rightarrow$ 2.5 $\rightarrow$ Gemini API $\rightarrow$ scores $\rightarrow$ 2.6 $\rightarrow$ D3}
+\vspace{4cm}}}
+\caption{DFD Level 2 -- Interview Simulation Sub-Process}
+\label{fig:dfd2}
+\end{figure}
+
+
+\section{Behavioral Model}
+\label{sec:behavioral}
+
+The behavioral model captures the dynamic aspects of the system through state transitions for the primary interview session workflow.
+
+\subsection{State Transition Diagram -- Interview Session}
+
+An interview session passes through the following states:
+
+\begin{enumerate}
+  \item \textbf{IDLE} -- User has not initiated any interview.
+  \item \textbf{CONFIGURING} -- User fills the interview form (role, level, type, techstack).
+  \item \textbf{GENERATING} -- System requests questions from Hugging Face Mistral-7B; user sees loading indicator.
+  \item \textbf{PREVIEWING} -- Questions rendered; user reviews before starting.
+  \item \textbf{IN\_PROGRESS} -- Active interview session; questions served one at a time.
+  \item \textbf{EVALUATING} -- Answer submitted; Gemini evaluates and returns score.
+  \item \textbf{COMPLETED} -- All questions answered; final analysis triggered.
+  \item \textbf{FEEDBACK\_GENERATED} -- Comprehensive feedback stored in Firestore; user redirected to feedback page.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{3.5cm}
+\textbf{[INSERT: State Transition Diagram]}\\
+\textit{States and transitions as enumerated above; timeout transitions from IN\_PROGRESS $\rightarrow$ EVALUATING after 60 s}
+\vspace{3.5cm}}}
+\caption{State Transition Diagram -- Interview Session Lifecycle}
+\label{fig:state_machine}
+\end{figure}
+
+
+\section{System Design (Feasibility Analysis)}
+\label{sec:feasibility}
+
+\subsection{Technical Feasibility}
+
+The technology stack is entirely composed of production-grade, battle-tested tools:
+
+\begin{itemize}
+  \item \textbf{Next.js 15 / React 19:} Stable LTS release with active community support; supports Server Components, Server Actions, and App Router.
+  \item \textbf{Firebase:} Google-managed infrastructure with 99.95\% SLA; Firestore scales automatically to millions of concurrent reads.
+  \item \textbf{Hugging Face Inference API:} Hosted model inference with no GPU infrastructure required.
+  \item \textbf{Google Gemini API:} Enterprise-grade availability; rate limits of 60 RPM on the free tier are sufficient for a prototype.
+  \item \textbf{AssemblyAI:} 94\% word-level accuracy on English speech; REST API with sub-200 ms latency.
+  \item \textbf{Vercel:} Zero-config CI/CD deployment; edge functions with global CDN.
+\end{itemize}
+
+\textbf{Conclusion:} Technically feasible. All required infrastructure and APIs are available, stable, and documented.
+
+\subsection{Operational Feasibility}
+
+The system is designed to be operationally simple:
+\begin{itemize}
+  \item No server administration; all infrastructure is managed (Firebase + Vercel).
+  \item Web-only interface; no installation required by end users.
+  \item Role-based access controlled through session cookies; no complex IAM required.
+  \item All AI API keys managed as Vercel environment variables; rotation is one-step.
+\end{itemize}
+
+\textbf{Conclusion:} Operationally feasible. A single developer can maintain the system with minimal operational overhead.
+
+\subsection{Economic Feasibility}
+
+\begin{table}[H]
+\centering
+\caption{Cost Analysis -- AI MockPrep Monthly Operational Costs}
+\label{tab:cost_analysis}
+\begin{tabular}{|p{4cm}|p{4cm}|p{5.5cm}|}
+\hline
+\textbf{Service} & \textbf{Free Tier} & \textbf{Estimated Usage (Prototype)} \\
+\hline
+Firebase Firestore & 1 GB storage, 50K reads/day & 100 MB, 5K reads/day → \$0 \\
+\hline
+Firebase Auth & Unlimited users & 500 users → \$0 \\
+\hline
+Hugging Face Inference & 30K tokens/month & 20K tokens/month → \$0 \\
+\hline
+Google Gemini API & 60 RPM, 1M tokens/month & 500K tokens/month → \$0 \\
+\hline
+AssemblyAI & 5 hours free transcription & 3 hours/month → \$0 \\
+\hline
+Vercel & Hobby: unlimited deployments & 1 project → \$0 \\
+\hline
+\textbf{Total Monthly Cost} & --- & \textbf{\$0 (prototype)} \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Conclusion:} Economically feasible. The prototype operates entirely within free tiers. Scaling to 1,000 monthly active users would require approximately \$15--25/month.
 
 \section{Comparative Analysis of Existing Systems}
 
@@ -580,26 +935,12 @@ Jobscan & ATS keyword matching & Precise keyword gap analysis & Resume-only; no 
 \end{tabular}
 \end{table}
 
-\section{Research Gap Identification}
-
-The literature survey reveals the following critical gaps:
-
-\begin{enumerate}
-  \item \textbf{No Unified Platform:} No existing system combines interview simulation, real-time rubric-based evaluation, speech analytics, ATS resume analysis, coding assessment, and a resume builder within a single platform.
-  \item \textbf{Absence of Interview-Type-Aware Scoring:} Existing platforms apply uniform evaluation criteria regardless of interview type. Interview-type-specific weighting (e.g., STAR structure for behavioural, correctness for coding) is absent.
-  \item \textbf{Limited Quantitative Speech Analytics:} While speech transcription exists, comprehensive quantitative metrics (WPM segments, pacing consistency, filler frequency per 100 words, adaptive hesitation thresholds) are not available in interview preparation tools.
-  \item \textbf{No Composite ATS Scoring:} Resume analysis tools either focus on keyword matching or format compliance, but do not provide composite scoring models that mirror actual ATS evaluation strategies.
-  \item \textbf{Lack of Coding Assessment Integration:} Interview platforms either focus on verbal interviews or coding challenges, but not both within a unified workflow.
-\end{enumerate}
-
-AI MockPrep addresses all five gaps by providing a unified, accessible, AI-driven platform that integrates all essential preparation modules.
-
 
 % ────────────────────────────────────────────────────────────
 %                       CHAPTER 3
 % ────────────────────────────────────────────────────────────
-\chapter{System Design and Architecture}
-\label{ch:design}
+\chapter{Module Implementation and Integration}
+\label{ch:module_impl}
 
 \section{System Overview}
 
@@ -836,12 +1177,12 @@ The Firestore data model consists of five primary collections:
 % ────────────────────────────────────────────────────────────
 %                       CHAPTER 4
 % ────────────────────────────────────────────────────────────
-\chapter{Implementation and Methodology}
-\label{ch:implementation}
+\chapter{Implementation Details}
+\label{ch:impl_detail}
 
 \section{Development Methodology}
 
-AI MockPrep was developed using an \textbf{Agile} methodology with iterative sprint cycles of two weeks each. The development process followed these phases:
+AI MockPrep was developed using an \textbf{Agile} methodology with iterative sprint cycles of two weeks each. Each sprint followed a test-driven approach: unit tests were written alongside features and integration tests were executed at sprint completion. The development process comprised sixteen two-week sprints spanning August 2025 to April 2026.
 
 \begin{enumerate}
   \item \textbf{Sprint 1--2:} Requirement analysis, system architecture design, technology stack selection, and Firebase project setup.
@@ -1223,8 +1564,120 @@ AI APIs & Hugging Face, Google Gemini, VAPI AI, AssemblyAI \\
 % ────────────────────────────────────────────────────────────
 %                       CHAPTER 5
 % ────────────────────────────────────────────────────────────
-\chapter{Results and Discussion}
-\label{ch:results}
+\chapter{Task Analysis and Schedule}
+\label{ch:task_analysis}
+
+\section{Task Decomposition}
+\label{sec:task_decomp}
+
+The project was decomposed into seven high-level work packages (WPs), each subdivided into specific development tasks. Table~\ref{tab:task_decomp} presents the work breakdown structure (WBS).
+
+\begin{table}[H]
+\centering
+\caption{Work Breakdown Structure (WBS)}
+\label{tab:task_decomp}
+\begin{tabular}{|p{1cm}|p{3.5cm}|p{8.5cm}|}
+\hline
+\textbf{WP} & \textbf{Work Package} & \textbf{Tasks} \\
+\hline
+WP1 & Requirement Analysis & Stakeholder identification, functional requirements elicitation, non-functional requirements, technology stack evaluation \\
+\hline
+WP2 & System Architecture & Database schema design, API contract definition, component hierarchy design, security model \\
+\hline
+WP3 & Authentication Module & Firebase Auth integration, Google OAuth, session cookie management, email verification, route protection middleware \\
+\hline
+WP4 & Interview Engine & Hugging Face API integration, CSV question fallback, interview configuration UI, real-time answer evaluation (Gemini), voice interview (VAPI AI) \\
+\hline
+WP5 & Support Modules & Speech analytics pipeline, resume analysis engine, resume builder (48 templates), coding interview module (Monaco + Judge0), leaderboard \\
+\hline
+WP6 & Testing \& QA & Unit testing (module functions), integration testing (end-to-end flows), UAT with 50 participants, performance benchmarking \\
+\hline
+WP7 & Deployment \& Documentation & Vercel CI/CD setup, environment variable configuration, project report writing, research paper submission \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\section{Project Schedule (Gantt Chart Description)}
+\label{sec:gantt}
+
+The project spanned \textbf{36 weeks} from August 2025 to May 2026, divided into 18 two-week sprints. Table~\ref{tab:gantt} presents the timeline.
+
+\begin{table}[H]
+\centering
+\caption{Project Schedule -- Sprint Timeline}
+\label{tab:gantt}
+\begin{tabular}{|p{1.8cm}|p{4cm}|p{3.5cm}|p{3.5cm}|}
+\hline
+\textbf{Sprint} & \textbf{Deliverable} & \textbf{Start} & \textbf{End} \\
+\hline
+1--2 & Requirements \& Architecture (WP1, WP2) & Aug 2025 & Sep 2025 \\
+\hline
+3--4 & Authentication Module (WP3) & Sep 2025 & Oct 2025 \\
+\hline
+5--6 & Interview Config \& Question Generation (WP4) & Oct 2025 & Nov 2025 \\
+\hline
+7--8 & Real-Time Evaluation \& Feedback Display (WP4) & Nov 2025 & Dec 2025 \\
+\hline
+9--10 & Speech Analytics \& VAPI Voice Integration (WP5) & Dec 2025 & Jan 2026 \\
+\hline
+11--12 & Resume Analysis Engine (WP5) & Jan 2026 & Feb 2026 \\
+\hline
+13--14 & Resume Builder (WP5) & Feb 2026 & Mar 2026 \\
+\hline
+15--16 & Coding Interview Module \& Leaderboard (WP5) & Mar 2026 & Apr 2026 \\
+\hline
+17--18 & Testing, Documentation \& Deployment (WP6, WP7) & Apr 2026 & May 2026 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{4cm}
+\textbf{[INSERT: Gantt Chart]}\\
+\textit{X-axis: Weeks 1--36 (Aug 2025 -- May 2026)\\
+Y-axis: Work Packages WP1--WP7\\
+Bars: Duration and overlap as per Table~\ref{tab:gantt}\\
+Critical path: WP1 $\rightarrow$ WP2 $\rightarrow$ WP3 $\rightarrow$ WP4 $\rightarrow$ WP5 $\rightarrow$ WP6 $\rightarrow$ WP7}
+\vspace{4cm}}}
+\caption{Project Gantt Chart (Aug 2025 -- May 2026)}
+\label{fig:gantt}
+\end{figure}
+
+
+\section{Milestones}
+\label{sec:milestones}
+
+\begin{table}[H]
+\centering
+\caption{Key Project Milestones}
+\label{tab:milestones}
+\begin{tabular}{|p{2cm}|p{5cm}|p{5.5cm}|}
+\hline
+\textbf{Date} & \textbf{Milestone} & \textbf{Success Criterion} \\
+\hline
+Sep 2025 & Architecture Freeze & All modules defined; Firestore schema approved \\
+\hline
+Nov 2025 & Alpha Release & Interview simulation end-to-end functional \\
+\hline
+Jan 2026 & Beta Release & Speech analytics + resume analysis integrated \\
+\hline
+Mar 2026 & Feature Complete & All six modules operational \\
+\hline
+Apr 2026 & Testing Complete & All test cases passing; UAT signed off \\
+\hline
+May 2026 & Final Submission & Report submitted; system deployed on Vercel \\
+\hline
+\end{tabular}
+\end{table}
+
+
+% ────────────────────────────────────────────────────────────
+%                       CHAPTER 6 — TESTING AND EVALUATION
+% ────────────────────────────────────────────────────────────
+\chapter{Testing and Evaluation}
+\label{ch:testing}
 
 \section{Testing Methodology}
 
@@ -1408,12 +1861,97 @@ The results demonstrate that AI MockPrep provides statistically significant impr
 
 
 % ────────────────────────────────────────────────────────────
-%                       CHAPTER 6
+%                       CHAPTER 7 — PROJECT MANAGEMENT
 % ────────────────────────────────────────────────────────────
-\chapter{Conclusion and Future Scope}
-\label{ch:conclusion}
+\chapter{Project Management}
+\label{ch:project_mgmt}
+
+\section{Risk Analysis and Mitigation}
+\label{sec:risks}
+
+\begin{table}[H]
+\centering
+\caption{Risk Register and Mitigation Strategies}
+\label{tab:risks}
+\begin{tabular}{|p{3.5cm}|p{1.5cm}|p{1.5cm}|p{6.5cm}|}
+\hline
+\textbf{Risk} & \textbf{Likelihood} & \textbf{Impact} & \textbf{Mitigation Strategy} \\
+\hline
+Hugging Face API rate-limit exceeded & Medium & High & CSV-based fallback question bank of 500+ questions per domain; cached responses for repeated configurations \\
+\hline
+Google Gemini API quota exhaustion & Medium & High & Response caching per answer hash; graceful degradation to local scoring heuristics \\
+\hline
+Firebase Firestore read quota reached & Low & Medium & Client-side caching using React Context; batch reads; interview data TTL policies \\
+\hline
+AssemblyAI transcription inaccuracy & Medium & Medium & Manual transcript correction UI; confidence score threshold to flag low-accuracy segments \\
+\hline
+VAPI AI voice session dropout & Medium & Medium & Auto-reconnect logic with exponential backoff; text-based fallback interview mode \\
+\hline
+Session cookie expiry mid-interview & Low & High & Refresh token mechanism; in-browser localStorage backup of interview state \\
+\hline
+Browser compatibility (Web Speech API) & High & Low & AssemblyAI async upload as fallback; feature detection and graceful degradation \\
+\hline
+Scope creep & Medium & High & Strict sprint backlog; change requests reviewed by all four team members \\
+\hline
+Knowledge/skill gaps in new APIs & Medium & Medium & Two-day spike tasks per new API before full integration sprint \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\section{Learning Outcomes}
+\label{sec:learning}
+
+The development of AI MockPrep yielded significant learning outcomes across multiple dimensions:
+
+\subsection{Technical Skills Acquired}
+\begin{enumerate}
+  \item \textbf{Next.js 15 App Router:} Mastery of Server Components, Server Actions, route groups, dynamic routing, and middleware for authentication.
+  \item \textbf{Firebase:} Practical experience with Firestore document modelling, security rules, Admin SDK (server-side), and Client SDK (browser-side).
+  \item \textbf{Large Language Model Integration:} Understanding of prompt engineering, structured JSON output parsing, token management, and rate-limit handling for Hugging Face (Mistral-7B) and Google Gemini.
+  \item \textbf{Speech Processing:} Hands-on implementation of real-time audio capture (MediaRecorder API), Web Speech API transcription, and server-side ASR via AssemblyAI.
+  \item \textbf{Composite Scoring Systems:} Design and implementation of multi-dimensional weighted rubrics with interview-type-aware adjustments and penalty mechanisms.
+  \item \textbf{Monaco Editor Integration:} Configuration of a VS Code-grade code editor in a Next.js application with multi-language support.
+\end{enumerate}
+
+\subsection{Soft Skills Developed}
+\begin{enumerate}
+  \item \textbf{Agile Project Management:} Hands-on experience with sprint planning, retrospectives, and iterative delivery over 18 two-week sprints.
+  \item \textbf{Cross-functional Collaboration:} Effective division of responsibilities across four team members with asynchronous coordination via GitHub issues and pull requests.
+  \item \textbf{Technical Documentation:} Production of a comprehensive B.Tech project report, API documentation, and a research paper submitted for publication.
+  \item \textbf{Problem Decomposition:} Breaking a complex, multi-module system into independently testable, deployable units.
+\end{enumerate}
+
+
+\section{Results Achieved}
+\label{sec:results_summary}
+
+\begin{table}[H]
+\centering
+\caption{Summary of Key Results}
+\label{tab:results_summary}
+\begin{tabular}{|p{5cm}|p{3.5cm}|p{4.5cm}|}
+\hline
+\textbf{Metric} & \textbf{Baseline} & \textbf{After AI MockPrep Training} \\
+\hline
+Communication Clarity Score & 62\% & 83\% (+34\%) \\
+\hline
+Technical Accuracy Score & 58\% & 73\% (+26\%) \\
+\hline
+Filler Word Frequency & 8.2\% & 4.8\% ($-$41\%) \\
+\hline
+ATS Compliance Score & 53\% & 74\% (+40\%) \\
+\hline
+Interview Confidence (self-rated) & 54\% & 87\% (+61\%) \\
+\hline
+Recruiter Callback Rate & 30\% & 70\% (+133\%) \\
+\hline
+\end{tabular}
+\end{table}
+
 
 \section{Conclusion}
+\label{sec:conclusion}
 
 This project successfully designed, implemented, and validated \textbf{AI MockPrep}, a comprehensive, AI-driven interview preparation and career development platform that addresses the critical preparation gap between employer-facing AI recruitment tools and candidate readiness.
 
