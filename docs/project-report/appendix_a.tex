@@ -1,0 +1,351 @@
+% ============================================================
+%  APPENDIX A -- KEY CODE IMPLEMENTATIONS
+%  AI MockPrep Project Report
+% ============================================================
+
+\chapter{Key Code Implementations}
+\label{app:code}
+
+This appendix presents representative source-code excerpts that underpin the
+core functionality of AI MockPrep.  All listings are in TypeScript (the
+project-wide language) unless noted otherwise.
+
+% ────────────────────────────────────────────────────────────
+\section{Session Authentication Helper}
+\label{app:auth}
+% ────────────────────────────────────────────────────────────
+
+The \texttt{getCurrentUser} helper (\texttt{lib/auth.ts}) is called from every
+server component and server action that needs the identity of the signed-in
+user.  It reads the \texttt{session} cookie set by Firebase Auth, verifies it
+with the Admin SDK, and merges Auth-profile data with the richer profile stored
+in Firestore.
+
+\begin{lstlisting}[language=Java,
+  caption={Session verification and user-profile resolution (\texttt{lib/auth.ts})},
+  label={lst:getCurrentUser}]
+import { cookies }  from "next/headers";
+import { redirect } from "next/navigation";
+import { auth, db } from "@/firebase/admin";
+
+export async function getCurrentUser() {
+  const cookieStore  = await cookies();
+  const sessionCookie = cookieStore.get("session");
+  if (!sessionCookie) return null;
+
+  try {
+    const decoded    = await auth.verifySessionCookie(
+                         sessionCookie.value, true);
+    const userRecord = await auth.getUser(decoded.uid);
+
+    let photoURL    = userRecord.photoURL;
+    let displayName = userRecord.displayName;
+    let bio = "", headline = "";
+
+    if (db) {
+      const doc = await db.collection("users")
+                          .doc(decoded.uid).get();
+      if (doc.exists) {
+        const d = doc.data()!;
+        photoURL    = d.avatar     || d.photoURL    || photoURL;
+        displayName = d.name       || d.displayName || displayName;
+        bio         = d.bio        || "";
+        headline    = d.headline   || "";
+      }
+    }
+
+    return {
+      uid: decoded.uid, email: decoded.email,
+      name: displayName || decoded.name || "User",
+      photoURL: photoURL || undefined,
+      bio, headline,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function requireAuth() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/sign-in");
+  return user;
+}
+\end{lstlisting}
+
+% ────────────────────────────────────────────────────────────
+\section{Interview Creation Server Action}
+\label{app:interview-create}
+% ────────────────────────────────────────────────────────────
+
+The \texttt{createInterview} server action (\texttt{lib/actions/interview.action.ts})
+validates the caller's identity, delegates question generation to the
+\texttt{questionGenerator} module, and persists the new interview document to
+Firestore.
+
+\begin{lstlisting}[language=Java,
+  caption={Interview creation server action
+           (\texttt{lib/actions/interview.action.ts})},
+  label={lst:createInterview}]
+"use server";
+import { db }               from "@/firebase/admin";
+import { generateQuestions } from "@/lib/interview/questionGenerator";
+import { getCurrentUser }    from "@/lib/auth";
+
+export async function createInterview(params: {
+  userId: string; role: string; level: string;
+  techstack: string[]; type: string; company?: string;
+}) {
+  const { role, level, techstack, type, company } = params;
+  const currentUser = await getCurrentUser();
+  if (!currentUser)
+    return { success: false, message: "Not authenticated" };
+
+  const questions = await generateQuestions(
+    role, level, techstack, type);
+
+  const data = {
+    userId: currentUser.uid,
+    company: company || null,
+    role, level, techstack, type, questions,
+    finalized: false,
+    createdAt: new Date().toISOString(),
+  };
+
+  const docRef = await db.collection("interviews").add(data);
+  return { success: true, interviewId: docRef.id };
+}
+\end{lstlisting}
+
+% ────────────────────────────────────────────────────────────
+\section{Question Generator}
+\label{app:qgen}
+% ────────────────────────────────────────────────────────────
+
+Question generation first consults a curated CSV bank; if no rows match the
+role/level/tech-stack query it falls back to a generative model
+(\texttt{lib/interview/questionGenerator.ts}).
+
+\begin{lstlisting}[language=Java,
+  caption={Question-generation entry point
+           (\texttt{lib/interview/questionGenerator.ts})},
+  label={lst:questionGenerator}]
+"use server";
+import {
+  loadQuestionsFromCSV,
+  generateFallbackCSVQuestions,
+} from "./csvQuestions";
+
+export const generateQuestions = async (
+  role: string, level: string,
+  techstack: string[], type = "Technical"
+): Promise<string[]> => {
+
+  const csvQuestions = await loadQuestionsFromCSV(
+    role, level, techstack, type);
+
+  if (csvQuestions.length > 0) return csvQuestions;
+
+  console.warn("No CSV match -- using fallback generation");
+  return generateFallbackCSVQuestions(role, level, techstack);
+};
+\end{lstlisting}
+
+% ────────────────────────────────────────────────────────────
+\section{Speech Coach -- Per-Response Analysis}
+\label{app:speech-coach}
+% ────────────────────────────────────────────────────────────
+
+\texttt{analyzeSpeechCoachResponse} (\texttt{lib/speech/coach.ts}) takes a
+single voice-transcribed answer and produces a multi-dimensional score covering
+confidence, tone, clarity, pacing, and filler-word control.
+
+\begin{lstlisting}[language=Java,
+  caption={Per-response speech-coach analysis
+           (\texttt{lib/speech/coach.ts})},
+  label={lst:speechCoach}]
+export const analyzeSpeechCoachResponse = (
+  question: string, answer: string,
+  durationSeconds: number
+): SpeechCoachResponseInsight => {
+
+  const words      = answer.trim().split(/\s+/).filter(Boolean);
+  const wordCount  = words.length;
+  const wpm        = Math.round((wordCount / durationSeconds) * 60);
+
+  // Filler-word detection
+  const fillerHits  = countFillerHits(answer);
+  const fillerCount = Object.values(fillerHits)
+    .reduce((s, c) => s + c, 0);
+  const fillerPer100 = (fillerCount / wordCount) * 100;
+
+  // Pattern-match scoring
+  const assertiveCount =
+    countPatternMatches(answer, ASSERTIVE_PATTERNS);
+  const hedgingCount   =
+    countPatternMatches(answer, HEDGING_PATTERNS);
+  const structureScore =
+    STRUCTURE_CUES.filter(c =>
+      answer.toLowerCase().includes(c)).length;
+
+  const confidence   = clamp(60 + assertiveCount*10
+                                - hedgingCount*8);
+  const pacing       = clamp(100 - Math.abs(wpm-145)*1.1);
+  const fillerControl= clamp(100 - fillerPer100*9);
+  const clarity      = clamp(40 + structureScore*10);
+
+  const overall = clamp(
+    confidence*0.24 + tone*0.16 +
+    clarity*0.24   + pacing*0.20 +
+    fillerControl*0.16
+  );
+
+  return {
+    question, answer, durationSeconds,
+    confidence, tone, clarity, pacing,
+    fillerControl, overall,
+    fillerCount, fillerHits, wpm,
+  };
+};
+\end{lstlisting}
+
+% ────────────────────────────────────────────────────────────
+\section{Speech Coach -- Session Summary Aggregation}
+\label{app:speech-summary}
+% ────────────────────────────────────────────────────────────
+
+After all questions are answered, \texttt{summarizeSpeechCoachResponses}
+aggregates per-question insights into a session-level summary with actionable
+recommendations.
+
+\begin{lstlisting}[language=Java,
+  caption={Session-level speech-coach summary
+           (\texttt{lib/speech/coach.ts})},
+  label={lst:speechSummary}]
+export const summarizeSpeechCoachResponses = (
+  analyses: SpeechCoachResponseInsight[]
+): InterviewSpeechCoachSummary => {
+  if (analyses.length === 0)
+    return { analyzedResponses: 0, /* ... zero values */ };
+
+  const average = (fn: (a: SpeechCoachResponseInsight)
+                        => number) =>
+    Math.round(analyses.reduce((s, a) => s + fn(a), 0)
+               / analyses.length);
+
+  // Aggregate filler-word frequency map
+  const fillerMap: Record<string, number> = {};
+  for (const a of analyses)
+    for (const [word, n] of Object.entries(a.fillerHits))
+      fillerMap[word] = (fillerMap[word] ?? 0) + n;
+
+  const topFillerWords = Object.entries(fillerMap)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3).map(([w]) => w);
+
+  const summary = {
+    analyzedResponses: analyses.length,
+    confidence:   average(a => a.confidence),
+    tone:         average(a => a.tone),
+    clarity:      average(a => a.clarity),
+    pacing:       average(a => a.pacing),
+    fillerControl:average(a => a.fillerControl),
+    overall:      average(a => a.overall),
+    totalFillerWords:
+      analyses.reduce((s, a) => s + a.fillerCount, 0),
+    topFillerWords,
+    averageWpm: average(a => a.wpm),
+    insights: [], recommendations: [],
+  };
+
+  // Build human-readable insights
+  if (summary.confidence >= 75)
+    summary.insights.push(
+      "Strong confidence language in your spoken responses.");
+  if (summary.fillerControl < 70)
+    summary.recommendations.push(
+      "Replace filler words with a brief pause to keep "
+      + "delivery crisp.");
+
+  return summary;
+};
+\end{lstlisting}
+
+% ────────────────────────────────────────────────────────────
+\section{Inadequate Response Detection}
+\label{app:inadequate}
+% ────────────────────────────────────────────────────────────
+
+Before passing an answer to the AI evaluator, the interview engine screens for
+non-substantive responses.  Detected inadequate answers receive a fixed low
+score rather than consuming API quota on empty content.
+
+\begin{lstlisting}[language=Java,
+  caption={Inadequate response detection
+           (\texttt{lib/realTimeAnalysis.ts})},
+  label={lst:inadequate}]
+private isInadequateResponse(answer: string): boolean {
+  const clean = answer.toLowerCase().trim();
+
+  const dontKnow = [
+    /^i don'?t know$/, /^don'?t know$/,
+    /^no idea$/, /^not sure$/,
+    /^idk$/, /^pass$/, /^skip$/,
+  ];
+  if (dontKnow.some(p => p.test(clean))) return true;
+
+  // Reject very short answers (< 10 chars)
+  if (clean.length < 10) return true;
+
+  // Reject pure filler / yes-no answers
+  const filler = [
+    /^(um+|uh+|well|so|like|you know)[\s\.,]*$/,
+    /^(yes|no|maybe|possibly|probably)[\s\.,]*$/,
+  ];
+  if (filler.some(p => p.test(clean))) return true;
+
+  return false;
+}
+\end{lstlisting}
+
+% ────────────────────────────────────────────────────────────
+\section{Route-Protection Middleware}
+\label{app:middleware}
+% ────────────────────────────────────────────────────────────
+
+The \texttt{proxy} function (\texttt{proxy.ts}) runs on every request via
+Next.js Middleware.  It allows public paths unconditionally and redirects
+unauthenticated users to \texttt{/sign-in}, preserving the intended destination
+in a \texttt{next} query parameter.
+
+\begin{lstlisting}[language=Java,
+  caption={Route-protection middleware (\texttt{proxy.ts})},
+  label={lst:middleware}]
+const PUBLIC_PATHS = new Set([
+  "/", "/sign-in", "/sign-up", "/verify-email",
+  "/about", "/contact", "/help", "/privacy", "/terms",
+]);
+
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Skip Next.js internals and static assets
+  if (pathname.startsWith("/api/") ||
+      pathname.startsWith("/_next/") ||
+      pathname.match(/\.(svg|png|jpg|jpeg|ico|js|css)$/))
+    return NextResponse.next();
+
+  if (PUBLIC_PATHS.has(pathname))
+    return NextResponse.next();
+
+  const session = request.cookies.get("session")?.value;
+  if (!session || !auth)
+    return redirectToSignIn(request, pathname);
+
+  try {
+    await auth.verifySessionCookie(session, true);
+    return NextResponse.next();
+  } catch {
+    return redirectToSignIn(request, pathname);
+  }
+}
+\end{lstlisting}

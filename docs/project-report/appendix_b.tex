@@ -1,0 +1,241 @@
+% ============================================================
+%  APPENDIX B -- SUPPLEMENTARY MATERIALS
+%  AI MockPrep Project Report
+% ============================================================
+
+\chapter{Supplementary Materials}
+\label{app:supplementary}
+
+This appendix provides reference material that supports the main chapters:
+API-endpoint specifications, the full project directory layout, required
+environment variables, and a summary of key third-party dependencies.
+
+% ────────────────────────────────────────────────────────────
+\section{API Endpoints}
+\label{app:api}
+% ────────────────────────────────────────────────────────────
+
+Table~\ref{tab:api_endpoints} lists every REST route exposed by the system.
+All endpoints reside under the Next.js \texttt{app/api/} directory and are
+protected by the session-cookie middleware unless marked \emph{Public}.
+
+\begin{table}[H]
+\centering
+\caption{System API Endpoints}
+\label{tab:api_endpoints}
+\begin{tabular}{|p{4.2cm}|p{1.6cm}|p{1.5cm}|p{6cm}|}
+\hline
+\textbf{Endpoint} & \textbf{Method} & \textbf{Auth} & \textbf{Description} \\
+\hline
+\texttt{/api/auth/session}       & POST & Public  & Exchange Firebase ID token for a session cookie \\
+\hline
+\texttt{/api/auth/logout}        & POST & Public  & Clear the session cookie \\
+\hline
+\texttt{/api/auth/check}         & GET  & Cookie  & Validate session and return user identity \\
+\hline
+\texttt{/api/resume/analyze}     & POST & Cookie  & ATS analysis -- match resume against job description \\
+\hline
+\texttt{/api/speech/analyze}     & POST & Cookie  & Transcription + speech-coach scoring \\
+\hline
+\texttt{/api/speech/realtime-token} & GET & Cookie & Generate AssemblyAI real-time token \\
+\hline
+\texttt{/api/coding/execute}     & POST & Cookie  & Execute candidate code in a sandboxed runtime \\
+\hline
+\texttt{/api/coding/validate}    & POST & Cookie  & Run test-case suite against submitted code \\
+\hline
+\texttt{/api/contact}            & POST & Public  & Submit contact form (dispatched via Nodemailer) \\
+\hline
+\texttt{/api/support}            & POST & Public  & Create a support ticket \\
+\hline
+\end{tabular}
+\end{table}
+
+% ────────────────────────────────────────────────────────────
+\section{Project Directory Structure}
+\label{app:directory}
+% ────────────────────────────────────────────────────────────
+
+The listing below shows the top-level directory tree of the repository.
+Directories marked with \texttt{\#} comments summarise the sub-tree purpose.
+
+\begin{lstlisting}[
+  caption={Repository directory structure},
+  label={lst:directory},
+  basicstyle=\ttfamily\footnotesize,
+  numbers=none]
+interview-ai-agent/
+|-- app/
+|   |-- (auth)/          # Sign-in, sign-up, email verification
+|   |-- (root)/          # Dashboard, interview, resume, speech,
+|   |   |                #   leaderboard, profile, coding
+|   |-- (support)/       # About, contact, help, privacy, terms
+|   |-- api/             # REST API route handlers
+|   |-- layout.tsx       # Root layout (fonts, providers)
+|   +-- globals.css      # Design tokens & Tailwind utilities
+|-- components/
+|   |-- auth/            # Sign-in / sign-up form components
+|   |-- coding/          # Monaco editor, test-case panel
+|   |-- resume/          # ATS analysis card, score gauges
+|   |-- resume-builder/  # Multi-step builder, PDF preview
+|   |-- speech/          # Recording controls, waveform, scores
+|   |-- ui/              # Radix UI primitive wrappers
+|   +-- *.tsx            # Shared: InterviewForm, FeedbackDisplay...
+|-- lib/
+|   |-- actions/         # Server actions (CRUD + business logic)
+|   |   |-- auth.action.ts
+|   |   |-- interview.action.ts
+|   |   |-- feedback.action.ts
+|   |   |-- leaderboard.action.ts
+|   |   +-- resume-builder.action.ts
+|   |-- ai/              # AI-provider wrappers
+|   |   +-- interviewFeedback.ts  # HF inference + Gemini fallback
+|   |-- coding/          # Problem bank, execution engine
+|   |-- email/           # Nodemailer / Resend templates
+|   |-- interview/       # Question generation (CSV + fallback)
+|   |-- monitoring/      # Error & performance monitoring hooks
+|   |-- resume/          # PDF/DOCX parsing utilities
+|   |-- resume-builder/  # Template rendering logic
+|   |-- security/        # SSRF-safe redirect helper
+|   |-- speech/          # Speech API, coach engine, synthesis
+|   |-- auth.ts          # getCurrentUser / requireAuth helpers
+|   |-- realTimeAnalysis.ts  # Google Gemini scoring service
+|   |-- utils.ts         # Shared utility functions
+|   +-- vapi.ts          # VAPI voice AI integration
+|-- firebase/
+|   |-- admin.ts         # Firebase Admin SDK (server-side)
+|   +-- client.ts        # Firebase Client SDK (browser)
+|-- types/               # Global TypeScript interfaces (index.d.ts)
+|-- constants/           # Role maps, level maps, tech-stack lists
+|-- public/              # Static assets (logos, avatars, icons)
+|-- scripts/             # One-off data-migration / seed scripts
+|-- docs/                # Project report LaTeX source
+|-- proxy.ts             # Next.js middleware (route protection)
+|-- next.config.ts       # Next.js configuration
+|-- tailwind.config.ts   # Tailwind CSS theme extensions
++-- package.json         # npm dependency manifest
+\end{lstlisting}
+
+% ────────────────────────────────────────────────────────────
+\section{Required Environment Variables}
+\label{app:env}
+% ────────────────────────────────────────────────────────────
+
+Table~\ref{tab:env_vars} lists every environment variable consumed by the
+application.  All secrets must be stored in \texttt{.env.local} for local
+development and in the hosting platform's secrets store (Vercel) for
+production.  The repository ships a \texttt{.env.example} template with
+placeholder values.
+
+\begin{longtable}{|p{5.8cm}|p{7.5cm}|}
+\caption{Required Environment Variables}\label{tab:env_vars} \\
+\hline
+\textbf{Variable} & \textbf{Purpose} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Variable} & \textbf{Purpose} \\
+\hline
+\endhead
+\hline
+\endfoot
+% Firebase Client SDK
+\texttt{NEXT\_PUBLIC\_FIREBASE\_API\_KEY}          & Firebase Web API key \\
+\hline
+\texttt{NEXT\_PUBLIC\_FIREBASE\_AUTH\_DOMAIN}      & Firebase Auth domain \\
+\hline
+\texttt{NEXT\_PUBLIC\_FIREBASE\_PROJECT\_ID}       & Firebase project identifier \\
+\hline
+\texttt{NEXT\_PUBLIC\_FIREBASE\_STORAGE\_BUCKET}   & Cloud Storage bucket \\
+\hline
+\texttt{NEXT\_PUBLIC\_FIREBASE\_MESSAGING\_SENDER\_ID} & FCM sender ID \\
+\hline
+\texttt{NEXT\_PUBLIC\_FIREBASE\_APP\_ID}           & Firebase app identifier \\
+\hline
+% Firebase Admin SDK
+\texttt{FIREBASE\_PROJECT\_ID}                     & Admin SDK project ID \\
+\hline
+\texttt{FIREBASE\_CLIENT\_EMAIL}                   & Service-account email \\
+\hline
+\texttt{FIREBASE\_PRIVATE\_KEY}                    & Service-account private key (PEM) \\
+\hline
+% AI providers
+\texttt{GOOGLE\_GEMINI\_API\_KEY}                  & Gemini 1.5 Flash -- real-time scoring \\
+\hline
+\texttt{HUGGINGFACE\_API\_KEY}                     & HF Inference API -- question \& feedback generation \\
+\hline
+\texttt{NEXT\_PUBLIC\_VAPI\_WEB\_TOKEN}            & VAPI voice AI browser SDK token \\
+\hline
+\texttt{ASSEMBLYAI\_API\_KEY}                      & AssemblyAI speech transcription \\
+\hline
+% Email
+\texttt{SMTP\_HOST}                                & SMTP relay host (e.g.\ smtp.gmail.com) \\
+\hline
+\texttt{SMTP\_PORT}                                & SMTP port (587 for STARTTLS) \\
+\hline
+\texttt{SMTP\_USER}                                & SMTP username / sender address \\
+\hline
+\texttt{SMTP\_PASS}                                & SMTP password or app password \\
+\hline
+\texttt{RESEND\_API\_KEY}                          & Resend transactional email API key \\
+\hline
+% Caching / rate-limiting
+\texttt{UPSTASH\_REDIS\_REST\_URL}                 & Upstash Redis REST endpoint \\
+\hline
+\texttt{UPSTASH\_REDIS\_REST\_TOKEN}               & Upstash Redis authentication token \\
+\hline
+\end{longtable}
+
+% ────────────────────────────────────────────────────────────
+\section{Key Third-Party Dependencies}
+\label{app:deps}
+% ────────────────────────────────────────────────────────────
+
+Table~\ref{tab:deps} summarises the principal npm packages that provide
+AI/ML, database, UI, and utility capabilities used by AI MockPrep.
+
+\begin{table}[H]
+\centering
+\caption{Key Third-Party Dependencies (\texttt{package.json})}
+\label{tab:deps}
+\begin{tabular}{|p{4.8cm}|p{1.8cm}|p{6.5cm}|}
+\hline
+\textbf{Package} & \textbf{Version} & \textbf{Role} \\
+\hline
+\texttt{next}                       & 16.x   & React meta-framework (App Router, SSR, API routes) \\
+\hline
+\texttt{react} / \texttt{react-dom} & 19.x   & UI rendering engine \\
+\hline
+\texttt{firebase}                   & 11.x   & Client-side Auth SDK \\
+\hline
+\texttt{firebase-admin}             & 13.x   & Server-side Firestore + Auth Admin SDK \\
+\hline
+\texttt{@google/generative-ai}      & 0.24.x & Gemini 1.5 Flash -- per-answer scoring \\
+\hline
+\texttt{@vapi-ai/web}               & 2.x    & Voice interview AI SDK \\
+\hline
+\texttt{assemblyai}                 & 4.x    & Real-time speech transcription \\
+\hline
+\texttt{@monaco-editor/react}       & 4.x    & In-browser code editor (coding interviews) \\
+\hline
+\texttt{pdfjs-dist}                 & 5.x    & Client-side PDF text extraction \\
+\hline
+\texttt{mammoth}                    & 1.x    & DOCX to plain-text conversion \\
+\hline
+\texttt{recharts}                   & 3.x    & Score charts and feedback visualisations \\
+\hline
+\texttt{framer-motion}              & 12.x   & Page-transition and micro-animations \\
+\hline
+\texttt{zod}                        & 3.x    & Runtime schema validation \\
+\hline
+\texttt{react-hook-form}            & 7.x    & Form-state management \\
+\hline
+\texttt{sonner}                     & 2.x    & Toast notifications \\
+\hline
+\texttt{nodemailer} / \texttt{resend} & 7.x / 6.x & Transactional email (contact, support) \\
+\hline
+\texttt{@upstash/redis}             & 1.x    & Edge-compatible caching \& rate-limiting \\
+\hline
+\texttt{tailwindcss}                & 4.x    & Utility-first CSS framework \\
+\hline
+\end{tabular}
+\end{table}
