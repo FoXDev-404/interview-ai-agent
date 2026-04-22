@@ -341,10 +341,11 @@ export default function ProfilePage() {
                 {/* Name Fields */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
                       First Name
                     </label>
                     <input
+                      id="firstName"
                       type="text"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
@@ -353,10 +354,11 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">
                       Last Name
                     </label>
                     <input
+                      id="lastName"
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
@@ -368,10 +370,11 @@ export default function ProfilePage() {
 
                 {/* Email (Read-only) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="headline" className="block text-sm font-medium text-gray-300 mb-2">
                     Professional Headline
                   </label>
                   <input
+                    id="headline"
                     type="text"
                     value={headline}
                     onChange={(e) => setHeadline(e.target.value)}
@@ -407,10 +410,11 @@ export default function ProfilePage() {
 
                 {/* Bio */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="bio" className="block text-sm font-medium text-gray-300 mb-2">
                     Bio
                   </label>
                   <textarea
+                    id="bio"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     rows={4}
@@ -554,11 +558,12 @@ export default function ProfilePage() {
             <div className="space-y-4">
               {/* Current Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-300 mb-2">
                   Current Password
                 </label>
                 <div className="relative">
                   <input
+                    id="currentPassword"
                     type={showCurrentPassword ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
@@ -591,11 +596,12 @@ export default function ProfilePage() {
 
               {/* New Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-300 mb-2">
                   New Password
                 </label>
                 <div className="relative">
                   <input
+                    id="newPassword"
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -628,11 +634,12 @@ export default function ProfilePage() {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
                   Confirm New Password
                 </label>
                 <div className="relative">
                   <input
+                    id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
